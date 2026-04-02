@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <title>정책레이더 | 부동산·금융 지능형 분석 시스템</title>
+  <title>정책레이더.JIN | 부동산·금융 지능형 분석 시스템</title>
   
   <!-- PWA Meta Tags -->
   <meta name="theme-color" content="#0f172a">
@@ -13,6 +13,9 @@
 
   <!-- Typography: Pretendard -->
   <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css" />
+
+  <!-- 💡 Google AdSense Placeholder (Paste your script here after approval) -->
+  <!-- <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-XXXXXXXXXXXX" crossorigin="anonymous"></script> -->
 
   <style>
     :root {
@@ -69,10 +72,47 @@
     }
     .logo svg { width: 28px; height: 28px; }
 
+    /* ── Hero Section (Landing Page) ── */
+    .hero {
+      background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+      color: white;
+      padding: 60px 20px;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+    .hero::before {
+      content: "";
+      position: absolute;
+      top: -50%; left: -50%; width: 200%; height: 200%;
+      background: radial-gradient(circle, rgba(225, 29, 72, 0.15) 0%, transparent 70%);
+      animation: drift 20s infinite linear;
+    }
+    @keyframes drift { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+
+    .hero-content { position: relative; z-index: 1; max-width: 600px; margin: 0 auto; }
+    .hero-brand { font-size: 0.9rem; font-weight: 800; color: var(--accent); letter-spacing: 2px; margin-bottom: 16px; }
+    .hero-title { font-size: 1.8rem; font-weight: 800; line-height: 1.3; margin-bottom: 20px; }
+    .hero-sub { font-size: 1rem; opacity: 0.8; margin-bottom: 30px; font-weight: 400; }
+    .hero-cta {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      background: var(--accent);
+      color: white;
+      padding: 14px 28px;
+      border-radius: 100px;
+      font-size: 1rem;
+      font-weight: 700;
+      text-decoration: none;
+      transition: transform 0.2s;
+    }
+    .hero-cta:active { transform: scale(0.95); }
+
     /* ── Filter Bar ── */
     .filter-bar {
       max-width: 800px;
-      margin: 20px auto;
+      margin: 30px auto 20px;
       padding: 0 16px;
       display: flex;
       gap: 10px;
@@ -100,18 +140,8 @@
     }
 
     /* ── Main Content ── */
-    main {
-      max-width: 800px;
-      margin: 0 auto;
-      padding: 0 16px 100px;
-    }
-    .section-title {
-      font-size: 0.9rem;
-      font-weight: 700;
-      color: var(--text-muted);
-      margin-bottom: 16px;
-      padding-left: 4px;
-    }
+    main { max-width: 800px; margin: 0 auto; padding: 0 16px 100px; }
+    .section-title { font-size: 0.9rem; font-weight: 700; color: var(--text-muted); margin-bottom: 16px; padding-left: 4px; }
 
     /* ── Post Cards ── */
     .post-card {
@@ -127,44 +157,18 @@
       animation: fadeIn 0.5s ease backwards;
     }
     .post-card:active { transform: scale(0.98); }
-    
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(10px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-    .post-card .badge-row {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 10px;
-    }
-    .category-badge {
-      font-size: 0.7rem;
-      font-weight: 700;
-      padding: 2px 8px;
-      border-radius: 4px;
-      text-transform: uppercase;
-    }
+    .post-card .badge-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+    .category-badge { font-size: 0.7rem; font-weight: 700; padding: 2px 8px; border-radius: 4px; text-transform: uppercase; }
     .cat-T { background: #fee2e2; color: #991b1b; } 
     .cat-F { background: #dcfce7; color: #166534; } 
     .cat-X { background: #fef9c3; color: #854d0e; } 
     .cat-S { background: #dbeafe; color: #1e40af; } 
     .cat-P { background: #f3e8ff; color: #6b21a8; } 
 
-    .post-title {
-      font-size: 1.1rem;
-      font-weight: 700;
-      color: var(--primary);
-      line-height: 1.4;
-      margin-bottom: 12px;
-    }
-    .post-meta {
-      font-size: 0.8rem;
-      color: var(--text-muted);
-      display: flex;
-      gap: 12px;
-    }
+    .post-title { font-size: 1.1rem; font-weight: 700; color: var(--primary); line-height: 1.4; margin-bottom: 12px; }
+    .post-meta { font-size: 0.8rem; color: var(--text-muted); display: flex; gap: 12px; }
     .premium-star { color: #f59e0b; font-weight: 800; }
 
     /* ── Detail Modal ── */
@@ -222,10 +226,7 @@
     .summary-item { margin-bottom: 8px; display: flex; gap: 8px; }
     .summary-item::before { content: "•"; color: var(--accent); font-weight: 900; }
 
-    .key-table {
-      width: 100%; border-collapse: collapse; margin-top: 8px;
-      font-size: 0.85rem;
-    }
+    .key-table { width: 100%; border-collapse: collapse; margin-top: 8px; font-size: 0.85rem; }
     .key-table th { text-align: left; background: #f1f5f9; padding: 10px; color: var(--text-muted); font-weight: 600; border-bottom: 1px solid #e2e8f0; }
     .key-table td { padding: 10px; border-bottom: 1px solid #f1f5f9; color: var(--primary); }
 
@@ -255,11 +256,23 @@
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
         <path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" stroke-linecap="round"/>
       </svg>
-      POLICY RADAR
+      정책레이더.JIN
     </a>
     <div id="lastUpdate" style="font-size: 0.7rem; color: var(--text-muted); text-align: right;">연결 중...</div>
   </div>
 </header>
+
+<section class="hero">
+  <div class="hero-content">
+    <div class="hero-brand">INTELLIGENT POLICY AGENT</div>
+    <h1 class="hero-title">복잡한 정책 발표,<br>이제 AI 리포트로 읽으세요.</h1>
+    <p class="hero-sub">매일 쏟아지는 국토교통부, 금융위, 기재부의 방대한 보도자료를 AI가 분석하여 핵심 요약과 체크리스트를 제공합니다.</p>
+    <a href="#mainList" class="hero-cta">
+      지금 분석 리포트 보기
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 14l-7 7-7-7M12 21V3"/></svg>
+    </a>
+  </div>
+</section>
 
 <div class="filter-bar" id="categoryFilters">
   <button class="filter-btn active" data-cat="all">전체</button>
@@ -270,7 +283,7 @@
 </div>
 
 <main id="mainList">
-  <div class="section-title">최근 분석 리포트</div>
+  <div class="section-title">실시간 AI 정책 분석 피드</div>
   <div id="postContainer">
     <div style="padding: 40px; text-align: center; color: var(--text-muted); font-size: 0.9rem;">
       데이터를 불러오고 있습니다...
@@ -278,8 +291,11 @@
   </div>
 </main>
 
+<!-- 💡 Bottom Ad Placeholder (Paste snippet here) -->
+<!-- <div class="adsense-footer-container"> ... </div> -->
+
 <div class="bottom-nav">
-  <div class="nav-item active" onclick="location.reload()">🏠 홈</div>
+  <div class="nav-item active" onclick="window.scrollTo({top:0, behavior:'smooth'})">🏠 홈</div>
   <div class="nav-item" onclick="window.print()">🖨️ 인쇄</div>
   <div class="nav-item" onclick="shareApp()">🔗 공유</div>
 </div>
@@ -299,7 +315,7 @@ async function loadPosts() {
     renderPosts();
     updateHeader();
   } catch (e) {
-    document.getElementById('postContainer').innerHTML = `<div style="text-align:center;padding:40px;color:red">데이터 로드 실패</div>`;
+    document.getElementById('postContainer').innerHTML = `<div style="text-align:center;padding:40px;color:red">데이터 로드 실패 (posts.json 확인)</div>`;
   }
 }
 
@@ -398,7 +414,7 @@ document.getElementById('categoryFilters').addEventListener('click', (e) => {
 
 function shareApp() {
   if (navigator.share) {
-    navigator.share({ title: '정책레이더', url: location.href });
+    navigator.share({ title: '정책레이더.JIN', url: location.href });
   } else {
     alert('공유 기능을 지원하지 않는 브라우저입니다.');
   }
