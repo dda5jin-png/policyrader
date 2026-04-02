@@ -100,8 +100,8 @@ def run_fetcher():
     # 최신순 정렬
     sorted_posts = sorted(unique_posts_dict.values(), key=lambda x: x['date'], reverse=True)
 
-    # 상위 10건만 처리 (병목 방지)
-    selected_posts = sorted_posts[:10]
+    # 상위 20건만 처리 (병목 방지)
+    selected_posts = sorted_posts[:20]
     
     final_data = []
     for p in selected_posts:
