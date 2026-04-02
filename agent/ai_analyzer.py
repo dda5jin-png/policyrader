@@ -71,15 +71,33 @@ def analyze_post(post):
         return analysis
     except Exception as e:
         print(f"[AI] 분석 실패 ({post['title']}): {e}")
-        # 실패 시 최소한의 데이터만이라도 유지하여 반환할 수 있으나, 여기서는 None 반환 후 스킵
-        return None
+        # AI 분석 실패 시, 최소한 원문이라도 표시할 수 있도록 폴백 데이터 생성
+        fallback = {
+            "id": post['id'],
+            "headline": post['title'],
+            "summary": ["AI 분석이 진행 중이거나 원문이 너무 깁니다.", "우측 버튼을 통해 원문을 확인해 주세요."],
+            "cat": "T",
+            "catName": "확인 중",
+            "searchPath": "-",
+            "keyData": [],
+            "expertOpinions": [
+                { "name": "시스템 알림", "affiliation": "정책레이더", "stance": "중립", "comment": "현재 실시간 분석이 지연되고 있습니다. 원문 링크를 참고해 주세요.", "source": "System" }
+            ],
+            "checklist": ["원문 링크를 통해 상세 내용을 확인하세요."],
+            "premium": false,
+            "source": post['source'],
+            "sourceUrl": post['link'],
+            "date": post['date'],
+            "originalText": post['originalText'],
+            "views": 0
+        }
+        return fallback
 
 def run_analyzer():
     if not GEMINI_API_KEY:
-        print("[AI] API 키가 설정되지 않았습니다. 분석을 스킵합니다.")
-        return
-
-    print("[AI] 분석 시작...")
+        print("[AI] API 키가 설정되지 않았습니다. 폴백(기본 데이터) 모드로 진행합니다.")
+    
+    print("[AI] 분석 프로세스 가동...")
     raw_data_path = 'agent/raw_data.json'
     if not os.path.exists(raw_data_path):
         print(f"[AI] {raw_data_path} 파일이 없습니다.")
