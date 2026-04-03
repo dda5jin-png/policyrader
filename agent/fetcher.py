@@ -1,10 +1,14 @@
 import requests
-import feedparser
-from bs4 import BeautifulSoup
+import xml.etree.ElementTree as ET
 import json
 import os
-from datetime import datetime
+from datetime import datetime, timedelta
 import time
+import re
+from dotenv import load_dotenv
+
+# .env 파일 로드
+load_dotenv()
 
 # ══════════════════════════════════════════════
 # 설정
@@ -15,106 +19,121 @@ TARGET_KEYWORDS = [
     'GTX', '철도', '지하철', '신도시', '공공주택', '규제', '공사', '분양'
 ]
 
-RSS_SOURCES = [
-    {"name": "국토교통부", "url": "https://www.molit.go.kr/dev/board/board_rss.jsp?rss_id=NEWS"},
-    {"name": "금융위원회", "url": "https://www.fsc.go.kr/rss/press_release.xml"},
-    {"name": "정책브리핑(기재부)", "url": "https://www.korea.kr/rss/dept_moef.xml"},
-    {"name": "정책브리핑(국토부)", "url": "https://www.korea.kr/rss/dept_molit.xml"}
-]
+# 공공데이터포털 인증키
+API_KEY = os.getenv("DATA_GO_KR_API_KEY")
+BASE_URL = "http://apis.data.go.kr/1371000/pressReleaseService/pressReleaseList"
 
-def fetch_rss_data():
+def fetch_period_api(start_date_str, end_date_str):
+    """지정된 기간(최대 3일) 동안의 보도자료를 API로 가져옵니다."""
+    if not API_KEY: return []
+    
+    params = {
+        'serviceKey': API_KEY,
+        'startDate': start_date_str,
+        'endDate': end_date_str,
+        'numOfRows': 100
+    }
+    
+    try:
+        response = requests.get(BASE_URL, params=params, timeout=30)
+        response.raise_for_status()
+        
+        root = ET.fromstring(response.content)
+        items = root.findall('.//NewsItem')
+        
+        results = []
+        for item in items:
+            title = item.findtext('Title', '').strip()
+            dept = item.findtext('MinisterCode', '').strip()
+            date_raw = item.findtext('ApproveDate', '').strip()
+            
+            try:
+                # MM/DD/YYYY HH:MM:SS -> YYYY-MM-DD
+                date_dt = datetime.strptime(date_raw, "%m/%d/%Y %H:%M:%S")
+                date_str = date_dt.strftime("%Y-%m-%d")
+            except:
+                date_str = date_raw[:10]
+
+            link = item.findtext('OriginalUrl', '').strip()
+            content = item.findtext('DataContents', '').strip()
+            news_id = item.findtext('NewsItemId', '').strip()
+
+            # 대상 부처 필터링 (국토교통부, 금융위원회)
+            if "국토" in dept or "금융" in dept:
+                results.append({
+                    "id": f"api_{news_id}",
+                    "title": title,
+                    "link": link,
+                    "date": date_str,
+                    "source": dept,
+                    "views": 0,
+                    "originalText": content,
+                    "has_keyword": any(kw in title for kw in TARGET_KEYWORDS)
+                })
+        return results
+    except Exception as e:
+        return []
+
+def fetch_via_api_historical(start_year=2025):
+    """오늘부터 과거(2025년)로 역순 수집을 진행합니다."""
+    print(f"[Fetcher] {start_year}년까지 오늘부터 역순으로 3일 단위 수집 시작...")
+    
     all_posts = []
-    for source in RSS_SOURCES:
-        try:
-            print(f"[Fetcher] {source['name']} RSS 가져오는 중...")
-            feed = feedparser.parse(source['url'])
-            
-            # 해당 소스의 모든 포스트를 날짜순으로 정렬
-            source_posts = []
-            for entry in feed.entries:
-                post = {
-                    "id": entry.id if hasattr(entry, 'id') else entry.link,
-                    "title": entry.title,
-                    "link": entry.link,
-                    "date": datetime(*entry.published_parsed[:6]).strftime('%Y-%m-%d'),
-                    "source": source['name'],
-                    "has_keyword": any(kw in entry.title for kw in TARGET_KEYWORDS)
-                }
-                source_posts.append(post)
-            
-            # 날짜순 정렬
-            source_posts.sort(key=lambda x: x['date'], reverse=True)
-            
-            # 전략 1: 키워드가 있는 모든 글 포함
-            # 전략 2: 키워드가 없더라도 해당 기관의 최신 5개 글은 무조건 포함 (사이트가 비어보이지 않게)
-            included_count = 0
-            for i, p in enumerate(source_posts):
-                if p['has_keyword'] or i < 5:
-                    all_posts.append(p)
-                    included_count += 1
-            
-            print(f"  -> {source['name']}: {included_count}건 선별 완료")
-                
-        except Exception as e:
-            print(f"[Fetcher] {source['name']} RSS 오류: {e}")
+    current_date = datetime.now()
+    limit_date = datetime(start_year, 1, 1)
+    
+    iter_date = current_date
+    while iter_date >= limit_date:
+        e_str = iter_date.strftime("%Y%m%d")
+        # 3일(오늘 포함) 수집을 위해 -2일 계산
+        s_date = iter_date - timedelta(days=2)
+        if s_date < limit_date: s_date = limit_date
+        s_str = s_date.strftime("%Y%m%d")
+        
+        print(f"  -> {s_str} ~ {e_str} 수집 중... (누적: {len(all_posts)}건)", end="\r")
+        
+        period_posts = fetch_period_api(s_str, e_str)
+        all_posts.extend(period_posts)
+        
+        # 다음 3일 블록으로 이동 (s_date보다 하루 전으로)
+        iter_date = s_date - timedelta(days=1)
+        time.sleep(0.1)
+        
+    print(f"\n[Fetcher] API 역순 수집 완료: 총 {len(all_posts)}건 확보")
     return all_posts
 
-def scrape_full_text(url):
-    try:
-        headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'}
-        res = requests.get(url, timeout=15, headers=headers)
-        res.raise_for_status()
-        res.encoding = res.apparent_encoding
-        soup = BeautifulSoup(res.text, 'html.parser')
-        
-        content = None
-        if "molit.go.kr" in url:
-            content = soup.select_one('.board_view_cont') or soup.select_one('.view_cont')
-        elif "fsc.go.kr" in url:
-            content = soup.select_one('#content-detail') or soup.select_one('.board-view-content')
-        elif "korea.kr" in url:
-            content = soup.select_one('.article-content') or soup.select_one('.view-cont')
-        
-        if not content:
-            content = soup.select_one('article') or soup.select_one('#content') or soup.select_one('.content')
-
-        if content:
-            for s in content(['script', 'style', 'header', 'footer', 'nav']):
-                s.decompose()
-            return content.get_text(separator='\n', strip=True)[:3000]
-        
-        return "본문 내용을 특정할 수 없습니다. 원문 링크를 확인해주세요."
-    except Exception as e:
-        return f"스크래핑 실패: {str(e)}"
+def select_top_posts(all_posts, max_per_month=5):
+    monthly_data = {}
+    for p in all_posts:
+        m_key = p['date'][:7]
+        if m_key not in monthly_data: monthly_data[m_key] = []
+        monthly_data[m_key].append(p)
+    
+    final = []
+    for m, posts in monthly_data.items():
+        # 키워드 우선 정렬
+        sorted_p = sorted(posts, key=lambda x: (x['has_keyword'], x['date']), reverse=True)
+        final.extend(sorted_p[:max_per_month])
+    return sorted(final, key=lambda x: x['date'], reverse=True)
 
 def run_fetcher():
-    print("[Fetcher] 프로젝트 수집 시작...")
-    all_raw_posts = fetch_rss_data()
+    print("[Fetcher] 정책레이더 API 역순 수집 엔진 가동...")
+    raw_posts = fetch_via_api_historical(2025)
     
-    # 중복 제거 (ID 기준)
-    unique_posts_dict = {}
-    for p in all_raw_posts:
-        if p['id'] not in unique_posts_dict:
-            unique_posts_dict[p['id']] = p
-    
-    # 최신순 정렬
-    sorted_posts = sorted(unique_posts_dict.values(), key=lambda x: x['date'], reverse=True)
+    if not raw_posts:
+        print("⚠️ [Fetcher] 수집된 데이터가 없습니다.")
+        return []
 
-    # 상위 20건만 처리 (병목 방지)
-    selected_posts = sorted_posts[:20]
+    selected = select_top_posts(raw_posts)
+    unique = {p['id']: p for p in selected}
+    result = list(unique.values())
     
-    final_data = []
-    for p in selected_posts:
-        print(f"[Fetcher] 본문 추출 중: {p['title']}")
-        p['originalText'] = scrape_full_text(p['link'])
-        final_data.append(p)
-        time.sleep(0.5)
-        
-    return final_data
+    print(f"[Fetcher] 총 {len(result)}건의 정책 자료를 선별했습니다.")
+    return result
 
 if __name__ == "__main__":
     data = run_fetcher()
-    os.makedirs('agent', exist_ok=True)
-    with open('agent/raw_data.json', 'w', encoding='utf-8') as f:
-        json.dump(data, f, ensure_ascii=False, indent=2)
-    print(f"[Fetcher] 총 {len(data)}건 최종 수집 완료.")
+    if data:
+        os.makedirs('agent', exist_ok=True)
+        with open('agent/raw_data.json', 'w', encoding='utf-8') as f:
+            json.dump(data, f, ensure_ascii=False, indent=2)

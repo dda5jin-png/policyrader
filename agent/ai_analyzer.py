@@ -2,34 +2,55 @@ import google.generativeai as genai
 import json
 import os
 import re
+import time
 from datetime import datetime
+from dotenv import load_dotenv
+
+# .env 파일 로드
+load_dotenv()
 
 # ══════════════════════════════════════════════
 # 설정
 # ══════════════════════════════════════════════
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
 genai.configure(api_key=GEMINI_API_KEY)
-model = genai.GenerativeModel('gemini-1.5-flash')
+
+# 가용 모델 목록 (무료 티어에서 가장 안정적인 모델 우선)
+MODELS_TO_TRY = ['gemini-flash-latest', 'gemini-1.5-flash', 'gemini-2.0-flash']
+
+def get_model():
+    """가용한 모델 중 하나를 선택하여 반환합니다."""
+    for model_name in MODELS_TO_TRY:
+        try:
+            # 모델명을 명확히 지정 (models/ 접두어 포함 권장)
+            m_name = f"models/{model_name}" if not model_name.startswith("models/") else model_name
+            m = genai.GenerativeModel(m_name)
+            print(f"[AI] 모델 설정 완료: {model_name}")
+            return m
+        except:
+            continue
+    return genai.GenerativeModel('gemini-pro')
+
+model = get_model()
 
 def clean_json_response(text):
     """AI 응답에서 JSON만 추출하는 유틸리티"""
-    # ```json ... ``` 또는 ``` ... ``` 블록 추출
     match = re.search(r'```(?:json)?\s*(\{.*?\})\s*```', text, re.DOTALL)
     if match:
         return match.group(1).strip()
-    # 블록이 없으면 텍스트 전체에서 첫 { 와 마지막 } 사이 추출
     match = re.search(r'(\{.*\})', text, re.DOTALL)
     if match:
         return match.group(1).strip()
     return text.strip()
 
-def analyze_post(post):
+def analyze_post_with_retry(post, retries=3):
+    """할당량 초과 시 재시도 로직이 포함된 분석 함수"""
     prompt = f"""
     당신은 대한민국 '부동산 및 금융 정책 분석가'입니다. 
     아래 보도자료를 분석하여 실질적인 시장 영향과 사용자가 알아야 할 핵심 정보를 리포트 형식으로 요약해주세요.
 
     [보도자료 제목]: {post['title']}
-    [보도자료 본문]: {post['originalText']}
+    [보도자료 본문]: {post['originalText'][:5000]} # 너무 길면 잘라냄
 
     [분석 가이드라인]:
     1. 부동산 시장(가격, 거래량, 제도)과 가계 금융(대출, 금리, 세금)에 직접적인 영향이 있는 내용을 우선하십시오.
@@ -46,97 +67,93 @@ def analyze_post(post):
         {{ "항목": "상세항목명", "수치": "구체적수치", "기준일": "YYYY.MM.DD", "적용대상": "대상자 범위" }}
       ],
       "expertOpinions": [
-        {{ "name": "AI 정책 분석기", "affiliation": "초거대 AI 기반 지능형 분석", "stance": "중립/긍정/부정", "comment": "전문가 시각에서의 시장 영향 분석", "source": "Gemini 1.5 Framework" }}
+        {{ "name": "AI 정책 분석기", "affiliation": "초거대 AI 기반 지능형 분석", "stance": "중립/긍정/부정", "comment": "전문가 시각에서의 시장 영향 분석", "source": "Gemini Engine" }}
       ],
       "checklist": ["사용자가 즉시 확인하거나 조치해야 할 사항 3가지 이상"],
-      "premium": true/false (정말 중요하거나 파급력이 큰 정책인 경우 true)
+      "premium": true/false
     }}
     """
     
-    try:
-        response = model.generate_content(prompt)
-        clean_json = clean_json_response(response.text)
-        analysis = json.loads(clean_json)
-        
-        # 기본 정보 병합 (수집된 데이터 유지)
-        analysis.update({
-            "id": post['id'],
-            "headline": post['title'],
-            "source": post['source'],
-            "sourceUrl": post['link'],
-            "date": post['date'],
-            "originalText": post['originalText'],
-            "views": 0
-        })
-        return analysis
-    except Exception as e:
-        print(f"[AI] 분석 실패 ({post['title']}): {e}")
-        # AI 분석 실패 시, 최소한 원문이라도 표시할 수 있도록 폴백 데이터 생성
-        fallback = {
-            "id": post['id'],
-            "headline": post['title'],
-            "summary": ["AI 분석이 진행 중이거나 원문이 너무 깁니다.", "우측 버튼을 통해 원문을 확인해 주세요."],
-            "cat": "T",
-            "catName": "확인 중",
-            "searchPath": "-",
-            "keyData": [],
-            "expertOpinions": [
-                { "name": "시스템 알림", "affiliation": "정책레이더", "stance": "중립", "comment": "현재 실시간 분석이 지연되고 있습니다. 원문 링크를 참고해 주세요.", "source": "System" }
-            ],
-            "checklist": ["원문 링크를 통해 상세 내용을 확인하세요."],
-            "premium": false,
-            "source": post['source'],
-            "sourceUrl": post['link'],
-            "date": post['date'],
-            "originalText": post['originalText'],
-            "views": 0
-        }
-        return fallback
+    for i in range(retries):
+        try:
+            response = model.generate_content(prompt)
+            clean_json = clean_json_response(response.text)
+            analysis = json.loads(clean_json)
+            
+            analysis.update({
+                "id": post['id'],
+                "headline": post['title'],
+                "source": post['source'],
+                "sourceUrl": post['link'],
+                "date": post['date'],
+                "originalText": post['originalText'][:1000], # 저장용 데이터는 요약
+                "views": post.get('views', 0)
+            })
+            return analysis
+        except Exception as e:
+            if "quota" in str(e).lower() or "429" in str(e):
+                wait_time = (i + 1) * 20 # 할당량 초과 시 점진적으로 대기 시간 증가
+                print(f"  [AI] 할당량 초과. {wait_time}초 후 재시도 합니다... ({i+1}/{retries})")
+                time.sleep(wait_time)
+            else:
+                print(f"[AI] 분석 실패 ({post['title']}): {e}")
+                break
+                
+    return None # 실패 시
 
-def run_analyzer():
+def run_analyzer(limit_count=30):
     if not GEMINI_API_KEY:
-        print("[AI] API 키가 설정되지 않았습니다. 폴백(기본 데이터) 모드로 진행합니다.")
-    
-    print("[AI] 분석 프로세스 가동...")
-    raw_data_path = 'agent/raw_data.json'
-    if not os.path.exists(raw_data_path):
-        print(f"[AI] {raw_data_path} 파일이 없습니다.")
+        print("[AI] API 키 오류")
         return
+
+    print(f"[AI] 분석 프로세스 가동 (최대 {limit_count}건 우선 분석)...")
+    raw_data_path = 'agent/raw_data.json'
+    if not os.path.exists(raw_data_path): return
 
     with open(raw_data_path, 'r', encoding='utf-8') as f:
         raw_data = json.load(f)
 
-    if not raw_data:
-        print("[AI] 분석할 새로운 데이터가 없습니다.")
-        return
+    if not raw_data: return
 
-    analyzed_posts = []
-    for p in raw_data:
-        print(f"[AI] 분석 중: {p['title']}")
-        result = analyze_post(p)
-        if result:
-            analyzed_posts.append(result)
-
-    # 기존 posts.json 로드 및 병합
+    # 기존 데이터 로드
     existing_posts = []
     if os.path.exists('posts.json'):
         with open('posts.json', 'r', encoding='utf-8') as f:
             content = f.read().strip()
-            if content:
-                existing_posts = json.loads(content)
+            if content: existing_posts = json.loads(content)
+    
+    existing_ids = {p['id'] for p in existing_posts}
+    
+    analyzed_count = 0
+    new_analyzed_posts = []
+    
+    # 최신 데이터부터 순회
+    for p in raw_data:
+        if analyzed_count >= limit_count: break
+        if p['id'] in existing_ids: continue
+            
+        print(f"[AI] ({analyzed_count+1}/{limit_count}) 분석 중: {p['title'][:40]}...")
+        result = analyze_post_with_retry(p)
+        if result:
+            new_analyzed_posts.append(result)
+            analyzed_count += 1
+            time.sleep(10) # 무료 티어 안전 대기 시간
 
-    # 중복 제거 및 업데이트 (ID 기준)
+    if not new_analyzed_posts:
+        print("[AI] 새로 분석된 내용이 없습니다.")
+        return
+
+    # 병합
     post_map = {p['id']: p for p in existing_posts}
-    for p in analyzed_posts:
+    for p in new_analyzed_posts:
         post_map[p['id']] = p
 
-    # 최신순 정렬
     final_posts = sorted(post_map.values(), key=lambda x: x['date'], reverse=True)
 
     with open('posts.json', 'w', encoding='utf-8') as f:
         json.dump(final_posts, f, ensure_ascii=False, indent=2)
     
-    print(f"[AI] {len(analyzed_posts)}건 분석 및 저장 완료 (전체 {len(final_posts)}건).")
+    print(f"[AI] {len(new_analyzed_posts)}건 분석 완료.")
 
 if __name__ == "__main__":
-    run_analyzer()
+    run_analyzer(limit_count=30)
