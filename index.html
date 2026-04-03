@@ -450,6 +450,7 @@
     <button class="filter-btn" data-cat="S">부동산 공급·개발정책</button>
     <button class="filter-btn" data-cat="T">부동산 거래·법령</button>
     <button class="filter-btn" data-cat="R">부동산 임대·주거정책</button>
+    <button class="filter-btn" data-cat="P">부동산 프롭테크</button>
   </div>
   <div class="cat-desc" id="catDesc">전체 부동산 관련 정책 자료를 모두 표시합니다.</div>
 </div>
@@ -474,11 +475,21 @@ let cat = 'all';
 
 const CAT_INFO = {
   all: "전체 부동산 관련 정책 자료를 모두 표시합니다.",
-  F: "대출 규제, 금리, 보증제도 등 금융 관련 부동산 정책을 분석합니다.",
-  X: "취득세·양도세·종부세 등 부동산 과세 관련 정책을 분석합니다.",
-  S: "신규 공급, 재개발·재건축, 택지개발 관련 정책을 분석합니다.",
-  T: "계약, 중개, 등기, 관련 법령 개정 등 거래 제도 정책을 분석합니다.",
-  R: "전월세 규제, 공공임대, 주거 복지 관련 정책을 분석합니다."
+  F: "대출 규제(LTV·DSR), 금리 변동, 보증 보험 등 자금 조달 정책을 분석합니다.",
+  X: "취득세, 종부세, 양도세 등 부동산 세제 개편 및 과세 표준을 분석합니다.",
+  S: "공공 주택 공급, 3기 신도시, 재건축·재개발 및 SOC 개발 정책을 분석합니다.",
+  T: "청약 제도, 부동산 거래 규제, 공인중개법, 시장 모니터링 정보를 분석합니다.",
+  R: "전월세 상한제, 계약갱신학구권, 공공임대 및 주거 복지 지원책을 분석합니다.",
+  P: "부동산 신기술, 프롭테크 스타트업, 디지털 부동산 서비스 정책을 분석합니다."
+};
+
+const CAT_NAMES = {
+  F: "부동산 금융정책",
+  X: "부동산 세금정책",
+  S: "부동산 공급·개발정책",
+  T: "부동산 거래·법령",
+  R: "부동산 임대·주거정책",
+  P: "부동산 프롭테크"
 };
 
 async function init() {
@@ -517,7 +528,7 @@ function render() {
   container.innerHTML = filtered.map((p, i) => `
     <div class="post-card" style="animation: modalFade 0.5s ease backwards ${i * 0.05}s" onclick="show('${p.id}')">
       <div class="card-head">
-        <span class="badge cat-${p.cat}">${p.catName}</span>
+        <span class="badge cat-${p.cat}">${CAT_NAMES[p.cat] || p.catName}</span>
         <span style="font-size:0.75rem; color:var(--text-muted)">${p.date}</span>
       </div>
       <h2 class="card-title">${p.headline}</h2>
@@ -538,7 +549,7 @@ function show(id) {
   
   content.innerHTML = `
     <div class="modal-close" onclick="closeM()">✕</div>
-    <span class="badge cat-${p.cat}">${p.catName}</span>
+    <span class="badge cat-${p.cat}">${CAT_NAMES[p.cat] || p.catName}</span>
     <h1 style="margin:20px 0; line-height:1.3">${p.headline}</h1>
     <p style="color:var(--text-muted); font-size:0.85rem">발행: ${p.date} | 출처: ${p.source}</p>
 
