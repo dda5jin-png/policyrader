@@ -6,6 +6,7 @@ from datetime import datetime, timedelta
 import time
 import re
 from dotenv import load_dotenv
+from bs4 import BeautifulSoup
 
 # .env 파일 로드
 load_dotenv()
@@ -23,9 +24,35 @@ TARGET_KEYWORDS = [
 API_KEY = os.getenv("DATA_GO_KR_API_KEY")
 BASE_URL = "http://apis.data.go.kr/1371000/pressReleaseService/pressReleaseList"
 
+def scrape_full_content(url):
+    """보도자료 원문 URL에서 본문 내용을 추출합니다."""
+    if not url or "korea.kr" not in url:
+        return ""
+    
+    try:
+        headers = {'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'}
+        response = requests.get(url, headers=headers, timeout=15)
+        response.raise_for_status()
+        
+        soup = BeautifulSoup(response.text, 'html.parser')
+        
+        # 보도자료 본문 영역 (korea.kr 기준)
+        content_div = soup.select_one('.news-article') or soup.select_one('.article-content') or soup.select_one('.view-cont')
+        if content_div:
+            # 불필요한 태그 제거
+            for s in content_div(['script', 'style', 'iframe', 'button']):
+                s.decompose()
+            return content_div.get_text(separator='\n', strip=True)
+        return ""
+    except Exception as e:
+        print(f"  ⚠️ Scraping error ({url}): {e}")
+        return ""
+
 def fetch_period_api(start_date_str, end_date_str):
-    """지정된 기간(최대 3일) 동안의 보도자료를 API로 가져옵니다."""
-    if not API_KEY: return []
+    """지정된 기간 동안의 보도자료를 API로 가져옵니다."""
+    if not API_KEY: 
+        print("❌ API_KEY가 설정되지 않았습니다.")
+        return []
     
     params = {
         'serviceKey': API_KEY,
@@ -58,8 +85,20 @@ def fetch_period_api(start_date_str, end_date_str):
             content = item.findtext('DataContents', '').strip()
             news_id = item.findtext('NewsItemId', '').strip()
 
-            # 대상 부처 필터링 (국토교통부, 금융위원회)
-            if "국토" in dept or "금융" in dept:
+            # 대상 부처 필터링 (국토교통부, 금융위원회, 기획재정부 등 추가 가능)
+            relevant_depts = ["국토", "금융", "기획재정", "행정안전"]
+            if any(d in dept for d in relevant_depts):
+                # Placeholder 체크: 본문이 없으면 스크래핑 시도
+                is_placeholder = "자세한 내용은 첨부파일" in content or len(content) < 100
+                full_text = content
+                
+                if is_placeholder and link:
+                    print(f"  🔍 본문 스크래핑 시도: {title[:30]}...")
+                    scraped = scrape_full_content(link)
+                    if scraped:
+                        full_text = scraped
+                        print(f"    ✅ 스크래핑 성공 ({len(scraped)}자)")
+
                 results.append({
                     "id": f"api_{news_id}",
                     "title": title,
@@ -67,68 +106,103 @@ def fetch_period_api(start_date_str, end_date_str):
                     "date": date_str,
                     "source": dept,
                     "views": 0,
-                    "originalText": content,
+                    "originalText": full_text,
                     "has_keyword": any(kw in title for kw in TARGET_KEYWORDS)
                 })
         return results
     except Exception as e:
+        print(f"❌ API 요청 중 오류: {e}")
         return []
 
-def fetch_via_api_historical(start_year=2025):
-    """오늘부터 과거(2025년)로 역순 수집을 진행합니다."""
-    print(f"[Fetcher] {start_year}년까지 오늘부터 역순으로 3일 단위 수집 시작...")
+def fetch_via_api_range(start_date_limit):
+    """현재부터 지정된 과거 날짜까지 역순으로 수집합니다."""
+    print(f"[Fetcher] {start_date_limit.strftime('%Y-%m-%d')}까지 오늘부터 역순으로 수집 시작...")
     
     all_posts = []
     current_date = datetime.now()
-    limit_date = datetime(start_year, 1, 1)
     
     iter_date = current_date
-    while iter_date >= limit_date:
+    while iter_date >= start_date_limit:
         e_str = iter_date.strftime("%Y%m%d")
-        # 3일(오늘 포함) 수집을 위해 -2일 계산
+        # 3일 단위 블록 수집
         s_date = iter_date - timedelta(days=2)
-        if s_date < limit_date: s_date = limit_date
+        if s_date < start_date_limit: s_date = start_date_limit
         s_str = s_date.strftime("%Y%m%d")
         
-        print(f"  -> {s_str} ~ {e_str} 수집 중... (누적: {len(all_posts)}건)", end="\r")
+        print(f"  -> {s_str} ~ {e_str} 수집 중... (누적: {len(all_posts)}건)")
         
         period_posts = fetch_period_api(s_str, e_str)
         all_posts.extend(period_posts)
         
-        # 다음 3일 블록으로 이동 (s_date보다 하루 전으로)
+        # 다음 3일 블록으로 이동
         iter_date = s_date - timedelta(days=1)
-        time.sleep(0.1)
+        time.sleep(0.5) # API 부하 조절
         
-    print(f"\n[Fetcher] API 역순 수집 완료: 총 {len(all_posts)}건 확보")
+    print(f"[Fetcher] 수집 완료: 총 {len(all_posts)}건 확보")
     return all_posts
 
-def select_top_posts(all_posts, max_per_month=5):
+def select_top_posts(all_posts, max_per_month=10):
+    """월별로 중요도가 높은 포스트를 선별합니다."""
     monthly_data = {}
     for p in all_posts:
-        m_key = p['date'][:7]
+        m_key = p['date'][:7] # YYYY-MM
         if m_key not in monthly_data: monthly_data[m_key] = []
         monthly_data[m_key].append(p)
     
     final = []
     for m, posts in monthly_data.items():
-        # 키워드 우선 정렬
+        # 키워드 포함 여부 및 날짜순 정렬
         sorted_p = sorted(posts, key=lambda x: (x['has_keyword'], x['date']), reverse=True)
         final.extend(sorted_p[:max_per_month])
     return sorted(final, key=lambda x: x['date'], reverse=True)
 
+def get_last_post_date():
+    """기존 posts.json에서 가장 최신 날짜를 가져옵니다."""
+    if os.path.exists('posts.json'):
+        try:
+            with open('posts.json', 'r', encoding='utf-8') as f:
+                data = json.load(f)
+                if data and isinstance(data, list) and len(data) > 0:
+                    return datetime.strptime(data[0]['date'], "%Y-%m-%d")
+        except Exception as e:
+            print(f"  ⚠️ Error reading posts.json: {e}")
+    return None # 신규 설치 시
+
 def run_fetcher():
-    print("[Fetcher] 정책레이더 API 역순 수집 엔진 가동...")
-    raw_posts = fetch_via_api_historical(2025)
+    print("[Fetcher] 정책레이더 지능형 수집 엔진 가동...")
+    
+    last_date = get_last_post_date()
+    if last_date:
+        # 증분 수집: 마지막 수집일로부터 3일 전부터
+        start_date_limit = last_date - timedelta(days=3)
+        max_posts = 15
+    else:
+        # 최초 수집: 최근 14일치만
+        print("  💡 최초 실행 감지: 최근 14일 데이터를 수집합니다.")
+        start_date_limit = datetime.now() - timedelta(days=14)
+        max_posts = 8
+
+    raw_posts = fetch_via_api_range(start_date_limit)
     
     if not raw_posts:
-        print("⚠️ [Fetcher] 수집된 데이터가 없습니다.")
+        print("⚠️ [Fetcher] 새로운 데이터가 없습니다.")
         return []
 
-    selected = select_top_posts(raw_posts)
-    unique = {p['id']: p for p in selected}
-    result = list(unique.values())
+    # 중요 포스트 선별
+    selected = select_top_posts(raw_posts, max_per_month=15)
     
-    print(f"[Fetcher] 총 {len(result)}건의 정책 자료를 선별했습니다.")
+    # 중복 제거 (이미 posts.json에 있는 ID 제외)
+    existing_ids = set()
+    if os.path.exists('posts.json'):
+        try:
+            with open('posts.json', 'r', encoding='utf-8') as f:
+                existing_data = json.load(f)
+                existing_ids = {p['id'] for p in existing_data}
+        except: pass
+
+    result = [p for p in selected if p['id'] not in existing_ids]
+    
+    print(f"[Fetcher] 총 {len(result)}건의 새로운 고부가가치 정책 자료를 선별했습니다.")
     return result
 
 if __name__ == "__main__":

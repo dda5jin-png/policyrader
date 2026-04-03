@@ -3,42 +3,44 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <title>정책레이더.JIN | 부동산·금융 지능형 분석 시스템</title>
+  <title>Policy Radar | AI Intelligence Pipeline</title>
   
   <!-- PWA Meta Tags -->
-  <meta name="theme-color" content="#0f172a">
+  <meta name="theme-color" content="#030712">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <link rel="manifest" href="manifest.json">
 
-  <!-- Typography: Pretendard -->
-  <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css" />
-
-  <!-- 💡 Google AdSense Placeholder (Paste your script here after approval) -->
-  <!-- <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-XXXXXXXXXXXX" crossorigin="anonymous"></script> -->
-
+  <!-- Typography -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css">
+  
   <style>
     :root {
-      --primary: #0f172a; /* Slate 900 */
-      --secondary: #1e293b; /* Slate 800 */
-      --accent: #e11d48; /* Rose 600 */
-      --bg: #f8fafc; /* Slate 50 */
-      --card-bg: rgba(255, 255, 255, 0.8);
-      --text-main: #0f172a;
-      --text-muted: #64748b;
-      --glass: rgba(255, 255, 255, 0.7);
-      --blur: blur(12px);
-      --shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
-      --radius: 12px;
+      --primary: #0f172a;
+      --accent: #f43f5e;
+      --accent-soft: rgba(244, 63, 94, 0.1);
+      --bg: #030712;
+      --card-bg: rgba(30, 41, 59, 0.5);
+      --border: rgba(255, 255, 255, 0.08);
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --glass: rgba(15, 23, 42, 0.8);
+      --blur: blur(16px);
+      --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.4), 0 4px 6px -4px rgba(0, 0, 0, 0.4);
+      --radius: 16px;
     }
 
     * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+    
     body {
-      font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, Roboto, sans-serif;
+      font-family: 'Pretendard', sans-serif;
       background-color: var(--bg);
+      background-image: 
+        radial-gradient(at 0% 0%, rgba(244, 63, 94, 0.1) 0px, transparent 50%),
+        radial-gradient(at 100% 100%, rgba(15, 23, 42, 0.5) 0px, transparent 50%);
       color: var(--text-main);
       line-height: 1.6;
-      word-break: keep-all;
+      min-height: 100vh;
       -webkit-font-smoothing: antialiased;
     }
 
@@ -46,16 +48,16 @@
     header {
       position: sticky;
       top: 0;
-      z-index: 100;
+      z-index: 1000;
       background: var(--glass);
       backdrop-filter: var(--blur);
       -webkit-backdrop-filter: var(--blur);
-      border-bottom: 1px solid rgba(0, 0, 0, 0.05);
-      padding: 12px 16px;
-      padding-top: max(12px, env(safe-area-inset-top));
+      border-bottom: 1px solid var(--border);
+      padding: 16px 20px;
+      padding-top: max(16px, env(safe-area-inset-top));
     }
     .header-inner {
-      max-width: 800px;
+      max-width: 900px;
       margin: 0 auto;
       display: flex;
       justify-content: space-between;
@@ -64,187 +66,240 @@
     .logo {
       display: flex;
       align-items: center;
-      gap: 10px;
-      font-weight: 800;
-      font-size: 1.2rem;
-      color: var(--primary);
+      gap: 12px;
+      font-weight: 900;
+      font-size: 1.3rem;
+      color: var(--text-main);
       text-decoration: none;
+      letter-spacing: -0.5px;
     }
-    .logo svg { width: 28px; height: 28px; }
+    .logo-icon {
+      width: 32px; height: 32px;
+      background: linear-gradient(135deg, var(--accent), #e11d48);
+      border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+      box-shadow: 0 0 15px var(--accent-soft);
+    }
 
-    /* ── Hero Section (Landing Page) ── */
+    /* ── Hero ── */
     .hero {
-      background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
-      color: white;
-      padding: 60px 20px;
+      padding: 60px 24px;
       text-align: center;
+      max-width: 900px;
+      margin: 0 auto;
+    }
+    .hero-tag {
+      display: inline-block;
+      padding: 6px 14px;
+      background: var(--accent-soft);
+      color: var(--accent);
+      border-radius: 100px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      margin-bottom: 20px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+    .hero h1 {
+      font-size: 2.2rem;
+      font-weight: 800;
+      line-height: 1.2;
+      margin-bottom: 20px;
+      background: linear-gradient(to right, #fff, #94a3b8);
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    /* ── Filter ── */
+    .filter-wrap {
+      max-width: 900px;
+      margin: 0 auto 30px;
+      padding: 0 20px;
+      overflow-x: auto;
+      display: flex;
+      gap: 12px;
+      scrollbar-width: none;
+    }
+    .filter-wrap::-webkit-scrollbar { display: none; }
+    .filter-btn {
+      padding: 10px 20px;
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 100px;
+      color: var(--text-muted);
+      font-size: 0.9rem;
+      font-weight: 600;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .filter-btn.active {
+      background: var(--text-main);
+      color: var(--bg);
+      border-color: var(--text-main);
+      box-shadow: 0 0 20px rgba(255, 255, 255, 0.1);
+    }
+
+    /* ── Content ── */
+    main {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 0 20px 120px;
+    }
+    .post-grid {
+      display: grid;
+      gap: 20px;
+    }
+
+    /* ── Card ── */
+    .post-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 24px;
+      cursor: pointer;
+      transition: all 0.3s ease;
       position: relative;
       overflow: hidden;
     }
-    .hero::before {
+    .post-card::before {
       content: "";
       position: absolute;
-      top: -50%; left: -50%; width: 200%; height: 200%;
-      background: radial-gradient(circle, rgba(225, 29, 72, 0.15) 0%, transparent 70%);
-      animation: drift 20s infinite linear;
+      top: 0; left: 0; width: 100%; height: 4px;
+      background: linear-gradient(to right, var(--accent), transparent);
+      opacity: 0;
+      transition: opacity 0.3s;
     }
-    @keyframes drift { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
-
-    .hero-content { position: relative; z-index: 1; max-width: 600px; margin: 0 auto; }
-    .hero-brand { font-size: 0.9rem; font-weight: 800; color: var(--accent); letter-spacing: 2px; margin-bottom: 16px; }
-    .hero-title { font-size: 1.8rem; font-weight: 800; line-height: 1.3; margin-bottom: 20px; }
-    .hero-sub { font-size: 1rem; opacity: 0.8; margin-bottom: 30px; font-weight: 400; }
-    .hero-cta {
-      display: inline-flex;
-      align-items: center;
-      gap: 10px;
-      background: var(--accent);
-      color: white;
-      padding: 14px 28px;
-      border-radius: 100px;
-      font-size: 1rem;
-      font-weight: 700;
-      text-decoration: none;
-      transition: transform 0.2s;
+    .post-card:hover {
+      transform: translateY(-4px);
+      border-color: rgba(255, 255, 255, 0.2);
+      box-shadow: var(--shadow-lg);
     }
-    .hero-cta:active { transform: scale(0.95); }
+    .post-card:hover::before { opacity: 1; }
 
-    /* ── Filter Bar ── */
-    .filter-bar {
-      max-width: 800px;
-      margin: 30px auto 20px;
-      padding: 0 16px;
+    .card-head {
       display: flex;
-      gap: 10px;
-      overflow-x: auto;
-      scrollbar-width: none;
-    }
-    .filter-bar::-webkit-scrollbar { display: none; }
-    .filter-btn {
-      padding: 8px 16px;
-      background: white;
-      border: 1px solid #e2e8f0;
-      border-radius: 100px;
-      font-size: 0.85rem;
-      font-weight: 600;
-      color: var(--text-muted);
-      cursor: pointer;
-      white-space: nowrap;
-      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-    }
-    .filter-btn.active {
-      background: var(--primary);
-      color: white;
-      border-color: var(--primary);
-      box-shadow: var(--shadow);
-    }
-
-    /* ── Main Content ── */
-    main { max-width: 800px; margin: 0 auto; padding: 0 16px 100px; }
-    .section-title { font-size: 0.9rem; font-weight: 700; color: var(--text-muted); margin-bottom: 16px; padding-left: 4px; }
-
-    /* ── Post Cards ── */
-    .post-card {
-      background: var(--card-bg);
-      backdrop-filter: var(--blur);
-      border-radius: var(--radius);
-      padding: 20px;
+      justify-content: space-between;
       margin-bottom: 16px;
-      border: 1px solid rgba(255, 255, 255, 0.4);
-      box-shadow: var(--shadow);
-      cursor: pointer;
-      transition: transform 0.2s ease, box-shadow 0.2s ease;
-      animation: fadeIn 0.5s ease backwards;
     }
-    .post-card:active { transform: scale(0.98); }
-    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    .badge {
+      font-size: 0.65rem;
+      font-weight: 800;
+      padding: 4px 10px;
+      border-radius: 6px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .cat-T { background: #fee2e2; color: #991b1b; } /* 거래 */
+    .cat-F { background: #dcfce7; color: #166534; } /* 금융 */
+    .cat-X { background: #fef9c3; color: #854d0e; } /* 세제 */
+    .cat-S { background: #dbeafe; color: #1e40af; } /* 공급 */
+    .cat-P { background: #f3e8ff; color: #6b21a8; } /* 프롭테크 */
 
-    .post-card .badge-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
-    .category-badge { font-size: 0.7rem; font-weight: 700; padding: 2px 8px; border-radius: 4px; text-transform: uppercase; }
-    .cat-T { background: #fee2e2; color: #991b1b; } 
-    .cat-F { background: #dcfce7; color: #166534; } 
-    .cat-X { background: #fef9c3; color: #854d0e; } 
-    .cat-S { background: #dbeafe; color: #1e40af; } 
-    .cat-P { background: #f3e8ff; color: #6b21a8; } 
+    .card-title {
+      font-size: 1.2rem;
+      font-weight: 700;
+      margin-bottom: 16px;
+      color: var(--text-main);
+      line-height: 1.4;
+    }
+    .card-footer {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
 
-    .post-title { font-size: 1.1rem; font-weight: 700; color: var(--primary); line-height: 1.4; margin-bottom: 12px; }
-    .post-meta { font-size: 0.8rem; color: var(--text-muted); display: flex; gap: 12px; }
-    .premium-star { color: #f59e0b; font-weight: 800; }
-
-    /* ── Detail Modal ── */
+    /* ── Modal ── */
     .modal-overlay {
       position: fixed;
       top: 0; left: 0; right: 0; bottom: 0;
-      background: rgba(15, 23, 42, 0.6);
-      backdrop-filter: blur(4px);
-      z-index: 200;
+      background: rgba(0, 0, 0, 0.85);
+      backdrop-filter: blur(8px);
+      z-index: 2000;
       display: none;
-      align-items: flex-end;
+      align-items: center;
       justify-content: center;
+      padding: 20px;
     }
     .modal-content {
       width: 100%;
-      max-width: 800px;
-      background: white;
-      border-top-left-radius: 24px;
-      border-top-right-radius: 24px;
-      max-height: 92vh;
+      max-width: 700px;
+      background: #0f172a;
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      max-height: 85vh;
       overflow-y: auto;
-      padding: 32px 20px;
+      padding: 40px 30px;
       position: relative;
-      animation: slideUp 0.3s cubic-bezier(0, 1, 0, 1);
+      animation: modalFade 0.3s cubic-bezier(0.16, 1, 0.3, 1);
     }
-    @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+    @keyframes modalFade { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
+    
     .modal-close {
       position: absolute;
       top: 20px; right: 20px;
-      width: 32px; height: 32px;
-      background: #f1f5f9;
+      width: 40px; height: 40px;
+      background: rgba(255, 255, 255, 0.05);
       border-radius: 50%;
       display: flex; align-items: center; justify-content: center;
-      cursor: pointer; font-size: 1.2rem;
+      cursor: pointer; color: white;
     }
 
-    .detail-label {
-      display: inline-block;
-      background: var(--primary);
-      color: white;
+    .info-label {
       font-size: 0.75rem;
-      font-weight: 700;
-      padding: 4px 10px;
-      border-radius: 4px;
-      margin-bottom: 12px;
-      margin-top: 24px;
+      color: var(--accent);
+      font-weight: 800;
+      margin: 32px 0 12px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      display: flex; align-items: center; gap: 8px;
     }
-    .detail-text { font-size: 0.95rem; color: #334155; line-height: 1.7; margin-bottom: 12px; }
-    .summary-box {
-      background: #f8fafc;
-      border-left: 4px solid var(--accent);
-      padding: 16px;
-      border-radius: 8px;
+    .info-label::after { content: ""; flex: 1; height: 1px; background: var(--border); }
+
+    .summary-list { list-style: none; }
+    .summary-item {
+      padding: 12px 16px;
+      background: rgba(255, 255, 255, 0.03);
+      border-radius: 12px;
+      margin-bottom: 10px;
+      font-size: 0.95rem;
+      display: flex; gap: 12px;
     }
-    .summary-item { margin-bottom: 8px; display: flex; gap: 8px; }
-    .summary-item::before { content: "•"; color: var(--accent); font-weight: 900; }
+    .summary-item::before { content: "→"; color: var(--accent); font-weight: 900; }
 
-    .key-table { width: 100%; border-collapse: collapse; margin-top: 8px; font-size: 0.85rem; }
-    .key-table th { text-align: left; background: #f1f5f9; padding: 10px; color: var(--text-muted); font-weight: 600; border-bottom: 1px solid #e2e8f0; }
-    .key-table td { padding: 10px; border-bottom: 1px solid #f1f5f9; color: var(--primary); }
+    .table-container { overflow-x: auto; margin-top: 10px; }
+    table { width: 100%; border-collapse: collapse; min-width: 400px; }
+    th { text-align: left; font-size: 0.75rem; color: var(--text-muted); padding: 12px; border-bottom: 1px solid var(--border); }
+    td { padding: 12px; font-size: 0.9rem; border-bottom: 1px solid rgba(255, 255, 255, 0.02); }
 
-    /* ── Bottom Controls ── */
+    .expert-box {
+      background: linear-gradient(135deg, rgba(244, 63, 94, 0.1), transparent);
+      border: 1px solid var(--accent-soft);
+      padding: 24px;
+      border-radius: 16px;
+      font-style: italic;
+      line-height: 1.7;
+    }
+
+    /* ── Nav ── */
     .bottom-nav {
       position: fixed;
-      bottom: 24px; left: 50%;
+      bottom: 30px; left: 50%;
       transform: translateX(-50%);
-      background: var(--primary);
-      color: white;
-      padding: 12px 24px;
+      background: var(--glass);
+      backdrop-filter: var(--blur);
+      border: 1px solid var(--border);
+      padding: 12px 30px;
       border-radius: 100px;
-      display: flex; gap: 20px;
-      box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.3);
-      z-index: 150;
+      display: flex; gap: 32px;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+      z-index: 1500;
     }
-    .nav-item { display: flex; flex-direction: column; align-items: center; font-size: 0.65rem; cursor: pointer; opacity: 0.8; }
-    .nav-item.active { opacity: 1; font-weight: 700; }
+    .nav-btn { font-size: 0.8rem; font-weight: 700; color: var(--text-muted); cursor: pointer; text-decoration: none; }
+    .nav-btn.active { color: var(--accent); }
 
   </style>
 </head>
@@ -252,146 +307,132 @@
 
 <header>
   <div class="header-inner">
-    <a href="/" class="logo">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
-        <path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" stroke-linecap="round"/>
-      </svg>
-      정책레이더.JIN
+    <a href="#" class="logo">
+      <div class="logo-icon">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3">
+          <path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" stroke-linecap="round"/>
+        </svg>
+      </div>
+      POLICY RADAR
     </a>
-    <div id="lastUpdate" style="font-size: 0.7rem; color: var(--text-muted); text-align: right;">연결 중...</div>
+    <div id="status" style="font-size: 0.7rem; color: var(--text-muted); text-align: right;">Loading...</div>
   </div>
 </header>
 
 <section class="hero">
-  <div class="hero-content">
-    <div class="hero-brand">INTELLIGENT POLICY AGENT</div>
-    <h1 class="hero-title">복잡한 정책 발표,<br>이제 AI 리포트로 읽으세요.</h1>
-    <p class="hero-sub">매일 쏟아지는 국토교통부, 금융위, 기재부의 방대한 보도자료를 AI가 분석하여 핵심 요약과 체크리스트를 제공합니다.</p>
-    <a href="#mainList" class="hero-cta">
-      지금 분석 리포트 보기
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 14l-7 7-7-7M12 21V3"/></svg>
-    </a>
-  </div>
+  <div class="hero-tag">AI-Powered Intelligence</div>
+  <h1>복잡한 정책 흐름을<br>가장 빠르고 정확하게 분석합니다.</h1>
+  <p style="color: var(--text-muted); margin-bottom: 40px;">국토교통부, 금융위 보도자료를 AI가 실시간 스캔하여<br>실질적인 시장 영향과 체크리스트를 도출합니다.</p>
 </section>
 
-<div class="filter-bar" id="categoryFilters">
-  <button class="filter-btn active" data-cat="all">전체</button>
+<div class="filter-wrap" id="filters">
+  <button class="filter-btn active" data-cat="all">전체 피드</button>
   <button class="filter-btn" data-cat="T">거래·법령</button>
   <button class="filter-btn" data-cat="F">금융·거시</button>
   <button class="filter-btn" data-cat="X">세제·평가</button>
   <button class="filter-btn" data-cat="S">공급·개발</button>
 </div>
 
-<main id="mainList">
-  <div class="section-title">실시간 AI 정책 분석 피드</div>
-  <div id="postContainer">
-    <div style="padding: 40px; text-align: center; color: var(--text-muted); font-size: 0.9rem;">
-      데이터를 불러오고 있습니다...
-    </div>
+<main>
+  <div id="container" class="post-grid">
+    <!-- Cards will be injected here -->
   </div>
 </main>
 
-<!-- 💡 Bottom Ad Placeholder (Paste snippet here) -->
-<!-- <div class="adsense-footer-container"> ... </div> -->
-
 <div class="bottom-nav">
-  <div class="nav-item active" onclick="window.scrollTo({top:0, behavior:'smooth'})">🏠 홈</div>
-  <div class="nav-item" onclick="window.print()">🖨️ 인쇄</div>
-  <div class="nav-item" onclick="shareApp()">🔗 공유</div>
+  <div class="nav-btn active" onclick="window.scrollTo({top:0, behavior:'smooth'})">Feed</div>
+  <div class="nav-btn" onclick="shareApp()">Share</div>
+  <div class="nav-btn" onclick="window.print()">Print</div>
 </div>
 
-<div class="modal-overlay" id="detailModal">
-  <div class="modal-content" id="modalBody"></div>
+<div class="modal-overlay" id="modal">
+  <div class="modal-content" id="modalContent"></div>
 </div>
 
 <script>
-let allPosts = [];
-let currentFilter = 'all';
+let posts = [];
+let cat = 'all';
 
-async function loadPosts() {
+async function init() {
   try {
-    const res = await fetch('posts.json?t=' + Date.now());
-    allPosts = await res.json();
-    renderPosts();
-    updateHeader();
+    const res = await fetch('posts.json?v=' + Date.now());
+    posts = await res.json();
+    render();
+    
+    if (posts.length > 0) {
+      document.getElementById('status').innerHTML = `Last updated<br><b>${posts[0].date}</b>`;
+    }
   } catch (e) {
-    document.getElementById('postContainer').innerHTML = `<div style="text-align:center;padding:40px;color:red">데이터 로드 실패 (posts.json 확인)</div>`;
+    document.getElementById('container').innerHTML = '<div style="text-align:center;padding:100px;color:gray">데이터를 불러올 수 없습니다.</div>';
   }
 }
 
-function updateHeader() {
-  if (allPosts.length > 0) {
-    const latestDate = allPosts[0].date;
-    document.getElementById('lastUpdate').innerHTML = `최근 업데이트<br><b>${latestDate}</b>`;
-  } else {
-    document.getElementById('lastUpdate').innerHTML = `업데이트 데이터<br>없음`;
-  }
-}
-
-function renderPosts() {
-  const container = document.getElementById('postContainer');
-  const filtered = currentFilter === 'all' ? allPosts : allPosts.filter(p => p.cat === currentFilter);
+function render() {
+  const container = document.getElementById('container');
+  const filtered = cat === 'all' ? posts : posts.filter(p => p.cat === cat);
   
   if (filtered.length === 0) {
-    container.innerHTML = `<div style="text-align:center;padding:80px;color:var(--text-muted)">현재 실시간 분석 데이터가 없습니다.<br>GitHub Actions 가동을 시작해주세요.</div>`;
+    container.innerHTML = '<div style="text-align:center;padding:100px;color:gray">해당 데이터가 아직 없습니다.</div>';
     return;
   }
 
-  container.innerHTML = filtered.map((p, idx) => `
-    <div class="post-card" style="animation-delay: ${idx * 0.05}s" onclick="openDetail('${p.id}')">
-      <div class="badge-row">
-        <span class="category-badge cat-${p.cat}">${p.catName || '카테고리'}</span>
-        <span class="post-meta">${p.date}</span>
+  container.innerHTML = filtered.map((p, i) => `
+    <div class="post-card" style="animation: modalFade 0.5s ease backwards ${i * 0.05}s" onclick="show('${p.id}')">
+      <div class="card-head">
+        <span class="badge cat-${p.cat}">${p.catName}</span>
+        <span style="font-size:0.75rem; color:var(--text-muted)">${p.date}</span>
       </div>
-      <div class="post-title">${p.premium ? '<span class="premium-star">★</span> ' : ''}${p.headline}</div>
-      <div class="post-meta">
-        <span>📍 ${p.source}</span>
+      <h2 class="card-title">${p.headline}</h2>
+      <div class="card-footer">
+        <span>${p.source}</span>
         <span>•</span>
-        <span>${p.views || 0} 조회</span>
+        <span>Premium Analysis</span>
       </div>
     </div>
   `).join('');
 }
 
-function openDetail(id) {
-  const p = allPosts.find(x => x.id === id);
-  if (!p) return;
-
-  const modal = document.getElementById('detailModal');
-  const body = document.getElementById('modalBody');
+function show(id) {
+  const p = posts.find(x => x.id === id);
+  const modal = document.getElementById('modal');
+  const content = document.getElementById('modalContent');
   
-  body.innerHTML = `
-    <div class="modal-close" onclick="closeModal()">✕</div>
-    <span class="category-badge cat-${p.cat}">${p.catName}</span>
-    <h1 style="font-size:1.5rem;font-weight:800;margin:12px 0;line-height:1.3;color:var(--primary)">${p.headline}</h1>
-    <div class="post-meta" style="margin-bottom:20px">
-      📅 ${p.date} &nbsp; | &nbsp; 출처: ${p.source}
-    </div>
+  content.innerHTML = `
+    <div class="modal-close" onclick="closeM()">✕</div>
+    <span class="badge cat-${p.cat}">${p.catName}</span>
+    <h1 style="margin:20px 0; line-height:1.3">${p.headline}</h1>
+    <p style="color:var(--text-muted); font-size:0.85rem">발행: ${p.date} | 출처: ${p.source}</p>
 
-    <div class="detail-label">핵심 정책 요약</div>
-    <div class="summary-box">
+    <div class="info-label">핵심 정책 요약</div>
+    <div class="summary-list">
       ${p.summary.map(s => `<div class="summary-item">${s}</div>`).join('')}
     </div>
 
-    <div class="detail-label">AI 심층 분석</div>
-    <div class="detail-text" style="background:#f1f5f9;padding:16px;border-radius:12px;font-style:italic">
+    <div class="info-label">전문가 시나리오 분석</div>
+    <div class="expert-box">
       "${p.expertOpinions[0].comment}"
-      <div style="font-size:0.75rem;margin-top:10px;text-align:right">- ${p.expertOpinions[0].name} (${p.expertOpinions[0].affiliation})</div>
+      <p style="margin-top:16px; font-weight:700; font-size:0.8rem; text-align:right; font-style:normal; color:var(--accent)">
+        — ${p.expertOpinions[0].name} (${p.expertOpinions[0].affiliation})
+      </p>
     </div>
 
-    <div class="detail-label">주요 수치 및 대상</div>
-    <table class="key-table">
-      <thead><tr><th>항목</th><th>수치</th><th>적용대상</th></tr></thead>
-      <tbody>
-        ${p.keyData && p.keyData.length > 0 ? p.keyData.map(d => `<tr><td>${d.항목}</td><td><strong>${d.수치}</strong></td><td>${d.적용대상}</td></tr>`).join('') : '<tr><td colspan="3" style="text-align:center">상세 수치 데이터 없음</td></tr>'}
-      </tbody>
-    </table>
+    <div class="info-label">데이터 세부 지표</div>
+    <div class="table-container">
+      <table>
+        <thead><tr><th>항목</th><th>수치</th><th>비고</th></tr></thead>
+        <tbody>
+          ${p.keyData.map(d => `<tr><td>${d.항목}</td><td style="color:white;font-weight:700">${d.수치}</td><td>${d.적용대상}</td></tr>`).join('')}
+        </tbody>
+      </table>
+    </div>
 
-    <div class="detail-label">사용자 체크리스트</div>
-    ${p.checklist.map(c => `<div class="summary-item">${c}</div>`).join('')}
+    <div class="info-label">사용자 액션 체크리스트</div>
+    <div class="summary-list">
+      ${p.checklist.map(c => `<div class="summary-item" style="background:var(--accent-soft); border-left:3px solid var(--accent)">${c}</div>`).join('')}
+    </div>
 
-    <div style="margin-top:40px; padding:20px; border-top:1px solid #eee; text-align:center">
-      <button onclick="window.open('${p.sourceUrl}')" style="background:var(--primary);color:white;border:none;padding:10px 20px;border-radius:8px;font-weight:700;cursor:pointer">보도자료 원문 보기</button>
+    <div style="margin-top:50px; text-align:center">
+      <button onclick="window.open('${p.sourceUrl}')" style="background:white; color:black; border:none; padding:16px 32px; border-radius:12px; font-weight:800; cursor:pointer">원문 보도자료 보기</button>
     </div>
   `;
   
@@ -399,32 +440,26 @@ function openDetail(id) {
   document.body.style.overflow = 'hidden';
 }
 
-function closeModal() {
-  document.getElementById('detailModal').style.display = 'none';
+function closeM() {
+  document.getElementById('modal').style.display = 'none';
   document.body.style.overflow = 'auto';
 }
 
-document.getElementById('categoryFilters').addEventListener('click', (e) => {
+document.getElementById('filters').addEventListener('click', e => {
   if (e.target.tagName !== 'BUTTON') return;
   document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
   e.target.classList.add('active');
-  currentFilter = e.target.dataset.cat;
-  renderPosts();
+  cat = e.target.dataset.cat;
+  render();
 });
 
 function shareApp() {
-  if (navigator.share) {
-    navigator.share({ title: '정책레이더.JIN', url: location.href });
-  } else {
-    alert('공유 기능을 지원하지 않는 브라우저입니다.');
-  }
+  if (navigator.share) navigator.share({ title: 'Policy Radar', url: location.href });
 }
 
-loadPosts();
+init();
 
-if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('sw.js');
-}
+if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js');
 </script>
 </body>
 </html>

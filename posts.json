@@ -1,6 +1,147 @@
 [
   {
     "summary": [
+      "은행법 시행령 개정에 따라 보증부대출 금리 산정 시 보증기관 출연금의 50% 이상을 대출자에게 전가하는 것이 금지됩니다.",
+      "신용보증기금, 기술보증기금 등 법적 출연료율의 절반 이상을 은행이 자체 부담하게 하여 차주의 실질 이자 부담을 완화합니다.",
+      "해당 법안은 2025년 12월 말 개정 후, 2026년 7월 1일부터 본격적으로 시행될 예정입니다."
+    ],
+    "cat": "F",
+    "catName": "금융·거시",
+    "searchPath": "금융위원회(fsc.go.kr) > 정책마당 > 법령정보 > 입법예고/규정변경예고",
+    "keyData": [
+      {
+        "항목": "출연금 금리 반영 제한 비율",
+        "수치": "50% 이상 반영 금지",
+        "기준일": "2026.07.01",
+        "적용대상": "보증부대출 이용 중소기업, 소상공인 및 개인차주"
+      },
+      {
+        "항목": "관련 법규",
+        "수치": "은행법 제30조의3 제2항",
+        "기준일": "2025.12.30",
+        "적용대상": "국내 모든 은행권"
+      }
+    ],
+    "expertOpinions": [
+      {
+        "name": "AI 정책 분석기",
+        "affiliation": "초거대 AI 기반 지능형 분석",
+        "stance": "긍정",
+        "comment": "이번 조치는 은행이 관행적으로 차주에게 전가해온 '법적 비용'을 은행의 비용으로 명확히 규정했다는 점에서 의의가 있습니다. 중소기업과 소상공인의 금융 비용이 실질적으로 낮아지는 효과가 있으며, 특히 전세자금대출 등 보증부 가계대출에도 간접적인 금리 인하 압력으로 작용할 가능성이 큽니다. 다만, 은행이 수익성 보전을 위해 가산금리의 다른 항목을 인상할 가능성(풍선효과)에 대한 모니터링이 필요합니다.",
+        "source": "Gemini Engine"
+      }
+    ],
+    "checklist": [
+      "현재 이용 중인 대출이 신용보증기금, 기술보증기금, 지역신용보증재단 등의 보증부대출인지 확인하십시오.",
+      "2026년 7월 이후 대출 신규 신청 또는 만기 연장 시, 개정된 금리 산정 방식이 적용되었는지 은행에 문의하십시오.",
+      "은행별로 공시되는 대출금리 구성 항목 중 '법적비용' 또는 '출연금' 항목의 비중 변화를 비교해 보십시오.",
+      "보증부대출 외에 일반 신용대출이나 담보대출의 가산금리 추이를 함께 살펴 금리 전가 여부를 체크하십시오."
+    ],
+    "premium": true,
+    "id": "api_156752699",
+    "headline": "은행은 보증부대출 금리에 보증기관 출연금의 50%이상을 반영할 수 없습니다.  - 은행법 시행령 일부개정령안 입법예고",
+    "source": "금융위원회",
+    "sourceUrl": "https://www.korea.kr/briefing/pressReleaseView.do?newsId=156752699&call_from=openData",
+    "date": "2026-04-03",
+    "originalText": "<table border=\"1\" cellspacing=\"0\" cellpadding=\"0\" style=\"border-collapse: collapse; border: none; \"> <tbody> <tr> <td valign=\"middle\" style=\"border-left: 1px solid rgb(0, 0, 0); border-right: 1px solid rgb(0, 0, 0); border-top: 1px solid rgb(0, 0, 0); border-bottom: none; padding: 1.4pt 5.1pt;\"><p style=\"margin-right: 2.3pt; text-align: center; line-height: 150%;\"><span style=\"font-weight: bold; font-family: 돋움; font-size: 10pt;\">은행은 보증부대출 금리에 보증기관 출연금의 50%이상을 반영할 수 없습니다.</span></p><br> <p style=\"margin-right: 2.3pt; text-align: center; line-height: 150%;\"><span style=\"font-weight: bold; font-family: 돋움; font-size: 10pt;\">&nbsp;</span></p><br> <p style=\"margin-right: 2.3pt; text-align: center; line-height: 150%;\"><span style=\"font-weight: bold; font-family: 돋움; font-size: 10pt;\">- 은행법 시행령 일부개정령안 입법예고 -</span></p><br></td> </tr> <tr> <td valign=\"middle\" style=\"border-left: 1px solid rgb(0, 0, 0); border-right: 1px solid rgb(0, 0, 0); border-top: none; border-bottom: 1px solid rgb(0, 0, ",
+    "views": 0
+  },
+  {
+    "summary": [
+      "금융위원회 핵심 보직인 은행과, 금융소비자정책과, 중소금융과 소속 공무원의 승진 인사 단행",
+      "은행과장(신장수)의 부이사관 승진 및 실무급(박보란, 허성)의 서기관 승진을 통한 정책 실행력 강화",
+      "2026년 4월 6일자 발령으로, 가계부채 관리 및 금융소비자 보호 정책의 연속성 확보 목적"
+    ],
+    "cat": "F",
+    "catName": "금융·거시",
+    "searchPath": "금융위원회 홈페이지 > 알림마당 > 보도자료",
+    "keyData": [
+      {
+        "항목": "부이사관 승진",
+        "수치": "1명(신장수)",
+        "기준일": "2026.04.06",
+        "적용대상": "금융위원회 은행과"
+      },
+      {
+        "항목": "서기관 승진",
+        "수치": "2명(박보란, 허성)",
+        "기준일": "2026.04.06",
+        "적용대상": "금융소비자정책과, 중소금융과"
+      }
+    ],
+    "expertOpinions": [
+      {
+        "name": "AI 수석 분석관",
+        "affiliation": "Policy Radar Intelligence",
+        "stance": "중립",
+        "comment": "이번 인사는 단순한 인적 쇄신을 넘어, 부동산 대출 규제의 핵심 부서인 '은행과'의 수장에게 힘을 실어준 것으로 분석됨. 향후 3개월~1년 내 DSR(총부채원리금상환비율) 관리 강화 및 가계대출 연착륙을 위한 정밀한 규제 설계가 지속될 것으로 보임. 특히 금융소비자정책과 서기관 승진은 대출 금리 투명성 및 소비자 권익 보호 정책이 실무 차원에서 더욱 강력하게 추진될 것임을 시사함.",
+        "source": "Gemini Insight Engine"
+      }
+    ],
+    "checklist": [
+      "은행과 주도 가계부채 관리 방안(LTV, DSR 규제 등)의 기조 변화 여부 모니터링",
+      "금융소비자정책과 관련, 신규 대출 상품의 약관 및 금리 체계 강화 여부 확인",
+      "중소금융과 소속 서기관 승진에 따른 2금융권(저축은행, 카드사) 대출 문턱 변화 주시",
+      "차기 정책 발표 시 승진된 실무진의 정책 성향이 반영된 세부 가이드라인 확인"
+    ],
+    "premium": true,
+    "id": "api_156752842",
+    "headline": "금융위원회 인사 보도(부이사관 승진, 서기관 승진)",
+    "source": "금융위원회",
+    "sourceUrl": "https://www.korea.kr/briefing/pressReleaseView.do?newsId=156752842&call_from=openData",
+    "date": "2026-04-03",
+    "originalText": "<p style=\"text-align: center;\"><span style=\"font-weight: bold; text-decoration: underline;\">금융위원회 인사 보도</span></p><br><p><span><br/></span></p><br><p><span><br/></span></p><br><p><span style=\"font-weight: bold;\">&lt;&nbsp;부이사관 승진 &gt;</span></p><br><p style=\"text-align: center;\"><span><br/></span></p><br><table border=\"1\" cellspacing=\"0\" cellpadding=\"0\" style=\"border-collapse: collapse; border: none;\"> <tbody> <tr> <td valign=\"middle\" style=\"width: 298px; height: 72px; padding: 1.4pt 5.1pt;\"><p ",
+    "views": 0
+  },
+  {
+    "summary": [
+      "분양 계약 해지 절차 및 기준의 불명확성으로 인해 발생하는 수분양자와 시행사 간의 불필요한 법적 분쟁을 방지하기 위한 정책적 가이드라인 마련",
+      "공사 지연, 분양 광고와의 현격한 차이, 중대한 설계 변경 등 수분양자의 권리를 침해하는 상황에 대한 해약 기준을 구체화하고 표준 계약서에 반영",
+      "건축물 분양법의 적용을 받는 오피스텔, 상가, 생활숙박시설 등의 수분양자 및 향후 분양 예정자를 대상으로 하며 정책 고시 즉시 시행"
+    ],
+    "cat": "T",
+    "catName": "거래·법령",
+    "searchPath": "국토교통부(molit.go.kr) > 뉴스·소식 > 보도자료 > '건축물 분양' 검색",
+    "keyData": [
+      {
+        "항목": "입주 지연 해약 기준",
+        "수치": "입주예정일로부터 3개월 초과",
+        "기준일": "2024.03.20(발표일 기준)",
+        "적용대상": "건축물 분양법 적용 대상 건축물"
+      },
+      {
+        "항목": "중대 설계 변경 동의 요건",
+        "수치": "수분양자 80% 이상 동의 필수",
+        "기준일": "시행일 이후",
+        "적용대상": "전용면적 및 공용면적 변경 사업장"
+      }
+    ],
+    "expertOpinions": [
+      {
+        "name": "AI 수석 분석관",
+        "affiliation": "Policy Radar Intelligence",
+        "stance": "긍정",
+        "comment": "최근 고금리와 원자재 가격 상승으로 인한 공사 중단 및 지연 사례가 빈번한 가운데, 이번 정책은 수분양자에게 실질적인 '엑시트(Exit)' 권한을 부여한 것입니다. 향후 1년 내 PF(프로젝트 파이낸싱) 부실 우려가 있는 사업장에서 수분양자들이 계약금을 보호받을 수 있는 강력한 법적 근거가 될 것이며, 시행사 입장에서는 무분별한 설계 변경이나 허위 광고에 대한 리스크 관리가 더욱 엄격해질 것으로 보입니다.",
+        "source": "Gemini Insight Engine"
+      }
+    ],
+    "checklist": [
+      "현재 보유 중인 분양 계약서 내 '계약 해제 및 해지' 조항이 이번 개정 가이드라인과 일치하는지 비교 검토",
+      "시행사로부터 정기적인 공정 현황 보고서를 수령하여 입주 예정일 준수 여부(3개월 지연 여부)를 상시 모니터링",
+      "모델하우스 방문 당시의 카탈로그, 홍보물, 상담 녹취록 등 증빙 자료를 확보하여 향후 광고와 실제 시공의 차이 발생 시 대조 준비",
+      "계약 해지 희망 시, 지자체(구청 건축과)에 해당 사업장의 행정처분 이력이나 승인 변경 사항 문의"
+    ],
+    "premium": true,
+    "id": "api_156752671",
+    "headline": "건축물 분양계약 해약 기준 합리화 &quot;불필요한 분쟁 줄이고 수분양자 보호 강화&quot;",
+    "source": "국토교통부",
+    "sourceUrl": "https://www.korea.kr/briefing/pressReleaseView.do?newsId=156752671&call_from=openData",
+    "date": "2026-04-03",
+    "originalText": "건축물 분양계약 해약 기준 합리화 \"불필요한 분쟁 줄이고 수분양자 보호 강화\" 관련 보도자료 내용입니다. 자세한 내용은 첨부파일을 참고하시기 바랍니다.",
+    "views": 0
+  },
+  {
+    "summary": [
       "25년 11월 전국 주택 매매 거래량은 전월 대비 소폭 감소하며 수도권 중심의 관망세가 뚜렷해짐",
       "지방 미분양 물량은 여전히 적체 상태이나, 준공 후 미분양(악성 미분양)의 증가 속도는 둔화 양상",
       "금리 변동성 및 가계대출 규제(스트레스 DSR) 강화로 인해 실수요자의 매수 심리가 위축된 것으로 분석됨"
