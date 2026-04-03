@@ -142,13 +142,14 @@
     }
     .filter-wrap {
       padding: 0 20px;
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: center;
+      display: inline-grid;
+      grid-template-columns: auto repeat(3, auto);
       gap: 10px;
       margin-bottom: 12px;
     }
-    .filter-wrap::-webkit-scrollbar { display: none; }
+    .filter-btn[data-cat="all"] {
+      grid-row: span 2;
+    }
     .filter-btn {
       padding: 10px 18px;
       background: var(--card-bg);
@@ -449,7 +450,7 @@
     <button class="filter-btn" data-cat="S">부동산 공급·개발정책</button>
     <button class="filter-btn" data-cat="T">부동산 거래·법령</button>
     <button class="filter-btn" data-cat="R">부동산 임대·주거정책</button>
-    <button class="filter-btn" data-cat="P">부동산 프롭테크</button>
+    <button class="filter-btn" data-cat="P">프롭테크</button>
   </div>
   <div class="cat-desc" id="catDesc">전체 부동산 관련 정책 자료를 모두 표시합니다.</div>
 </div>
@@ -488,7 +489,7 @@ const CAT_NAMES = {
   S: "부동산 공급·개발정책",
   T: "부동산 거래·법령",
   R: "부동산 임대·주거정책",
-  P: "부동산 프롭테크"
+  P: "프롭테크"
 };
 
 async function init() {
