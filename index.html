@@ -125,14 +125,31 @@
       display: flex;
       align-items: center;
       gap: 10px;
-      font-size: 0.85rem;
+      font-size: 0.95rem;
       color: var(--text-muted);
-      background: rgba(255, 255, 255, 0.03);
-      padding: 8px 16px;
+      background: rgba(255, 255, 255, 0.05);
+      padding: 12px 22px;
       border-radius: 100px;
       border: 1px solid var(--border);
+      font-weight: 500;
     }
-    .slogan-item svg { color: var(--accent); }
+    .slogan-item svg { color: var(--accent); flex-shrink: 0; }
+    .slogan-notice {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 0.82rem;
+      color: #f59e0b;
+      background: rgba(245, 158, 11, 0.08);
+      padding: 10px 20px;
+      border-radius: 100px;
+      border: 1px solid rgba(245, 158, 11, 0.25);
+      font-weight: 500;
+    }
+    .slogan-notice-mark {
+      font-size: 1rem;
+      line-height: 1;
+    }
 
     /* ── Filter ── */
     .filter-container {
@@ -423,22 +440,32 @@
 
 <section class="hero">
   <div class="hero-tag">Policy Radar AI Pipeline</div>
-  <h1>복잡한 부동산 정책 흐름을<br>가장 빠르고 정확하게 분석합니다.</h1>
-  <p style="color: var(--text-muted); opacity: 0.8">국토교통부·금융위 보도자료를 AI가 실시간 스캔하여<br>실질적인 시장 영향과 체크리스트를 도출합니다.</p>
+  <h1>복잡한 부동산 정책 흐름<br>가장 빠르고 정확하게 분석합니다.</h1>
 </section>
 
 <div class="slogan-section">
   <div class="slogan-item">
-    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
       <path d="M5 13l4 4L19 7" stroke-linecap="round" stroke-linejoin="round"/>
     </svg>
-    모든 분석은 정부 공식 브리핑 원문만을 기반으로 합니다. (편집 없는 팩트)
+    모든 분석은 정부 공식 브리핑 원문만을 기반으로 합니다. (원문 바로가기 제공)
   </div>
   <div class="slogan-item">
-    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
-      <path d="M8.684 4.087c.862-1.446 2.34-2.587 4.316-2.587 2.34 0 4.148 1.808 4.148 4.148 0 .862-.258 1.638-.733 2.284.475.646.733 1.422.733 2.284 0 2.34-1.808 4.148-4.148 4.148-2.34 0-4.148-1.808-4.148-4.148 0-.862.258-1.638.733-2.284-.475-.646-.733-1.422-.733-2.284 0-2.34 1.808-4.148 4.148-4.148zM5 13c-1.1 0-2 .9-2 2v4c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2v-4c0-1.1-.9-2-2-2" stroke-linecap="round" stroke-linejoin="round"/>
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+      <path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 17l-6.2 4.3 2.4-7.4L2 9.4h7.6z" stroke-linecap="round" stroke-linejoin="round"/>
     </svg>
-    분석 자료는 자유롭게 공유하거나 PDF로 인쇄/저장할 수 있습니다.
+    AI 정책 분석기(팩트체크, 정치성향 배제, 관련논문 리서치 결과 등으로 정제)로 인사이트 제공
+  </div>
+  <div class="slogan-item">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+      <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" stroke-linecap="round" stroke-linejoin="round"/>
+      <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+    관심 자료 링크 제공 및 PDF 출력기능 제공
+  </div>
+  <div class="slogan-notice">
+    <span class="slogan-notice-mark">※</span>
+    AI 정책 분석기 및 부가기능은 유료 전환 전 무료 제공 중입니다.
   </div>
 </div>
 
