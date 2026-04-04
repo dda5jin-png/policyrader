@@ -8,7 +8,7 @@ export const copyLink = (id: string) => {
     });
   } else {
     const el = document.createElement('textarea');
-    el.value = text;
+    el.value = url;
     el.style.cssText = 'position:fixed;opacity:0;top:0;left:0';
     document.body.appendChild(el);
     el.focus(); el.select();
