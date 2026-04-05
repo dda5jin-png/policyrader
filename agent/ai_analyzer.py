@@ -59,7 +59,7 @@ def analyze_post_with_retry(post, retries=2):
     [분석 가이드라인]:
     1. 시장 영향력: 부동산 가격, 대출 규제, 세금 변화, 공급 대책 중 실질적 파급력을 우선 분석하십시오.
     2. 전문성: 단순 요약이 아닌, 정책의 이면과 향후 시장에 미칠 '전문가 시각'을 포함하십시오.
-    3. 실무성: 사용자가 오늘 바로 확인하거나 준비해야 할 '체크리스트'를 구체적으로 작성하십시오.
+    3. 실무성: 사용자가 오늘 바로 확인하거나 준비해야 할 '전문가 인사이트'를 구체적으로 작성하십시오.
     4. 출력 형식: 반드시 유효한 JSON 형식으로만 응답하십시오.
 
     [출력 JSON 구조]:
@@ -140,32 +140,35 @@ def run_analyzer(limit_count=20):
         print("⚠️ 분석할 데이터가 비어있습니다.")
         return
 
+    # 출력 경로: public/posts.json (Next.js 정적 파일 서빙 경로)
+    output_path = 'public/posts.json'
+
     # 기존 데이터 로드
     existing_posts = []
-    if os.path.exists('posts.json'):
+    if os.path.exists(output_path):
         try:
-            with open('posts.json', 'r', encoding='utf-8') as f:
+            with open(output_path, 'r', encoding='utf-8') as f:
                 content = f.read().strip()
                 if content and content != '[]':
                     existing_posts = json.loads(content)
         except: pass
-    
+
     post_map = {p['id']: p for p in existing_posts}
     analyzed_count = 0
-    
+
     for p in raw_data:
         if analyzed_count >= limit_count: break
         if p['id'] in post_map: continue
-            
+
         print(f"[AI] ({analyzed_count+1}/{limit_count}) 분석 대상: {p['title'][:40]}...")
         result = analyze_post_with_retry(p)
-        
+
         if result:
             # 즉시 병합 및 증분 저장
             post_map[result['id']] = result
             final_posts = sorted(post_map.values(), key=lambda x: x['date'], reverse=True)
-            
-            with open('posts.json', 'w', encoding='utf-8') as f:
+
+            with open(output_path, 'w', encoding='utf-8') as f:
                 json.dump(final_posts, f, ensure_ascii=False, indent=2)
             
             analyzed_count += 1
