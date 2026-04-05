@@ -37,5 +37,11 @@ jobs:
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
           git add public/posts.json
-          git commit -m "chore: auto-update policy posts [$(date +'%Y-%m-%d')]" || echo "No changes to commit"
+          git commit -m "chore: auto-update policy posts [$(date +'%Y-%m-%d %H:%M:%S KST')]" || echo "No changes to commit"
           git push
+
+      # Vercel Deploy Hook이 있다면 아래와 같이 추가하여 강제 빌드를 트리거할 수 있습니다.
+      # - name: Trigger Vercel Deploy
+      #   if: success()
+      #   run: |
+      #     curl -X POST "${{ secrets.VERCEL_DEPLOY_HOOK_URL }}"

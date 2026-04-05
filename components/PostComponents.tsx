@@ -26,11 +26,11 @@ interface FiltersProps {
 
 export const Filters: React.FC<FiltersProps> = ({ currentCat, setCat }) => (
   <div className="max-w-[900px] mx-auto text-center px-4">
-    {/* 모바일: flex-wrap으로 자연스럽게 줄바꿈 / 데스크탑: 2행 그리드 유지 */}
-    <div className="flex flex-wrap justify-center gap-2 mb-3 sm:hidden">
+    {/* 모바일: 가로 스크롤 레이아웃으로 변경 (넘침 방지) */}
+    <div className="flex sm:hidden overflow-x-auto no-scrollbar gap-2 mb-4 pb-1 px-1 -mx-1 snap-x">
       <button
         onClick={() => setCat('all')}
-        className={`px-3 py-2 bg-[var(--card-bg)] border border-[var(--border)] rounded-xl text-[var(--text-muted)] text-[0.78rem] font-semibold cursor-pointer transition-all duration-300 ${currentCat === 'all' ? 'bg-[var(--accent)] text-white border-[var(--accent)]' : ''}`}
+        className={`flex-none px-4 py-2 bg-[var(--card-bg)] border border-[var(--border)] rounded-xl text-[var(--text-muted)] text-[0.8rem] font-semibold cursor-pointer transition-all duration-300 snap-start ${currentCat === 'all' ? 'bg-[var(--accent)] text-white border-[var(--accent)] shadow-[0_2px_8px_var(--accent-soft)]' : ''}`}
       >
         전체
       </button>
@@ -38,9 +38,9 @@ export const Filters: React.FC<FiltersProps> = ({ currentCat, setCat }) => (
         <button
           key={key}
           onClick={() => setCat(key)}
-          className={`px-3 py-2 bg-[var(--card-bg)] border border-[var(--border)] rounded-xl text-[var(--text-muted)] text-[0.78rem] font-semibold cursor-pointer transition-all duration-300 ${currentCat === key ? 'bg-[var(--accent)] text-white border-[var(--accent)]' : ''}`}
+          className={`flex-none px-4 py-2 bg-[var(--card-bg)] border border-[var(--border)] rounded-xl text-[var(--text-muted)] text-[0.8rem] font-semibold cursor-pointer whitespace-nowrap transition-all duration-300 snap-start ${currentCat === key ? 'bg-[var(--accent)] text-white border-[var(--accent)] shadow-[0_2px_8px_var(--accent-soft)]' : ''}`}
         >
-          {value}
+          {value.replace('부동산 ', '')}
         </button>
       ))}
     </div>
