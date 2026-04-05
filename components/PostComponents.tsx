@@ -25,11 +25,12 @@ interface FiltersProps {
 }
 
 export const Filters: React.FC<FiltersProps> = ({ currentCat, setCat }) => (
-  <div className="max-w-[900px] mx-auto text-center">
-    <div className="px-5 inline-grid grid-cols-[auto_repeat(3,auto)] gap-2.5 mb-3">
-      <button 
+  <div className="max-w-[900px] mx-auto text-center px-4">
+    {/* 모바일: flex-wrap으로 자연스럽게 줄바꿈 / 데스크탑: 2행 그리드 유지 */}
+    <div className="flex flex-wrap justify-center gap-2 mb-3 sm:hidden">
+      <button
         onClick={() => setCat('all')}
-        className={`row-span-2 px-4.5 py-2.5 bg-[var(--card-bg)] border border-[var(--border)] rounded-xl text-[var(--text-muted)] text-[0.85rem] font-semibold cursor-pointer whitespace-nowrap transition-all duration-300 hover:border-white/20 ${currentCat === 'all' ? 'bg-[var(--accent)] text-white border-[var(--accent)] shadow-[0_4_12px_var(--accent-soft)]' : ''}`}
+        className={`px-3 py-2 bg-[var(--card-bg)] border border-[var(--border)] rounded-xl text-[var(--text-muted)] text-[0.78rem] font-semibold cursor-pointer transition-all duration-300 ${currentCat === 'all' ? 'bg-[var(--accent)] text-white border-[var(--accent)]' : ''}`}
       >
         전체
       </button>
@@ -37,13 +38,31 @@ export const Filters: React.FC<FiltersProps> = ({ currentCat, setCat }) => (
         <button
           key={key}
           onClick={() => setCat(key)}
-          className={`px-4.5 py-2.5 bg-[var(--card-bg)] border border-[var(--border)] rounded-xl text-[var(--text-muted)] text-[0.85rem] font-semibold cursor-pointer whitespace-nowrap transition-all duration-300 hover:border-white/20 ${currentCat === key ? 'bg-[var(--accent)] text-white border-[var(--accent)] shadow-[0_4_12px_var(--accent-soft)]' : ''}`}
+          className={`px-3 py-2 bg-[var(--card-bg)] border border-[var(--border)] rounded-xl text-[var(--text-muted)] text-[0.78rem] font-semibold cursor-pointer transition-all duration-300 ${currentCat === key ? 'bg-[var(--accent)] text-white border-[var(--accent)]' : ''}`}
         >
           {value}
         </button>
       ))}
     </div>
-    <div className="text-[0.8rem] color-[#71717a] mb-[30px] min-h-[1.2rem]">
+    {/* 데스크탑: 기존 2행 그리드 레이아웃 유지 */}
+    <div className="hidden sm:inline-grid sm:grid-cols-[auto_repeat(3,auto)] gap-2.5 mb-3">
+      <button
+        onClick={() => setCat('all')}
+        className={`row-span-2 px-4 py-2.5 bg-[var(--card-bg)] border border-[var(--border)] rounded-xl text-[var(--text-muted)] text-[0.85rem] font-semibold cursor-pointer whitespace-nowrap transition-all duration-300 hover:border-white/20 ${currentCat === 'all' ? 'bg-[var(--accent)] text-white border-[var(--accent)] shadow-[0_4px_12px_var(--accent-soft)]' : ''}`}
+      >
+        전체
+      </button>
+      {Object.entries(CAT_NAMES).map(([key, value]) => (
+        <button
+          key={key}
+          onClick={() => setCat(key)}
+          className={`px-4 py-2.5 bg-[var(--card-bg)] border border-[var(--border)] rounded-xl text-[var(--text-muted)] text-[0.85rem] font-semibold cursor-pointer whitespace-nowrap transition-all duration-300 hover:border-white/20 ${currentCat === key ? 'bg-[var(--accent)] text-white border-[var(--accent)] shadow-[0_4px_12px_var(--accent-soft)]' : ''}`}
+        >
+          {value}
+        </button>
+      ))}
+    </div>
+    <div className="text-[0.8rem] text-[#71717a] mb-[30px] min-h-[1.2rem] px-2">
       {CAT_INFO[currentCat] || ""}
     </div>
   </div>
