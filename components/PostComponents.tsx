@@ -1,4 +1,5 @@
 import React from 'react';
+import { decodeHTMLEntities } from '../lib/utils';
 
 export const CAT_INFO: Record<string, string> = {
   all: "전체 부동산 관련 정책 자료를 모두 표시합니다.",
@@ -102,7 +103,7 @@ export const PostCard: React.FC<PostCardProps> = ({ post, onClick, index }) => (
       <span className="text-[0.75rem] text-[var(--text-muted)]">{post.date}</span>
     </div>
     <h2 className="text-[1.2rem] font-bold mb-4 text-[var(--text-main)] leading-1.4 line-clamp-2">
-      {post.headline}
+      {decodeHTMLEntities(post.headline)}
     </h2>
     <div className="flex items-center gap-4 text-[0.8rem] text-[var(--text-muted)]">
       <span>{post.source}</span>
