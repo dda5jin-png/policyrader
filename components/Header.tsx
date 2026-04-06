@@ -103,7 +103,7 @@ const Header = () => {
               )}
             </button>
             <div id="status" className="text-[0.7rem] text-[var(--text-muted)] leading-tight hidden sm:block">
-              AI Intelligence<br/>Pipeline Ready
+              Real-time Data<br/>Pipeline Ready
             </div>
         </div>
       </div>

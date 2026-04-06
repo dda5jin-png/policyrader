@@ -58,8 +58,8 @@ def analyze_post_with_retry(post, retries=2):
 
     [분석 가이드라인]:
     1. 시장 영향력: 부동산 가격, 대출 규제, 세금 변화, 공급 대책 중 실질적 파급력을 우선 분석하십시오.
-    2. 전문성: 단순 요약이 아닌, 정책의 이면과 향후 시장에 미칠 '전문가 시각'을 포함하십시오.
-    3. 실무성: 사용자가 오늘 바로 확인하거나 준비해야 할 '전문가 인사이트'를 구체적으로 작성하십시오.
+    2. 전문성: 단순 요약이 아닌, 정책의 이면과 향후 시장에 미칠 '심층 분석 시각'을 포함하십시오.
+    3. 실무성: 사용자가 오늘 바로 확인하거나 준비해야 할 '인사이트 체크리스트'를 구체적으로 작성하십시오.
     4. 출력 형식: 반드시 유효한 JSON 형식으로만 응답하십시오.
 
     [출력 JSON 구조]:
@@ -73,11 +73,11 @@ def analyze_post_with_retry(post, retries=2):
       ],
       "expertOpinions": [
         {{ 
-          "name": "AI 수석 분석관", 
-          "affiliation": "Policy Radar Intelligence", 
+          "name": "지능형 분석 리서치", 
+          "affiliation": "Policy Radar Research", 
           "stance": "중립/긍정/부정", 
-          "comment": "이 정책이 시장에 가져올 3개월~1년 뒤의 시나리오 분석",
-          "source": "Gemini Insight Engine" 
+          "comment": "이 정책이 시장에 가져올 3개월~1년 뒤의 기대효과 및 전망 분석",
+          "source": "Advanced Insight Engine" 
         }}
       ],
       "checklist": ["사용자가 즉시 확인해야 할 서류나 자격", "관련 기관(은행, 구청 등) 문의 사항", "향후 일정에 따른 준비 사항"],

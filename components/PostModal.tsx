@@ -39,18 +39,18 @@ const PostModal: React.FC<PostModalProps> = ({ post, onClose, onCopyLink, onPrin
         </div>
 
         <div className="text-[0.75rem] text-[var(--accent)] font-extrabold mt-8 mb-3 uppercase tracking-[1px] flex items-center gap-2">
-          전문가 시나리오 분석
+          기대효과 및 전망
           <div className="flex-1 h-px bg-[var(--border)]" />
         </div>
         <div className="bg-linear-to-br from-[var(--accent-soft)] to-transparent border border-[var(--accent-soft)] p-6 rounded-2xl italic leading-1.7 text-[var(--text-main)]">
           "{decodeHTMLEntities(post.expertOpinions[0]?.comment)}"
           <p className="mt-4 font-bold text-[0.8rem] text-right not-italic text-[var(--accent)]">
-            — {post.expertOpinions[0]?.name} ({post.expertOpinions[0]?.affiliation})
+            — 지능형 정책 리서치 ({post.expertOpinions[0]?.affiliation})
           </p>
         </div>
 
         <div className="text-[0.75rem] text-[var(--accent)] font-extrabold mt-8 mb-3 uppercase tracking-[1px] flex items-center gap-2">
-          데이터 세부 지표
+          관련 지표 정리
           <div className="flex-1 h-px bg-[var(--border)]" />
         </div>
         <div className="overflow-x-auto mt-2.5 rounded-lg border border-[var(--border)]">
@@ -76,7 +76,7 @@ const PostModal: React.FC<PostModalProps> = ({ post, onClose, onCopyLink, onPrin
 
         {/* 체크리스트: 임시 전면 개방 */}
         <div className="text-[0.75rem] text-[var(--accent)] font-extrabold mt-8 mb-3 uppercase tracking-[1px] flex items-center gap-2">
-          사용자 액션 체크리스트
+          인사이트 체크리스트
           <div className="flex-1 h-px bg-[var(--border)]" />
         </div>
         <div className="list-none">
