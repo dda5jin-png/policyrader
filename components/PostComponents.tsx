@@ -31,7 +31,7 @@ export const Filters: React.FC<FiltersProps> = ({ currentCat, setCat }) => (
     <div className="flex sm:hidden overflow-x-auto no-scrollbar gap-2 mb-4 pb-1 px-1 -mx-1 snap-x">
       <button
         onClick={() => setCat('all')}
-        className={`flex-none px-4 py-2 bg-[var(--card-bg)] border border-[var(--border)] rounded-xl text-[var(--text-muted)] text-[0.8rem] font-semibold cursor-pointer transition-all duration-300 snap-start ${currentCat === 'all' ? 'bg-[var(--accent)] text-white border-[var(--accent)] shadow-[0_2px_8px_var(--accent-soft)]' : ''}`}
+        className={`flex-none px-4 py-2 border rounded-xl text-[0.8rem] font-semibold cursor-pointer transition-all duration-300 snap-start ${currentCat === 'all' ? 'bg-[var(--accent)] text-white border-[var(--accent)] shadow-[0_2px_8px_var(--accent-soft)]' : 'bg-[var(--card-bg)] border-[var(--border)] text-[var(--text-muted)]'}`}
       >
         전체
       </button>
@@ -39,7 +39,7 @@ export const Filters: React.FC<FiltersProps> = ({ currentCat, setCat }) => (
         <button
           key={key}
           onClick={() => setCat(key)}
-          className={`flex-none px-4 py-2 bg-[var(--card-bg)] border border-[var(--border)] rounded-xl text-[var(--text-muted)] text-[0.8rem] font-semibold cursor-pointer whitespace-nowrap transition-all duration-300 snap-start ${currentCat === key ? 'bg-[var(--accent)] text-white border-[var(--accent)] shadow-[0_2px_8px_var(--accent-soft)]' : ''}`}
+          className={`flex-none px-4 py-2 border rounded-xl text-[0.8rem] font-semibold cursor-pointer whitespace-nowrap transition-all duration-300 snap-start ${currentCat === key ? 'bg-[var(--accent)] text-white border-[var(--accent)] shadow-[0_2px_8px_var(--accent-soft)]' : 'bg-[var(--card-bg)] border-[var(--border)] text-[var(--text-muted)]'}`}
         >
           {value.replace('부동산 ', '')}
         </button>
@@ -49,7 +49,7 @@ export const Filters: React.FC<FiltersProps> = ({ currentCat, setCat }) => (
     <div className="hidden sm:inline-grid sm:grid-cols-[auto_repeat(3,auto)] gap-2.5 mb-3">
       <button
         onClick={() => setCat('all')}
-        className={`row-span-2 px-4 py-2.5 bg-[var(--card-bg)] border border-[var(--border)] rounded-xl text-[var(--text-muted)] text-[0.85rem] font-semibold cursor-pointer whitespace-nowrap transition-all duration-300 hover:border-white/20 ${currentCat === 'all' ? 'bg-[var(--accent)] text-white border-[var(--accent)] shadow-[0_4px_12px_var(--accent-soft)]' : ''}`}
+        className={`row-span-2 px-4 py-2.5 border rounded-xl text-[0.85rem] font-semibold cursor-pointer whitespace-nowrap transition-all duration-300 hover:border-[var(--accent)] ${currentCat === 'all' ? 'bg-[var(--accent)] text-white border-[var(--accent)] shadow-[0_4px_12px_var(--accent-soft)]' : 'bg-[var(--card-bg)] border-[var(--border)] text-[var(--text-muted)]'}`}
       >
         전체
       </button>
@@ -57,7 +57,7 @@ export const Filters: React.FC<FiltersProps> = ({ currentCat, setCat }) => (
         <button
           key={key}
           onClick={() => setCat(key)}
-          className={`px-4 py-2.5 bg-[var(--card-bg)] border border-[var(--border)] rounded-xl text-[var(--text-muted)] text-[0.85rem] font-semibold cursor-pointer whitespace-nowrap transition-all duration-300 hover:border-white/20 ${currentCat === key ? 'bg-[var(--accent)] text-white border-[var(--accent)] shadow-[0_4px_12px_var(--accent-soft)]' : ''}`}
+          className={`px-4 py-2.5 border rounded-xl text-[0.85rem] font-semibold cursor-pointer whitespace-nowrap transition-all duration-300 hover:border-[var(--accent)] ${currentCat === key ? 'bg-[var(--accent)] text-white border-[var(--accent)] shadow-[0_4px_12px_var(--accent-soft)]' : 'bg-[var(--card-bg)] border-[var(--border)] text-[var(--text-muted)]'}`}
         >
           {value}
         </button>
