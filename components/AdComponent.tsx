@@ -2,6 +2,9 @@
 import React from 'react';
 
 const GoogleAd = ({ className = '' }: { className?: string }) => {
+  // 광고 영역 일시 숨김 처리 (요청 시 null 반환 대신 hidden 스타일 또는 주석 처리 가능)
+  return null; 
+
   return (
     <div className={`my-8 p-6 rounded-2xl border border-[var(--border)] bg-white/3 flex flex-col items-center justify-center min-h-[150px] relative overflow-hidden group ${className}`}>
       <div className="absolute top-3 left-3 flex items-center gap-1.5 grayscale opacity-30 group-hover:opacity-60 transition-opacity">
