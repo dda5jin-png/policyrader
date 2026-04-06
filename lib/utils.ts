@@ -1,5 +1,25 @@
 import { Post } from "../components/PostComponents";
 
+export const decodeHTMLEntities = (text: string): string => {
+  if (!text || typeof text !== 'string') return text;
+  return text
+    .replace(/&middot;/g, '·')
+    .replace(/&nbsp;/g, ' ')
+    .replace(/&amp;/g, '&')
+    .replace(/&lt;/g, '<')
+    .replace(/&gt;/g, '>')
+    .replace(/&quot;/g, '"')
+    .replace(/&#039;/g, "'")
+    .replace(/&#39;/g, "'")
+    .replace(/&ldquo;/g, '"')
+    .replace(/&rdquo;/g, '"')
+    .replace(/&#xFF62;/g, '「')
+    .replace(/&#xFF63;/g, '」')
+    .replace(/&bull;/g, '•')
+    .replace(/&ndash;/g, '–')
+    .replace(/&mdash;/g, '—');
+};
+
 export const copyLink = (id: string) => {
   const url = `${window.location.origin}${window.location.pathname}?id=${id}`;
   if (navigator.clipboard && navigator.clipboard.writeText) {

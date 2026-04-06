@@ -5,6 +5,7 @@ import Header from '../components/Header';
 import { Hero, SloganSection } from '../components/HeroSections';
 import { Filters, PostCard, Post } from '../components/PostComponents';
 import PostModal from '../components/PostModal';
+import GoogleAd from '../components/AdComponent';
 import { copyLink, printPDF } from '../lib/utils';
 
 export default function Home() {
@@ -77,12 +78,14 @@ export default function Home() {
           ) : (
             <div className="grid gap-5">
               {filteredPosts.map((post, index) => (
-                <PostCard 
-                  key={post.id} 
-                  post={post} 
-                  onClick={handlePostClick} 
-                  index={index} 
-                />
+                <React.Fragment key={post.id}>
+                  <PostCard 
+                    post={post} 
+                    onClick={handlePostClick} 
+                    index={index} 
+                  />
+                  {(index + 1) % 4 === 0 && <GoogleAd />}
+                </React.Fragment>
               ))}
             </div>
           )}

@@ -6,25 +6,26 @@ import { authClient } from '@/lib/auth-client';
 const Header = () => {
   const { data: session, isPending } = authClient.useSession();
   const [loginLoading, setLoginLoading] = useState(false);
-  const [loginError, setLoginError] = useState<string | null>(null);
+  const [isLight, setIsLight] = useState(false);
 
-  const handleLogin = async () => {
-    setLoginLoading(true);
-    setLoginError(null);
-    try {
-      await authClient.signIn.social({
-        provider: 'google',
-        callbackURL: '/'
-      });
-    } catch (err) {
-      console.error('로그인 오류:', err);
-      setLoginError('로그인 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.');
-      setLoginLoading(false);
+  React.useEffect(() => {
+    const savedTheme = localStorage.getItem('theme');
+    if (savedTheme === 'light') {
+      setIsLight(true);
+      document.documentElement.classList.add('light-mode');
     }
-  };
+  }, []);
 
-  const handleLogout = async () => {
-    await authClient.signOut();
+  const toggleTheme = () => {
+    const newIsLight = !isLight;
+    setIsLight(newIsLight);
+    if (newIsLight) {
+      document.documentElement.classList.add('light-mode');
+      localStorage.setItem('theme', 'light');
+    } else {
+      document.documentElement.classList.remove('light-mode');
+      localStorage.setItem('theme', 'dark');
+    }
   };
 
   return (
@@ -38,10 +39,6 @@ const Header = () => {
           </div>
           POLICY RADAR
         </a>
-        <div className="flex items-center gap-4 text-right">
-          {loginError && (
-            <span className="text-[0.65rem] text-red-400 max-w-[120px] leading-tight">{loginError}</span>
-          )}
           {/* 
           {!isPending && (
             <>
@@ -81,9 +78,33 @@ const Header = () => {
             </>
           )} 
           */}
-          <div id="status" className="text-[0.7rem] text-[var(--text-muted)] leading-tight hidden sm:block">
-            AI Intelligence<br/>Pipeline Ready
-          </div>
+          <div className="flex items-center gap-3">
+            <button 
+              onClick={toggleTheme}
+              className="w-10 h-10 rounded-full bg-white/5 border border-[var(--border)] flex items-center justify-center cursor-pointer hover:bg-white/10 transition-all text-[var(--text-main)]"
+              title={isLight ? "다크 모드로 전환" : "라이트 모드로 전환"}
+            >
+              {isLight ? (
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                  <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
+                </svg>
+              ) : (
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                  <circle cx="12" cy="12" r="5" />
+                  <line x1="12" y1="1" x2="12" y2="3" />
+                  <line x1="12" y1="21" x2="12" y2="23" />
+                  <line x1="4.22" y1="4.22" x2="5.64" y2="5.64" />
+                  <line x1="18.36" y1="18.36" x2="19.78" y2="19.78" />
+                  <line x1="1" y1="12" x2="3" y2="12" />
+                  <line x1="21" y1="12" x2="23" y2="12" />
+                  <line x1="4.22" y1="19.07" x2="5.64" y2="17.66" />
+                  <line x1="18.36" y1="5.64" x2="19.78" y2="7.07" />
+                </svg>
+              )}
+            </button>
+            <div id="status" className="text-[0.7rem] text-[var(--text-muted)] leading-tight hidden sm:block">
+              AI Intelligence<br/>Pipeline Ready
+            </div>
         </div>
       </div>
     </header>

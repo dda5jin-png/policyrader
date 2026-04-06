@@ -1,6 +1,7 @@
-'use client';
 import React from 'react';
 import { Post, CAT_NAMES } from './PostComponents';
+import { decodeHTMLEntities } from '../lib/utils';
+import GoogleAd from './AdComponent';
 
 interface PostModalProps {
   post: Post | null;
@@ -14,14 +15,14 @@ const PostModal: React.FC<PostModalProps> = ({ post, onClose, onCopyLink, onPrin
 
   return (
     <div className="fixed inset-0 bg-black/85 backdrop-blur-[8px] z-[2000] flex items-center justify-center p-5 animate-[modalFade_0.3s_cubic-bezier(0.16,1,0.3,1)]">
-      <div className="w-full max-w-[700px] bg-[#0f172a] border border-[var(--border)] rounded-[24px] max-h-[85vh] overflow-y-auto p-10 px-7.5 relative">
-        <div className="absolute top-5 right-5 w-10 h-10 bg-white/5 rounded-full flex items-center justify-center cursor-pointer text-white hover:bg-white/10" onClick={onClose}>✕</div>
+      <div className="w-full max-w-[700px] bg-[var(--primary)] border border-[var(--border)] rounded-[24px] max-h-[85vh] overflow-y-auto p-10 px-7.5 relative">
+        <div className="absolute top-5 right-5 w-10 h-10 bg-white/5 rounded-full flex items-center justify-center cursor-pointer text-[var(--text-main)] hover:bg-white/10" onClick={onClose}>✕</div>
         
         <span className={`text-[0.65rem] font-extrabold px-2.5 py-1 rounded-md uppercase tracking-[0.5px] cat-${post.cat}`}>
           {CAT_NAMES[post.cat] || post.catName}
         </span>
         
-        <h1 className="my-5 text-[1.5rem] font-extrabold leading-[1.3] text-white">{post.headline}</h1>
+        <h1 className="my-5 text-[1.5rem] font-extrabold leading-[1.3] text-[var(--text-main)]">{decodeHTMLEntities(post.headline)}</h1>
         <p className="text-[var(--text-muted)] text-[0.85rem]">발행: {post.date} | 출처: {post.source}</p>
 
         <div className="text-[0.75rem] text-[var(--accent)] font-extrabold mt-8 mb-3 uppercase tracking-[1px] flex items-center gap-2">
@@ -30,9 +31,9 @@ const PostModal: React.FC<PostModalProps> = ({ post, onClose, onCopyLink, onPrin
         </div>
         <div className="list-none">
           {post.summary.map((s, i) => (
-            <div key={i} className="p-3 px-4 bg-white/3 rounded-xl mb-2.5 text-[0.95rem] flex gap-3">
+            <div key={i} className="p-3 px-4 bg-white/3 rounded-xl mb-2.5 text-[0.95rem] flex gap-3 text-[var(--text-main)]">
               <span className="text-[var(--accent)] font-black">→</span>
-              {s}
+              {decodeHTMLEntities(s)}
             </div>
           ))}
         </div>
@@ -41,8 +42,8 @@ const PostModal: React.FC<PostModalProps> = ({ post, onClose, onCopyLink, onPrin
           전문가 시나리오 분석
           <div className="flex-1 h-px bg-[var(--border)]" />
         </div>
-        <div className="bg-linear-to-br from-[var(--accent-soft)] to-transparent border border-[var(--accent-soft)] p-6 rounded-2xl italic leading-1.7">
-          "{post.expertOpinions[0]?.comment}"
+        <div className="bg-linear-to-br from-[var(--accent-soft)] to-transparent border border-[var(--accent-soft)] p-6 rounded-2xl italic leading-1.7 text-[var(--text-main)]">
+          "{decodeHTMLEntities(post.expertOpinions[0]?.comment)}"
           <p className="mt-4 font-bold text-[0.8rem] text-right not-italic text-[var(--accent)]">
             — {post.expertOpinions[0]?.name} ({post.expertOpinions[0]?.affiliation})
           </p>
@@ -64,9 +65,9 @@ const PostModal: React.FC<PostModalProps> = ({ post, onClose, onCopyLink, onPrin
             <tbody>
               {post.keyData.map((d, i) => (
                 <tr key={i} className="border-b border-white/2">
-                  <td className="p-3 text-[0.9rem] text-white/80">{d.항목}</td>
-                  <td className="p-3 text-[0.9rem] text-white font-bold">{d.수치}</td>
-                  <td className="p-3 text-[0.9rem] text-white/60">{d.적용대상}</td>
+                  <td className="p-3 text-[0.9rem] text-[var(--text-main)] transition-colors">{decodeHTMLEntities(d.항목)}</td>
+                  <td className="p-3 text-[0.9rem] text-[var(--accent)] font-bold">{decodeHTMLEntities(d.수치)}</td>
+                  <td className="p-3 text-[0.9rem] text-[var(--text-muted)]">{decodeHTMLEntities(d.적용대상)}</td>
                 </tr>
               ))}
             </tbody>
@@ -80,11 +81,13 @@ const PostModal: React.FC<PostModalProps> = ({ post, onClose, onCopyLink, onPrin
         </div>
         <div className="list-none">
           {post.checklist.map((c, i) => (
-            <div key={i} className="p-3 px-4 bg-[var(--accent-soft)] border-l-3 border-[var(--accent)] rounded-r-xl rounded-l-none mb-2.5 text-[0.95rem] flex gap-3">
-              {c}
+            <div key={i} className="p-3 px-4 bg-[var(--accent-soft)] border-l-3 border-[var(--accent)] rounded-r-xl rounded-l-none mb-2.5 text-[0.95rem] flex gap-3 text-[var(--text-main)]">
+              {decodeHTMLEntities(c)}
             </div>
           ))}
         </div>
+
+        <GoogleAd />
 
         <div className="flex flex-col sm:flex-row gap-3 mt-8 justify-center items-center">
           {/* 링크생성, PDF출력: 임시 전면 개방 */}

@@ -17,6 +17,20 @@
   --background: #030712;
 }
 
+:root.light-mode {
+  --primary: #f8fafc;
+  --bg: #f8fafc;
+  --card-bg: #ffffff;
+  --border: rgba(0, 0, 0, 0.08);
+  --text-main: #0f172a;
+  --text-muted: #475569;
+  --glass: rgba(255, 255, 255, 0.8);
+  --foreground: #0f172a;
+  --background: #ffffff;
+  --accent-soft: rgba(244, 63, 94, 0.05);
+}
+
+
 body {
   font-family: 'Pretendard', sans-serif;
   background-color: var(--bg);
