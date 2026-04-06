@@ -5,7 +5,7 @@ export const Hero = () => (
     <div className="inline-block px-3.5 py-1.5 bg-[var(--accent-soft)] text-[var(--accent)] rounded-full text-[0.75rem] font-bold mb-5 uppercase tracking-[1px]">
       Policy Radar AI Pipeline
     </div>
-    <h1 className="text-[2.2rem] font-extrabold leading-[1.2] mb-5 bg-linear-to-r from-white to-[#94a3b8] bg-clip-text text-transparent">
+    <h1 className="text-[2.2rem] font-extrabold leading-[1.2] mb-5 text-[var(--text-main)]">
       복잡한 부동산 정책 흐름<br/>가장 빠르고 정확하게 분석합니다.
     </h1>
   </section>
@@ -13,7 +13,7 @@ export const Hero = () => (
 
 export const SloganSection = () => (
   <div className="max-w-[660px] mx-auto -mt-5 mb-11 px-5">
-    <div className="bg-white/5 border border-white/10 rounded-2xl p-7.5 pb-5">
+    <div className="bg-[var(--card-bg)] border border-[var(--border)] rounded-2xl p-7.5 pb-5 shadow-sm">
       <div className="flex items-start gap-3 text-[0.9rem] text-[var(--text-muted)] font-medium leading-[1.65] mb-3.5">
         <svg className="text-[var(--accent)] flex-shrink-0 mt-[3px]" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
           <path d="M5 13l4 4L19 7" strokeLinecap="round" strokeLinejoin="round"/>
@@ -33,7 +33,7 @@ export const SloganSection = () => (
         </svg>
         관심 자료의 링크 생성 및 PDF 출력 기능을 제공합니다.
       </div>
-      <hr className="border-t border-white/10 my-4 last:mb-0" />
+      <hr className="border-t border-[var(--border)] my-4 last:mb-0" />
       <div className="flex items-start gap-2 text-[0.8rem] text-[#f59e0b] font-medium leading-[1.6]">
         <span className="flex-shrink-0 text-[0.95rem] mt-px">※</span>
         AI 정책 분석기 및 부가기능은 유료 전환 전 무료 제공 중입니다.
