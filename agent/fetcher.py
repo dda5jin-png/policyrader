@@ -172,15 +172,20 @@ def run_fetcher():
     print("[Fetcher] 정책레이더 지능형 수집 엔진 가동...")
     
     last_date = get_last_post_date()
-    if last_date:
-        # 증분 수집: 마지막 수집일로부터 3일 전부터
+    force_backfill = os.getenv("FORCE_BACKFILL", "false").lower() == "true"
+    
+    if last_date and not force_backfill:
+        # 증분 수집: 마지막 수집일로부터 3일 전부터 (누락 방지)
         start_date_limit = last_date - timedelta(days=3)
         max_posts = 15
     else:
-        # 최초 수집: 최근 14일치만
-        print("  💡 최초 실행 감지: 최근 14일 데이터를 수집합니다.")
-        start_date_limit = datetime.now() - timedelta(days=14)
-        max_posts = 8
+        # 최초 수집 또는 강제 백필: 최근 90일치 (약 3개월) 데이터를 수집하여 기반 데이터 확보
+        if force_backfill:
+            print("  🚀 강제 백필 모드 활성화: 최근 90일 데이터를 수집합니다.")
+        else:
+            print("  💡 최초 실행(또는 데이터 없음) 감지: 최근 90일 데이터를 수집합니다.")
+        start_date_limit = datetime.now() - timedelta(days=90)
+        max_posts = 40 # 초기/백필 데이터는 넉넉히 확보
 
     raw_posts = fetch_via_api_range(start_date_limit)
     

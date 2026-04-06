@@ -86,28 +86,28 @@ const PostModal: React.FC<PostModalProps> = ({ post, onClose, onCopyLink, onPrin
           ))}
         </div>
 
-        <div className="flex gap-3 mt-8 justify-center">
+        <div className="flex flex-col sm:flex-row gap-3 mt-8 justify-center items-center">
           {/* 링크생성, PDF출력: 임시 전면 개방 */}
-          <button className="flex-1 max-w-[160px] p-3.5 rounded-xl border border-[var(--border)] bg-white/5 text-white text-[0.85rem] font-bold cursor-pointer flex items-center justify-center gap-2 transition-all hover:bg-white/10 hover:border-white/20" onClick={() => onCopyLink(post.id)}>
+          <button className="w-full sm:w-auto sm:flex-1 sm:max-w-[160px] p-3.5 rounded-xl border border-[var(--border)] bg-white/5 text-white text-[0.85rem] font-bold cursor-pointer flex items-center justify-center gap-2 transition-all hover:bg-white/10 hover:border-white/20" onClick={() => onCopyLink(post.id)}>
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
               <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" strokeLinecap="round" strokeLinejoin="round"/>
               <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" strokeLinecap="round" strokeLinejoin="round"/>
             </svg>
-            링크생성
+            <span className="whitespace-nowrap">링크생성</span>
           </button>
-          <button className="flex-1 max-w-[160px] p-3.5 rounded-xl border border-[var(--border)] bg-white/5 text-white text-[0.85rem] font-bold cursor-pointer flex items-center justify-center gap-2 transition-all hover:bg-white/10 hover:border-white/20" onClick={() => onPrintPDF(post)}>
+          <button className="w-full sm:w-auto sm:flex-1 sm:max-w-[160px] p-3.5 rounded-xl border border-[var(--border)] bg-white/5 text-white text-[0.85rem] font-bold cursor-pointer flex items-center justify-center gap-2 transition-all hover:bg-white/10 hover:border-white/20" onClick={() => onPrintPDF(post)}>
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
               <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" strokeLinecap="round" strokeLinejoin="round"/>
               <polyline points="14 2 14 8 20 8" strokeLinecap="round" strokeLinejoin="round"/>
               <line x1="12" y1="18" x2="12" y2="12" strokeLinecap="round"/>
               <line x1="9" y1="15" x2="15" y2="15" strokeLinecap="round"/>
             </svg>
-            PDF 출력
+            <span className="whitespace-nowrap">PDF 출력</span>
           </button>
           
           {/* 원문보기: 항상 표시 */}
-          <button className="flex-1 max-w-[160px] p-3.5 rounded-xl border-none bg-white text-black text-[0.85rem] font-bold cursor-pointer flex items-center justify-center gap-2 transition-all hover:bg-slate-200" onClick={() => window.open(post.sourceUrl)}>
-            원문보기
+          <button className="w-full sm:w-auto sm:flex-1 sm:max-w-[160px] p-3.5 rounded-xl border-none bg-white text-black text-[0.85rem] font-bold cursor-pointer flex items-center justify-center gap-2 transition-all hover:bg-slate-200" onClick={() => window.open(post.sourceUrl)}>
+            <span className="whitespace-nowrap">원문보기</span>
           </button>
         </div>
       </div>
