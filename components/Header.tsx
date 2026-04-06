@@ -42,6 +42,7 @@ const Header = () => {
           {loginError && (
             <span className="text-[0.65rem] text-red-400 max-w-[120px] leading-tight">{loginError}</span>
           )}
+          {/* 
           {!isPending && (
             <>
               {session ? (
@@ -78,7 +79,8 @@ const Header = () => {
                 </button>
               )}
             </>
-          )}
+          )} 
+          */}
           <div id="status" className="text-[0.7rem] text-[var(--text-muted)] leading-tight hidden sm:block">
             AI Intelligence<br/>Pipeline Ready
           </div>

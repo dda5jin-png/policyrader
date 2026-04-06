@@ -1,7 +1,6 @@
 'use client';
 import React from 'react';
 import { Post, CAT_NAMES } from './PostComponents';
-import { authClient } from '@/lib/auth-client';
 
 interface PostModalProps {
   post: Post | null;
@@ -11,9 +10,6 @@ interface PostModalProps {
 }
 
 const PostModal: React.FC<PostModalProps> = ({ post, onClose, onCopyLink, onPrintPDF }) => {
-  const { data: session } = authClient.useSession();
-  const isLoggedIn = !!session;
-
   if (!post) return null;
 
   return (
@@ -77,49 +73,38 @@ const PostModal: React.FC<PostModalProps> = ({ post, onClose, onCopyLink, onPrin
           </table>
         </div>
 
-        {/* 체크리스트: 로그인한 사용자만 */}
-        {isLoggedIn ? (
-          <>
-            <div className="text-[0.75rem] text-[var(--accent)] font-extrabold mt-8 mb-3 uppercase tracking-[1px] flex items-center gap-2">
-              사용자 액션 체크리스트
-              <div className="flex-1 h-px bg-[var(--border)]" />
+        {/* 체크리스트: 임시 전면 개방 */}
+        <div className="text-[0.75rem] text-[var(--accent)] font-extrabold mt-8 mb-3 uppercase tracking-[1px] flex items-center gap-2">
+          사용자 액션 체크리스트
+          <div className="flex-1 h-px bg-[var(--border)]" />
+        </div>
+        <div className="list-none">
+          {post.checklist.map((c, i) => (
+            <div key={i} className="p-3 px-4 bg-[var(--accent-soft)] border-l-3 border-[var(--accent)] rounded-r-xl rounded-l-none mb-2.5 text-[0.95rem] flex gap-3">
+              {c}
             </div>
-            <div className="list-none">
-              {post.checklist.map((c, i) => (
-                <div key={i} className="p-3 px-4 bg-[var(--accent-soft)] border-l-3 border-[var(--accent)] rounded-r-xl rounded-l-none mb-2.5 text-[0.95rem] flex gap-3">
-                  {c}
-                </div>
-              ))}
-            </div>
-          </>
-        ) : (
-          <div className="mt-8 p-4 rounded-xl border border-white/10 bg-white/3 text-center text-[0.85rem] text-[var(--text-muted)]">
-            🔒 <span className="text-white font-bold">로그인</span>하면 체크리스트, 링크 생성, PDF 출력을 사용할 수 있어요.
-          </div>
-        )}
+          ))}
+        </div>
 
         <div className="flex gap-3 mt-8 justify-center">
-          {/* 링크생성, PDF출력: 로그인한 사용자만 */}
-          {isLoggedIn && (
-            <>
-              <button className="flex-1 max-w-[160px] p-3.5 rounded-xl border border-[var(--border)] bg-white/5 text-white text-[0.85rem] font-bold cursor-pointer flex items-center justify-center gap-2 transition-all hover:bg-white/10 hover:border-white/20" onClick={() => onCopyLink(post.id)}>
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-                  <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" strokeLinecap="round" strokeLinejoin="round"/>
-                  <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" strokeLinecap="round" strokeLinejoin="round"/>
-                </svg>
-                링크생성
-              </button>
-              <button className="flex-1 max-w-[160px] p-3.5 rounded-xl border border-[var(--border)] bg-white/5 text-white text-[0.85rem] font-bold cursor-pointer flex items-center justify-center gap-2 transition-all hover:bg-white/10 hover:border-white/20" onClick={() => onPrintPDF(post)}>
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-                  <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" strokeLinecap="round" strokeLinejoin="round"/>
-                  <polyline points="14 2 14 8 20 8" strokeLinecap="round" strokeLinejoin="round"/>
-                  <line x1="12" y1="18" x2="12" y2="12" strokeLinecap="round"/>
-                  <line x1="9" y1="15" x2="15" y2="15" strokeLinecap="round"/>
-                </svg>
-                PDF 출력
-              </button>
-            </>
-          )}
+          {/* 링크생성, PDF출력: 임시 전면 개방 */}
+          <button className="flex-1 max-w-[160px] p-3.5 rounded-xl border border-[var(--border)] bg-white/5 text-white text-[0.85rem] font-bold cursor-pointer flex items-center justify-center gap-2 transition-all hover:bg-white/10 hover:border-white/20" onClick={() => onCopyLink(post.id)}>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+              <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" strokeLinecap="round" strokeLinejoin="round"/>
+              <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
+            링크생성
+          </button>
+          <button className="flex-1 max-w-[160px] p-3.5 rounded-xl border border-[var(--border)] bg-white/5 text-white text-[0.85rem] font-bold cursor-pointer flex items-center justify-center gap-2 transition-all hover:bg-white/10 hover:border-white/20" onClick={() => onPrintPDF(post)}>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" strokeLinecap="round" strokeLinejoin="round"/>
+              <polyline points="14 2 14 8 20 8" strokeLinecap="round" strokeLinejoin="round"/>
+              <line x1="12" y1="18" x2="12" y2="12" strokeLinecap="round"/>
+              <line x1="9" y1="15" x2="15" y2="15" strokeLinecap="round"/>
+            </svg>
+            PDF 출력
+          </button>
+          
           {/* 원문보기: 항상 표시 */}
           <button className="flex-1 max-w-[160px] p-3.5 rounded-xl border-none bg-white text-black text-[0.85rem] font-bold cursor-pointer flex items-center justify-center gap-2 transition-all hover:bg-slate-200" onClick={() => window.open(post.sourceUrl)}>
             원문보기
