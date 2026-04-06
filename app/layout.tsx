@@ -1,7 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
 
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://policyrader.com';
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://policyradar.co.kr';
 
 export const metadata: Metadata = {
   title: "Policy Radar - AI 기반 부동산·금융 정책 실시간 분석 서비스",

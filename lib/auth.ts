@@ -6,7 +6,7 @@ export const auth = betterAuth({
         connectionString: process.env.DATABASE_URL || process.env.DATABASE_URL_UNPOOLED,
         ssl: { rejectUnauthorized: false }
     }),
-    baseURL: process.env.NEXT_PUBLIC_SITE_URL || process.env.NEXT_PUBLIC_APP_URL || process.env.BETTER_AUTH_URL,
+    baseURL: process.env.NEXT_PUBLIC_SITE_URL || process.env.NEXT_PUBLIC_APP_URL || (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : undefined),
     socialProviders: {
         google: {
             clientId: process.env.GOOGLE_CLIENT_ID as string,

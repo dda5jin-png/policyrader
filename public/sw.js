@@ -5,7 +5,7 @@
 
 const CACHE_NAME = 'policyrader-v1';
 const STATIC_ASSETS = [
-  '/index.html',
+  '/',
   '/manifest.json',
   '/icons/icon-192.png',
   '/icons/icon-512.png'
@@ -70,7 +70,7 @@ self.addEventListener('fetch', event => {
           cache.put(event.request, responseToCache)
         );
         return response;
-      }).catch(() => caches.match('/index.html'));
+      }).catch(() => caches.match('/'));
     })
   );
 });
@@ -84,7 +84,7 @@ self.addEventListener('push', event => {
     icon: '/icons/icon-192.png',
     badge: '/icons/icon-96.png',
     tag: data.tag || 'policyrader-update',
-    data: { url: data.url || '/index.html' },
+    data: { url: data.url || '/' },
     actions: [
       { action: 'view', title: '바로 보기' },
       { action: 'close', title: '닫기' }
@@ -101,7 +101,7 @@ self.addEventListener('push', event => {
 self.addEventListener('notificationclick', event => {
   event.notification.close();
   if (event.action === 'view' || !event.action) {
-    const url = event.notification.data?.url || '/index.html';
+    const url = event.notification.data?.url || '/';
     event.waitUntil(clients.openWindow(url));
   }
 });

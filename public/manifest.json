@@ -2,7 +2,7 @@
   "name": "정책레이더 — 부동산·금융정책 아카이브",
   "short_name": "정책레이더",
   "description": "대한민국 부동산·금융정책 원문 아카이브. 국토부·금융위·기재부 공식 보도자료를 실시간으로 스크랩하고 전문가 분석을 제공합니다.",
-  "start_url": "/index.html",
+  "start_url": "/",
   "scope": "/",
   "display": "standalone",
   "orientation": "portrait-primary",
@@ -64,21 +64,21 @@
       "name": "금융·거시 정책",
       "short_name": "금융",
       "description": "DSR·금리·PF 등 금융거시 정책 모아보기",
-      "url": "/index.html?cat=F",
+      "url": "/?cat=F",
       "icons": [{"src": "icons/icon-96.png", "sizes": "96x96"}]
     },
     {
       "name": "세제·평가",
       "short_name": "세제",
       "description": "공시가격·취득세·양도세 정책 모아보기",
-      "url": "/index.html?cat=X",
+      "url": "/?cat=X",
       "icons": [{"src": "icons/icon-96.png", "sizes": "96x96"}]
     },
     {
       "name": "공급·개발",
       "short_name": "공급",
       "description": "신도시·정비사업·분양 정책 모아보기",
-      "url": "/index.html?cat=S",
+      "url": "/?cat=S",
       "icons": [{"src": "icons/icon-96.png", "sizes": "96x96"}]
     }
   ],
