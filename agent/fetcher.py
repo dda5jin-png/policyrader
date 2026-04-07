@@ -23,6 +23,7 @@ TARGET_KEYWORDS = [
 # 공공데이터포털 인증키
 API_KEY = os.getenv("DATA_GO_KR_API_KEY")
 BASE_URL = "http://apis.data.go.kr/1371000/pressReleaseService/pressReleaseList"
+POSTS_PATH = "public/posts.json"
 
 def scrape_full_content(url):
     """보도자료 원문 URL에서 본문 내용을 추출합니다."""
@@ -162,9 +163,9 @@ def select_top_posts(all_posts, max_per_month=10):
 
 def get_last_post_date():
     """기존 posts.json에서 가장 최신 날짜를 가져옵니다."""
-    if os.path.exists('posts.json'):
+    if os.path.exists(POSTS_PATH):
         try:
-            with open('posts.json', 'r', encoding='utf-8') as f:
+            with open(POSTS_PATH, 'r', encoding='utf-8') as f:
                 data = json.load(f)
                 if data and isinstance(data, list) and len(data) > 0:
                     return datetime.strptime(data[0]['date'], "%Y-%m-%d")
@@ -202,9 +203,9 @@ def run_fetcher():
     
     # 중복 제거 (이미 posts.json에 있는 ID 제외)
     existing_ids = set()
-    if os.path.exists('posts.json'):
+    if os.path.exists(POSTS_PATH):
         try:
-            with open('posts.json', 'r', encoding='utf-8') as f:
+            with open(POSTS_PATH, 'r', encoding='utf-8') as f:
                 existing_data = json.load(f)
                 existing_ids = {p['id'] for p in existing_data}
         except: pass

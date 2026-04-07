@@ -6,7 +6,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "validate:posts": "python3 agent/validate_posts.py --file public/posts.json --fix"
   },
   "dependencies": {
     "better-auth": "^1.5.6",

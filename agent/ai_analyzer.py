@@ -6,6 +6,10 @@ import time
 from datetime import datetime
 from dotenv import load_dotenv
 from agent.data_connector import DataConnector
+try:
+    from agent.post_processor import load_posts, normalize_post, save_posts, validate_posts
+except ModuleNotFoundError:
+    from post_processor import load_posts, normalize_post, save_posts, validate_posts
 
 # .env 파일 로드
 load_dotenv()
@@ -148,10 +152,7 @@ def run_analyzer(priority_ids=None, limit_count=10):
     with open(raw_path, 'r', encoding='utf-8') as f:
         raw_data = json.load(f)
     
-    existing_posts = []
-    if os.path.exists(posts_path):
-        with open(posts_path, 'r', encoding='utf-8') as f:
-            existing_posts = json.load(f)
+    existing_posts = load_posts(posts_path)
     
     post_map = {p['id']: p for p in existing_posts}
     to_analyze = [p for p in raw_data if p['id'] in (priority_ids or [])]
@@ -163,12 +164,18 @@ def run_analyzer(priority_ids=None, limit_count=10):
         result = analyze_post_with_retry(p)
         if result:
             result.update({"id": p['id'], "date": p['date'], "link": p['link'], "source": p['source']})
-            post_map[p['id']] = result
+            normalized, warnings = normalize_post(result, source_post=p)
+            post_map[p['id']] = normalized
+            for warning in warnings:
+                print(f"  ⚠️ {warning}")
             # 즉시 업데이트
-            with open(posts_path, 'w', encoding='utf-8') as f:
-                json.dump(list(post_map.values()), f, ensure_ascii=False, indent=2)
+            save_posts(list(post_map.values()), posts_path)
             print("  ✅ 반영 완료")
             time.sleep(30) # 안전 대기
+
+    final_issues = validate_posts(load_posts(posts_path))
+    if final_issues:
+        raise ValueError(f"posts.json validation failed: {final_issues[:5]}")
 
 if __name__ == "__main__":
     run_analyzer()
