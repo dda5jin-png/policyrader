@@ -24,6 +24,9 @@ GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
 genai.configure(api_key=GEMINI_API_KEY)
 
 MODELS_TO_TRY = ['gemini-2.0-flash', 'gemini-flash-lite-latest', 'gemini-flash-latest', 'gemini-pro-latest']
+MAX_ANALYZER_RETRIES = int(os.getenv("ANALYZER_MAX_RETRIES", "3"))
+ANALYZER_RETRY_BUFFER_SECONDS = int(os.getenv("ANALYZER_RETRY_BUFFER_SECONDS", "5"))
+ANALYZER_BETWEEN_POST_DELAY_SECONDS = int(os.getenv("ANALYZER_BETWEEN_POST_DELAY_SECONDS", "30"))
 
 def get_model(model_name=None, temperature=0.0):
     generation_config = {
@@ -53,11 +56,74 @@ def extract_region(text):
         if r in text: return r
     return None
 
+def is_quota_error(error):
+    message = str(error).lower()
+    return "429" in message or "quota" in message or "rate limit" in message
+
+def extract_retry_delay_seconds(error):
+    message = str(error)
+    patterns = [
+        r"retry in\s+(\d+(?:\.\d+)?)s",
+        r"retry_delay\s*\{\s*seconds:\s*(\d+)",
+    ]
+    for pattern in patterns:
+        match = re.search(pattern, message, re.IGNORECASE | re.DOTALL)
+        if match:
+            try:
+                return max(1, int(float(match.group(1))) + ANALYZER_RETRY_BUFFER_SECONDS)
+            except ValueError:
+                continue
+    return None
+
+def wait_for_quota_reset(error, attempt_index):
+    retry_seconds = extract_retry_delay_seconds(error)
+    if retry_seconds is None:
+        retry_seconds = min(90, (attempt_index + 1) * 20 + ANALYZER_RETRY_BUFFER_SECONDS)
+    print(f"  ⏳ Gemini 할당량 제한 감지, {retry_seconds}초 대기 후 재시도합니다.")
+    time.sleep(retry_seconds)
+
+def analyze_with_model(post, model_name):
+    original_text = post.get('originalText', post.get('original_text', ''))
+
+    if model_name == 'gemini-flash-lite-latest':
+        print(f"  ⚡ [Lite Mode] {model_name} 단일 단계 분석을 수행합니다.")
+        prompt = f"""
+        당신은 대한민국 '부동산 및 금융 세무 정책 수석 리서처'입니다. 
+        다음 보도자료를 전문적으로 분석하여 JSON으로 응답하십시오.
+        
+        [필수 분석 항목]:
+        1. regionalImpact: 지역별(강남, 수도권, 지방 등) 세제 혜택 수치 변화 및 차별적 영향
+        2. yieldImpact: 취득세/재산세/양도세 변화에 따른 실질 투자 수익률(ROI) 및 시장 전망 분석
+        3. evidenceText: 이 분석의 근거가 되는 원문의 핵심 구절 (텍스트로만)
+        
+        제목: {post['title']}
+        본문: {original_text[:5000]}
+        
+        응답 JSON 구조:
+        {{
+          "headline": "...",
+          "summary": ["..."],
+          "cat": "...",
+          "catName": "...",
+          "keyData": [{{ "항목": "...", "수치": "...", "적용대상": "..." }}],
+          "regionalImpact": "...",
+          "yieldImpact": "...",
+          "evidenceText": "...",
+          "expertOpinions": [{{ "comment": "...", "affiliation": "정책 분석팀" }}],
+          "checklist": ["..."]
+        }}
+        """
+        model = get_model(model_name)
+        response = model.generate_content(prompt)
+        return json.loads(clean_json_response(response.text))
+
+    return run_pag_pipeline(post, model_name=model_name)
+
 # ══════════════════════════════════════════════
 # 분석 파이프라인
 # ══════════════════════════════════════════════
 
-def run_pag_pipeline(post):
+def run_pag_pipeline(post, model_name=None):
     """지표 오류 및 환각 방지를 위한 4단계 PAG 자가 검증 파이프라인"""
     original_text = post.get('originalText', post.get('original_text', ''))
     connector = DataConnector()
@@ -95,58 +161,36 @@ def run_pag_pipeline(post):
     }}
     """
     
-    model = get_model()
+    model = get_model(model_name)
     chat = model.start_chat(history=[])
     response = chat.send_message(baseline_prompt)
     return json.loads(clean_json_response(response.text))
 
-def run_lite_pipeline(post):
-    """할당량 부족 시 1회 호출로 핵심 정보를 추출하는 라이트 모드"""
-    print("  ⚡ [Lite Mode] 고해상도 단일 단계 분석을 수행합니다.")
-    original_text = post.get('originalText', post.get('original_text', ''))
-    
-    # Lite Mode에서도 반드시 포함되어야 하는 핵심 인텔리전스 프롬프트
-    prompt = f"""
-    당신은 대한민국 '부동산 및 금융 세무 정책 수석 리서처'입니다. 
-    다음 보도자료를 전문적으로 분석하여 JSON으로 응답하십시오.
-    
-    [필수 분석 항목]:
-    1. regionalImpact: 지역별(강남, 수도권, 지방 등) 세제 혜택 수치 변화 및 차별적 영향
-    2. yieldImpact: 취득세/재산세/양도세 변화에 따른 실질 투자 수익률(ROI) 및 시장 전망 분석
-    3. evidenceText: 이 분석의 근거가 되는 원문의 핵심 구절 (텍스트로만)
-    
-    제목: {post['title']}
-    본문: {original_text[:5000]}
-    
-    응답 JSON 구조:
-    {{
-      "headline": "...",
-      "summary": ["..."],
-      "cat": "...",
-      "catName": "...",
-      "keyData": [{{ "항목": "...", "수치": "...", "적용대상": "..." }}],
-      "regionalImpact": "...",
-      "yieldImpact": "...",
-      "evidenceText": "...",
-      "expertOpinions": [{{ "comment": "...", "affiliation": "정책 분석팀" }}],
-      "checklist": ["..."]
-    }}
-    """
-    model = get_model('gemini-flash-lite-latest') 
-    response = model.generate_content(prompt)
-    return json.loads(clean_json_response(response.text))
-
 def analyze_post_with_retry(post):
-    """PAG 파이프라인 시도 후 실패 시 Lite Mode로 복구"""
-    try:
-        # 우선 순위: 고해상도 PAG 파이프라인
-        return run_pag_pipeline(post)
-    except Exception as e:
-        if "429" in str(e) or "quota" in str(e).lower():
-            return run_lite_pipeline(post)
-        print(f"  ❌ 분석 실패: {e}")
-        # 다른 모델로 교차 시도
-        return run_lite_pipeline(post)
+    """모델 교차 시도 + 할당량 대기 재시도"""
+    attempts = 0
+    last_error = None
+    model_sequence = ['gemini-2.0-flash', 'gemini-flash-lite-latest', 'gemini-flash-latest']
+
+    while attempts < MAX_ANALYZER_RETRIES:
+        for model_name in model_sequence:
+            try:
+                print(f"  🤖 {model_name} 분석 시도")
+                return analyze_with_model(post, model_name)
+            except Exception as error:
+                last_error = error
+                if is_quota_error(error):
+                    print(f"  ⚠️ {model_name} 할당량 제한: {error}")
+                    continue
+                print(f"  ❌ {model_name} 분석 실패: {error}")
+
+        if last_error and is_quota_error(last_error):
+            wait_for_quota_reset(last_error, attempts)
+            attempts += 1
+            continue
+        break
+
+    raise last_error if last_error else RuntimeError("Unknown analyzer failure")
 
 def run_analyzer(priority_ids=None, limit_count=10):
     print(f"🚀 [Analyzer] 분석 가동 (우선순위: {priority_ids})")
@@ -174,7 +218,7 @@ def run_analyzer(priority_ids=None, limit_count=10):
             # 즉시 업데이트
             save_posts(list(post_map.values()), posts_path)
             print("  ✅ 반영 완료")
-            time.sleep(30) # 안전 대기
+            time.sleep(ANALYZER_BETWEEN_POST_DELAY_SECONDS) # 안전 대기
 
     final_issues = validate_posts(load_posts(posts_path))
     if final_issues:
