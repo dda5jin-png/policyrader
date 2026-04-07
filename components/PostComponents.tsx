@@ -81,6 +81,9 @@ export interface Post {
   expertOpinions: Array<{ name: string; affiliation: string; comment: string }>;
   keyData: Array<{ 항목: string; 수치: string; 적용대상: string }>;
   checklist: string[];
+  regionalImpact?: string;
+  yieldImpact?: string;
+  evidenceText?: string;
 }
 
 interface PostCardProps {

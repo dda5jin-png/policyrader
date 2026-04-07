@@ -49,6 +49,32 @@ const PostModal: React.FC<PostModalProps> = ({ post, onClose, onCopyLink, onPrin
           </p>
         </div>
 
+        {/* 신규: 지역별 영향 분석 */}
+        {post.regionalImpact && (
+          <>
+            <div className="text-[0.75rem] text-[var(--accent)] font-extrabold mt-8 mb-3 uppercase tracking-[1px] flex items-center gap-2">
+              지역별 세부 영향
+              <div className="flex-1 h-px bg-[var(--border)]" />
+            </div>
+            <div className="p-4 bg-[var(--accent-soft)]/20 border border-[var(--accent-soft)] rounded-xl text-[0.95rem] leading-relaxed text-[var(--text-main)]">
+              {decodeHTMLEntities(post.regionalImpact)}
+            </div>
+          </>
+        )}
+
+        {/* 신규: 수익률/ROI 인사이트 */}
+        {post.yieldImpact && (
+          <>
+            <div className="text-[0.75rem] text-[var(--accent)] font-extrabold mt-8 mb-3 uppercase tracking-[1px] flex items-center gap-2">
+              수익률 및 투자 관점 분석
+              <div className="flex-1 h-px bg-[var(--border)]" />
+            </div>
+            <div className="p-4 bg-[var(--accent-soft)]/20 border border-[var(--accent-soft)] rounded-xl text-[0.95rem] leading-relaxed text-[var(--text-main)]">
+              {decodeHTMLEntities(post.yieldImpact)}
+            </div>
+          </>
+        )}
+
         <div className="text-[0.75rem] text-[var(--accent)] font-extrabold mt-8 mb-3 uppercase tracking-[1px] flex items-center gap-2">
           관련 지표 정리
           <div className="flex-1 h-px bg-[var(--border)]" />
@@ -86,6 +112,19 @@ const PostModal: React.FC<PostModalProps> = ({ post, onClose, onCopyLink, onPrin
             </div>
           ))}
         </div>
+
+        {/* 신규: 분석 근거 명시 (Text Only) */}
+        {post.evidenceText && (
+          <>
+            <div className="text-[0.75rem] text-[var(--text-muted)] font-extrabold mt-10 mb-3 uppercase tracking-[1px] flex items-center gap-2">
+              데이터 분석 근거
+              <div className="flex-1 h-px bg-[var(--border)]" />
+            </div>
+            <div className="text-[0.8rem] text-[var(--text-muted)] italic leading-relaxed px-1">
+              * {decodeHTMLEntities(post.evidenceText)}
+            </div>
+          </>
+        )}
 
         <GoogleAd />
 

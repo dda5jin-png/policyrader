@@ -58,41 +58,84 @@ def run_pag_pipeline(post):
     market_context = connector.get_market_context(region) if region else ""
     context_str = f"\n[참조: 실제 시장 데이터]\n{market_context}\n" if market_context else ""
 
-    # 프롬프트 정의
-    baseline_prompt = f"""당신은 대한민국 '부동산 정책 수석 분석가'입니다. {context_str}\n[보도자료 원문]: {original_text[:10000]}\n반드시 JSON으로 응답하십시오... (중략)"""
-    # (간결함을 위해 실제 구현 시에는 상세 프롬프트 유지)
+    # [1단계: 베이스라인 생성]
+    baseline_prompt = f"""
+    당신은 대한민국 '부동산 및 금융 세무 정책 수석 리서처'입니다. 
+    제공된 보도자료를 바탕으로 다음의 인텔리전스 데이터를 JSON으로 추출하십시오.
     
-    # 4단계 체인 실행 (생략된 상세 로직은 기존과 동일하게 유지)
-    # 실제 구현부에서는 Multi-turn Chat 활용
+    [가드레일 - 핵심]:
+    1. 지역별 세액 변화(Regional Impact): 강남 vs 비강남, 수도권 vs 지방 등 지역별로 혜택이 어떻게 다른지 구체적인 수치나 경향을 추출하십시오.
+    2. 수익률 영향(Yield Impact): 취득세/재산세/양도세 변화가 실질 투자 수익률(ROI)에 어떤 영향을 주는지 분석하십시오.
+    3. 근거 명시(Evidence): 분석된 내용의 근거가 되는 원문의 특정 구절이나 부처 발표 문서명을 'evidenceText' 필드에 텍스트로 명시하십시오.
+    
+    {context_str}
+    
+    [보도자료 제목]: {post['title']}
+    [보도자료 원문]: {original_text[:10000]}
+
+    반드시 다음 JSON 구조로 응답하십시오:
+    {{
+      "summary": ["..."],
+      "cat": "...",
+      "catName": "...",
+      "keyData": [...],
+      "regionalImpact": "지역별 예상 세금 변화 (수치/경향)",
+      "yieldImpact": "수익률 및 투자 관점의 분석",
+      "evidenceText": "분석의 근거가 되는 원문 출처 (텍스트로만)",
+      "checklist": [...]
+    }}
+    """
+    
     model = get_model()
     chat = model.start_chat(history=[])
-    # ... (상세 Step 1~4 실행) ...
-    # 여기서는 데모를 위해 1단계 호출로 대체하거나 기존 로직을 복구함
-    # 실제로는 이전에 작성된 4단계 로직이 들어감
-    response = chat.send_message(f"다음 보도자료를 4단계 PAG 방식으로 분석하여 JSON으로 출력하십시오: {original_text[:5000]}")
+    response = chat.send_message(baseline_prompt)
     return json.loads(clean_json_response(response.text))
 
 def run_lite_pipeline(post):
     """할당량 부족 시 1회 호출로 핵심 정보를 추출하는 라이트 모드"""
-    print("  ⚡ [Lite Mode] 단일 단계 분석으로 전환합니다.")
+    print("  ⚡ [Lite Mode] 고해상도 단일 단계 분석을 수행합니다.")
     original_text = post.get('originalText', post.get('original_text', ''))
-    prompt = f"다음 부동산 정책 보도자료를 분석하여 JSON으로 요약하십시오:\n제목: {post['title']}\n본문: {original_text[:5000]}"
-    model = get_model('gemini-flash-lite-latest') # 확인된 정식 모델명
+    
+    # Lite Mode에서도 반드시 포함되어야 하는 핵심 인텔리전스 프롬프트
+    prompt = f"""
+    당신은 대한민국 '부동산 및 금융 세무 정책 수석 리서처'입니다. 
+    다음 보도자료를 전문적으로 분석하여 JSON으로 응답하십시오.
+    
+    [필수 분석 항목]:
+    1. regionalImpact: 지역별(강남, 수도권, 지방 등) 세제 혜택 수치 변화 및 차별적 영향
+    2. yieldImpact: 취득세/재산세/양도세 변화에 따른 실질 투자 수익률(ROI) 및 시장 전망 분석
+    3. evidenceText: 이 분석의 근거가 되는 원문의 핵심 구절 (텍스트로만)
+    
+    제목: {post['title']}
+    본문: {original_text[:5000]}
+    
+    응답 JSON 구조:
+    {{
+      "summary": ["..."],
+      "cat": "...",
+      "catName": "...",
+      "keyData": [{{ "항목": "...", "수치": "...", "적용대상": "..." }}],
+      "regionalImpact": "지역별 수치 변화 분석 결과",
+      "yieldImpact": "수익률 및 투자 관점 리포트",
+      "evidenceText": "분석 근거 원문 텍스트",
+      "checklist": ["..."]
+    }}
+    """
+    model = get_model('gemini-flash-lite-latest') 
     response = model.generate_content(prompt)
     return json.loads(clean_json_response(response.text))
 
-def analyze_post_with_retry(post, retries=2):
-    for model_name in MODELS_TO_TRY:
-        try:
-            # 429 오류 발생 여부 확인을 위해 시도
-            # 여기서는 편의상 바로 라이트 모드 테스트를 위해 로직 구성
-            return run_lite_pipeline(post) 
-        except Exception as e:
-            if "429" in str(e) or "quota" in str(e).lower():
-                print(f"  ⚠️ [Quota] {model_name} 초과. 다음 시도...")
-                continue
-            print(f"  ❌ 오류: {e}")
-    return None
+def analyze_post_with_retry(post):
+    """PAG 파이프라인 시도 후 실패 시 Lite Mode로 복구"""
+    try:
+        # 우선 순위: 고해상도 PAG 파이프라인
+        return run_pag_pipeline(post)
+    except Exception as e:
+        if "429" in str(e) or "quota" in str(e).lower():
+            return run_lite_pipeline(post)
+        print(f"  ❌ 분석 실패: {e}")
+        # 다른 모델로 교차 시도
+        return run_lite_pipeline(post)
 
 def run_analyzer(priority_ids=None, limit_count=10):
     print(f"🚀 [Analyzer] 분석 가동 (우선순위: {priority_ids})")
