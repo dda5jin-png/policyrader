@@ -1,5 +1,58 @@
 [
   {
+    "summary": [
+      "중동 분쟁 장기화에 따른 국제 유가 변동성 확대와 석유화학·정유업계의 공급망 불안 해소를 위한 범정부적 금융 지원 대책 수립",
+      "정책금융기관(산은, 수은 등)을 통해 기존 24.3조원 규모의 자금 지원 프로그램을 가동 중이며, 추경 통과 시 26.8조원 규모로 확대(+2.5조원) 예정",
+      "민간 금융권에서도 53조원 규모의 신규 자금을 공급하여 중소·중견기업의 유동성 애로를 완화하고 P-CBO 차환 부담을 경감하는 것이 핵심"
+    ],
+    "cat": "F",
+    "catName": "부동산 금융정책",
+    "searchPath": "금융위원회(fsc.go.kr) > 뉴스·소식 > 보도자료",
+    "keyData": [
+      {
+        "항목": "정책금융 신규자금 지원 규모",
+        "수치": "24.3조원 (최대 26.8조원)",
+        "기준일": "2024.04.07",
+        "적용대상": "중동 상황 피해 석유화학·정유업계"
+      },
+      {
+        "항목": "민간금융권 자금 지원",
+        "수치": "53조원 + α",
+        "기준일": "2024.04.07",
+        "적용대상": "산업계 전반 및 중동 관련 피해 기업"
+      },
+      {
+        "항목": "추경 편성 예정액",
+        "수치": "2.5조원",
+        "기준일": "2024.04.07",
+        "적용대상": "금융 지원 프로그램 증액분"
+      }
+    ],
+    "expertOpinions": [
+      {
+        "name": "지능형 분석 리서치",
+        "affiliation": "Policy Radar Research",
+        "stance": "중립",
+        "comment": "이번 대책은 산업 기반 붕괴를 막기 위한 긴급 수혈 성격이 강함. 석유화학·정유업종은 건설 원가와 직결되는 기초 자재 공급망의 핵심이므로, 이들의 금융 리스크 해소는 거시적으로 부동산 공급망 안정에 기여할 것. 다만, 유동성 공급 확대가 금리 인하 시점을 늦출 수 있어 부동산 시장 회복기에는 양날의 검이 될 전망.",
+        "source": "Advanced Insight Engine"
+      }
+    ],
+    "checklist": [
+      "석유화학·정유 관련 중소·중견기업은 신용보증기금 P-CBO 차환 지원 조건 확인",
+      "국제 유가 상승에 따른 건설 원가(에너지비, 자재비) 인상분 반영 여부 점검 (시공사 및 재건축 조합)",
+      "울산, 여수, 서산 등 석유화학 거점 도시의 기업 유동성 개선에 따른 지역 부동산 경기 하방 경직성 확보 여부 모니터링",
+      "정책금융 및 민간금융 신규 대출 프로그램 신청 시점 및 금리 우대 혜택 문의(거래은행)"
+    ],
+    "premium": true,
+    "id": "api_156753303",
+    "headline": "&quot;중동상황으로 인한 석유화학&middot;정유업계의 애로를 금융권이 직접 듣고 어려움을 함께 극복해나가겠습니다&quot; - 금융위원장, 첫 산업계 릴레이 간담회로 석유화학&middot;정유업계와 「중동상황 피해업종 산업-금융권 간담회」 개최",
+    "source": "금융위원회",
+    "sourceUrl": "https://www.korea.kr/briefing/pressReleaseView.do?newsId=156753303&call_from=openData",
+    "date": "2026-04-07",
+    "originalText": "<table border=\"1\" cellspacing=\"0\" cellpadding=\"0\" style=\"border-collapse: collapse; border: none; \"> <tbody> <tr> <td valign=\"middle\" style=\"border-left: 1px solid rgb(0, 0, 0); border-right: 1px solid rgb(0, 0, 0); border-top: 1px solid rgb(0, 0, 0); border-bottom: none; padding: 1.4pt 5.1pt;\"><p style=\"margin-right: 2.3pt; text-align: center; line-height: 150%;\"><span style=\"font-weight: bold; font-family: 돋움; font-size: 10pt;\">\"</span><span style=\"font-weight: bold; color: rgb(0, 0, 255); fon",
+    "views": 0
+  },
+  {
     "id": "manual_tax_2026_04",
     "headline": "다주택자 양도소득세 중과 유예 종료 및 보완 대책 발표",
     "date": "2026-04-06",
