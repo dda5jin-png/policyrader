@@ -85,9 +85,11 @@ def fetch_period_api(start_date_str, end_date_str):
             content = item.findtext('DataContents', '').strip()
             news_id = item.findtext('NewsItemId', '').strip()
 
-            # 대상 부처 필터링 (국토교통부, 금융위원회, 기획재정부 등 추가 가능)
-            relevant_depts = ["국토", "금융", "기획재정", "행정안전"]
-            if any(d in dept for d in relevant_depts):
+            # 대상 부처 필터링 (기획재정부/재정경제부 관련 명칭 포함)
+            relevant_depts = ["국토", "금융", "기획재정", "재정경제", "행정안전", "국세"]
+            is_tax_related = any(kw in title for kw in ['세법', '세제', '종부세', '양도세', '취득세', '재산세'])
+            
+            if any(d in dept for d in relevant_depts) or is_tax_related:
                 # Placeholder 체크: 본문이 없으면 스크래핑 시도
                 is_placeholder = "자세한 내용은 첨부파일" in content or len(content) < 100
                 full_text = content
@@ -114,18 +116,20 @@ def fetch_period_api(start_date_str, end_date_str):
         print(f"❌ API 요청 중 오류: {e}")
         return []
 
-def fetch_via_api_range(start_date_limit):
-    """현재부터 지정된 과거 날짜까지 역순으로 수집합니다."""
-    print(f"[Fetcher] {start_date_limit.strftime('%Y-%m-%d')}까지 오늘부터 역순으로 수집 시작...")
+def fetch_via_api_range(start_date_limit, end_date_limit=None):
+    """지정된 시작일부터 종료일(기본값은 현재)까지 수집합니다."""
+    if end_date_limit is None:
+        end_date_limit = datetime.now()
+        
+    print(f"[Fetcher] {start_date_limit.strftime('%Y-%m-%d')} ~ {end_date_limit.strftime('%Y-%m-%d')} 기간 수집 시작...")
     
     all_posts = []
-    current_date = datetime.now()
+    iter_date = end_date_limit
     
-    iter_date = current_date
     while iter_date >= start_date_limit:
         e_str = iter_date.strftime("%Y%m%d")
-        # 3일 단위 블록 수집
-        s_date = iter_date - timedelta(days=2)
+        # 7일 단위 블록 수집 (데이터 유실 방지 및 효율성)
+        s_date = iter_date - timedelta(days=6)
         if s_date < start_date_limit: s_date = start_date_limit
         s_str = s_date.strftime("%Y%m%d")
         
@@ -134,11 +138,11 @@ def fetch_via_api_range(start_date_limit):
         period_posts = fetch_period_api(s_str, e_str)
         all_posts.extend(period_posts)
         
-        # 다음 3일 블록으로 이동
+        # 다음 블록으로 이동
         iter_date = s_date - timedelta(days=1)
-        time.sleep(0.5) # API 부하 조절
+        time.sleep(0.5)
         
-    print(f"[Fetcher] 수집 완료: 총 {len(all_posts)}건 확보")
+    print(f"[Fetcher] 해당 기간 수집 완료: 총 {len(all_posts)}건 확보")
     return all_posts
 
 def select_top_posts(all_posts, max_per_month=10):
