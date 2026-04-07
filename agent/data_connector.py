@@ -2,18 +2,58 @@ import requests
 import xml.etree.ElementTree as ET
 import os
 import json
+import math
 from datetime import datetime, timedelta
 from dotenv import load_dotenv
 
 load_dotenv()
+
+class TaxEngine:
+    """부동산 세무 계산 로직 엔진"""
+    
+    @staticmethod
+    def calculate_acquisition_tax(price, is_adjustment_area=True, num_houses=1):
+        """취득세 계산 (2025년 기준 간소화 버전)"""
+        # 기본 취득세율 (1주택자 기준 1~3%)
+        if num_houses == 1:
+            if price <= 60000: return price * 0.01
+            elif price <= 90000: return price * (price * (2/30000) - 3) / 100
+            else: return price * 0.03
+        
+        # 다주택자 중과 (간소화)
+        rate = 0.08 if is_adjustment_area else 0.04
+        return price * rate
+
+    @staticmethod
+    def calculate_property_tax(official_price):
+        """재산세 계산 (공정시장가액비율 60% 가정)"""
+        base = official_price * 0.6
+        if base <= 6000: return base * 0.001
+        elif base <= 15000: return 6 + (base - 6000) * 0.0015
+        elif base <= 30000: return 19.5 + (base - 15000) * 0.0025
+        else: return 57 + (base - 30000) * 0.004
+
+    @staticmethod
+    def calculate_comprehensive_tax(official_price, is_single_house=True):
+        """종합부동산세 계산 (1주택자 공제 12억 가정)"""
+        deduction = 120000 if is_single_house else 90000
+        taxable = max(0, (official_price - deduction) * 0.6) # 공정시장가액비율 60%
+        if taxable == 0: return 0
+        
+        # 세율 구간 (간소화)
+        if taxable <= 30000: return taxable * 0.005
+        elif taxable <= 60000: return 150 + (taxable - 30000) * 0.007
+        else: return 360 + (taxable - 60000) * 0.01
 
 class DataConnector:
     """국토교통부 실거래가 API 및 기타 공공데이터 연동 클래스"""
     
     def __init__(self):
         self.api_key = os.getenv("DATA_GO_KR_API_KEY")
+        self.vworld_key = os.getenv("VWORLD_API_KEY")
         # 사용자가 제공한 데브(Dev) 엔드포인트 사용
         self.base_url = "https://apis.data.go.kr/1613000/RTMSDataSvcAptTradeDev"
+        self.tax_engine = TaxEngine()
         
         # 주요 시군구 법정동 코드 (앞 5자리)
         # TODO: 필요 시 별도 JSON 파일로 분리하여 관리
@@ -126,6 +166,64 @@ class DataConnector:
             print(f"  ⚠️ 전월세 API 호출 실패: {e}")
             return None
 
+    def fetch_vworld_land_price(self, pnu, stdr_year=None):
+        """V-WORLD API를 통해 특정 필지(PNU)의 공시지가를 가져옵니다."""
+        if not self.vworld_key:
+            return None
+        
+        if not stdr_year:
+            stdr_year = datetime.now().year
+            
+        url = "https://api.vworld.kr/ned/data/getIndvLandPriceAttr"
+        params = {
+            'key': self.vworld_key,
+            'format': 'json',
+            'pnu': pnu,
+            'stdrYear': stdr_year,
+            'numOfRows': 1,
+            'pageNo': 1
+        }
+        
+        try:
+            response = requests.get(url, params=params, timeout=10)
+            data = response.json()
+            if "indvLandPriceAttrs" in data:
+                return data["indvLandPriceAttrs"]["field"][0]
+            return None
+        except Exception as e:
+            print(f"  ⚠️ V-WORLD 공시지가 조회 실패: {e}")
+            return None
+
+    def fetch_apt_official_price(self, pnu, stdr_year=None):
+        """공공데이터포털 API를 통해 공동주택 공시가격을 가져옵니다."""
+        if not self.api_key:
+            return None
+        
+        if not stdr_year:
+            stdr_year = datetime.now().year
+            
+        url = "http://apis.data.go.kr/1613000/PublicHousingPriceService/getCommuseHousingPriceAttr"
+        params = {
+            'serviceKey': self.api_key,
+            'pnu': pnu,
+            'stdrYear': stdr_year,
+            'numOfRows': 1,
+            'pageNo': 1,
+            'format': 'json'
+        }
+        
+        try:
+            response = requests.get(url, params=params, timeout=10)
+            data = response.json()
+            # API 응답 구조에 따라 파싱 (JSON 기준 예시)
+            if "response" in data and "body" in data["response"]:
+                items = data["response"]["body"].get("items", {}).get("item", [])
+                return items[0] if items else None
+            return None
+        except Exception as e:
+            print(f"  ⚠️ 공동주택 공시가격 조회 실패: {e}")
+            return None
+
     def fetch_bok_stats(self, table_code, item_code, cycle='M', count=1):
         """한국은행 ECOS API를 통해 경제 통계를 가져옵니다."""
         api_key = os.getenv("BOK_ECOS_API_KEY")
@@ -221,6 +319,10 @@ class DataConnector:
         if all_trades:
             avg_trade = sum(t['price'] for t in all_trades) / len(all_trades)
             summary += f"- 평균 매매가: {avg_trade:,.0f}만원 ({len(all_trades)}건)\n"
+            
+            # 세금 시뮬레이션 샘플 (평균가 기준)
+            acq_tax = self.tax_engine.calculate_acquisition_tax(avg_trade)
+            summary += f"- [예상 취득세]: {acq_tax:,.0f}만원 (1주택 기준)\n"
             
         jeonse_only = [r for r in all_rents if r['monthly'] == 0]
         if jeonse_only:

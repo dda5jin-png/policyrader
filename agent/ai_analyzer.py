@@ -61,12 +61,12 @@ def run_pag_pipeline(post):
     # [1단계: 베이스라인 생성]
     baseline_prompt = f"""
     당신은 대한민국 '부동산 및 금융 세무 정책 수석 리서처'입니다. 
-    제공된 보도자료를 바탕으로 다음의 인텔리전스 데이터를 JSON으로 추출하십시오.
+    제공된 보도자료와 [실제 시장 데이터]를 결합하여 전문적인 인텔리전스 리포트를 JSON으로 추출하십시오.
     
     [가드레일 - 핵심]:
-    1. 지역별 세액 변화(Regional Impact): 강남 vs 비강남, 수도권 vs 지방 등 지역별로 혜택이 어떻게 다른지 구체적인 수치나 경향을 추출하십시오.
-    2. 수익률 영향(Yield Impact): 취득세/재산세/양도세 변화가 실질 투자 수익률(ROI)에 어떤 영향을 주는지 분석하십시오.
-    3. 근거 명시(Evidence): 분석된 내용의 근거가 되는 원문의 특정 구절이나 부처 발표 문서명을 'evidenceText' 필드에 텍스트로 명시하십시오.
+    1. 지역별 세무 시뮬레이션(Regional Impact): 강남 vs 비강남 등 지역별 공시가격 변화에 따른 '보유세(재산세/종부세) 절감액' 또는 '취득세 부담액'을 수치(원화)로 추정하여 리포팅하십시오.
+    2. 수익률 인사이트(Yield Impact): 취득세/재산세 변화와 현재 금리 환경을 결합하여, 실질 투자 수익률(ROI)이 전후 대비 몇 %p 변화하는지 분석하십시오.
+    3. 근거 명시(Evidence): 분석된 수치와 결론의 근거가 되는 원문의 특정 구절이나 부처 발표 문서명을 'evidenceText' 필드에 텍스트로 명시하십시오.
     
     {context_str}
     
@@ -75,14 +75,16 @@ def run_pag_pipeline(post):
 
     반드시 다음 JSON 구조로 응답하십시오:
     {{
-      "summary": ["..."],
-      "cat": "...",
-      "catName": "...",
-      "keyData": [...],
-      "regionalImpact": "지역별 예상 세금 변화 (수치/경향)",
-      "yieldImpact": "수익률 및 투자 관점의 분석",
+      "headline": "보도자료를 관통하는 임팩트 있는 제목",
+      "summary": ["핵심 요약 3줄"],
+      "cat": "category_id",
+      "catName": "카테고리명",
+      "keyData": [{{ "항목": "상세항목", "수치": "구체적수치", "적용대상": "대상자" }}],
+      "regionalImpact": "실제 수치가 포함된 지역별 세액 변화 분석 결과",
+      "yieldImpact": "ROI 변화폭 및 투자 관점의 전문 리포트",
       "evidenceText": "분석의 근거가 되는 원문 출처 (텍스트로만)",
-      "checklist": [...]
+      "expertOpinions": [{{ "comment": "정책의 핵심을 찌르는 수석 리서처의 총평", "affiliation": "정책 분석팀" }}],
+      "checklist": ["투자자/실거주자가 체크해야 할 리스트"]
     }}
     """
     
@@ -111,13 +113,15 @@ def run_lite_pipeline(post):
     
     응답 JSON 구조:
     {{
+      "headline": "...",
       "summary": ["..."],
       "cat": "...",
       "catName": "...",
       "keyData": [{{ "항목": "...", "수치": "...", "적용대상": "..." }}],
-      "regionalImpact": "지역별 수치 변화 분석 결과",
-      "yieldImpact": "수익률 및 투자 관점 리포트",
-      "evidenceText": "분석 근거 원문 텍스트",
+      "regionalImpact": "...",
+      "yieldImpact": "...",
+      "evidenceText": "...",
+      "expertOpinions": [{{ "comment": "...", "affiliation": "정책 분석팀" }}],
       "checklist": ["..."]
     }}
     """
