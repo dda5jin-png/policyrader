@@ -70,6 +70,39 @@
     "views": 0
   },
   {
+    "headline": "불편한 토지이용규제 개선 및 토지규제정보 공개 확대",
+    "summary": [
+      "불합리한 토지이용규제를 정비해 국민과 기업의 현장 불편을 줄이는 방향으로 제도 개선을 추진함",
+      "토지규제 관련 공개 정보를 확대해 정책 투명성과 정보 접근성을 높일 계획임",
+      "세부 내용은 첨부자료 기준으로 후속 안내되며, 이번 보도자료는 제도 개선 방향을 우선 제시하는 성격임"
+    ],
+    "cat": "T",
+    "catName": "부동산 거래·법령",
+    "sourceUrl": "https://www.korea.kr/briefing/pressReleaseView.do?newsId=156753263&call_from=openData",
+    "keyData": [
+      {
+        "항목": "정책 상태",
+        "수치": "추진 및 보도자료 배포",
+        "적용대상": "토지이용규제 관련 이해관계자"
+      },
+      {
+        "항목": "주요 방향",
+        "수치": "규제 개선 및 정보공개 확대",
+        "적용대상": "국민·기업"
+      }
+    ],
+    "expertOpinions": [
+      {
+        "name": "지능형 분석 리서치",
+        "affiliation": "Policy Radar Research",
+        "comment": "이번 조치는 토지이용규제 자체를 대폭 완화하는 발표라기보다, 현장 불편이 큰 규제를 우선 정비하고 규제정보 접근성을 높이려는 행정 개선 성격이 강합니다. 실제 체감도는 후속 고시와 정보 공개 범위 확대 수준에 따라 달라질 가능성이 큽니다."
+      }
+    ],
+    "checklist": [
+      "관심 지역의 토지이용규제 정보가 새 공개 범위에 포함되는지 확인",
+      "개발 가능성 판단 시 기존 규제 해석과 달라지는 부분이 있는지 지자체 기준 재검토",
+      "후속 고시 또는 세부 시행안이 발표되는지 추가 모니터링"
+    ],
     "policy_summary": {
       "title": "불편한 토지이용규제 개선 및 토지규제정보 공개 확대",
       "key_objectives": [
@@ -2338,8 +2371,8 @@
       "최대 82.5%의 징벌적 세율 대신 기본세율(6~45%) 적용으로 다주택자 세부담 완화",
       "일시적 2주택 처분 기한 3년 유지 및 상생임대인 특례 2년 연장으로 시장 안정화 도모"
     ],
-    "cat": "TAX_POLICY_001",
-    "catName": "부동산 세제 및 양도소득세",
+    "cat": "X",
+    "catName": "부동산 세금정책",
     "keyData": [
       {
         "항목": "양도세 최고세율",
@@ -2375,6 +2408,7 @@
     "id": "manual_tax_2026_decree",
     "date": "2026-01-16",
     "link": "https://www.korea.kr/news/policyNewsView.do?newsId=148958167",
+    "sourceUrl": "https://www.korea.kr/news/policyNewsView.do?newsId=148958167",
     "source": "재정경제부"
   },
   {
@@ -2384,8 +2418,8 @@
       "다주택자 양도세 중과 유예 1년 연장으로 매물 출회 유도 및 거래 정상화 도모",
       "GTX 노선 및 노후 계획도시 재건축 가속화로 역세권 중심 공급 생태계 재편"
     ],
-    "cat": "RE_POLICY_2026",
-    "catName": "부동산 정책 및 세무 전략",
+    "cat": "X",
+    "catName": "부동산 세금정책",
     "keyData": [
       {
         "항목": "실거주 의무",
@@ -2421,9 +2455,48 @@
     "id": "manual_tax_2026_policy",
     "date": "2026-01-05",
     "link": "https://www.korea.kr/news/policyNewsView.do?newsId=148957488",
+    "sourceUrl": "https://www.korea.kr/news/policyNewsView.do?newsId=148957488",
     "source": "경제기획부"
   },
   {
+    "headline": "2026년 새해부터 달라지는 지방세제",
+    "summary": [
+      "2026년 1월 1일부터 개정 지방세법 및 지방세특례제한법이 시행되며 새 지방세제 기준이 적용됨",
+      "행정안전부가 국회 의결 내용을 반영해 새해 달라지는 지방세 제도를 안내함",
+      "세부 적용 기준은 첨부 문서 기준으로 확인이 필요하며, 납세자와 실무 담당자의 제도 숙지가 중요함"
+    ],
+    "cat": "X",
+    "catName": "부동산 세금정책",
+    "sourceUrl": "https://www.korea.kr/briefing/pressReleaseView.do?newsId=156737839&call_from=openData",
+    "keyData": [
+      {
+        "항목": "국회 의결일",
+        "수치": "2025-12-30",
+        "적용대상": "지방세 납세자"
+      },
+      {
+        "항목": "시행일",
+        "수치": "2026-01-01",
+        "적용대상": "지방세 납세자"
+      },
+      {
+        "항목": "주요 법령",
+        "수치": "지방세법·지방세특례제한법",
+        "적용대상": "세무 실무 담당자"
+      }
+    ],
+    "expertOpinions": [
+      {
+        "name": "지능형 분석 리서치",
+        "affiliation": "Policy Radar Research",
+        "comment": "지방세제 개편은 취득세와 재산세 같은 생활형 세목 체감도에 직접 연결될 수 있어, 시행일 이전에 대상별 적용 요건을 빠르게 확인하는 것이 중요합니다. 특히 부동산 보유·거래 계획이 있는 경우 지방세특례 적용 범위를 함께 점검할 필요가 있습니다."
+      }
+    ],
+    "checklist": [
+      "2026년 1월 1일 시행 기준으로 보유·취득 예정 자산의 지방세 적용 여부 확인",
+      "지방세특례제한법상 감면 또는 특례 대상인지 지자체 안내문과 함께 재검토",
+      "첨부 문서 기준 세목별 세율·감면 요건 변동 사항 확인"
+    ],
     "policy_summary": {
       "title": "2026년 새해부터 달라지는 지방세제",
       "announcing_agency": "행정안전부",
@@ -3021,8 +3094,8 @@
       "1주택자 종부세 공제 확대 및 다주택자 중과세율 완화로 부동산 보유 비용 절감",
       "금융투자소득세 폐지 및 결혼세액공제 신설을 통한 자본시장 활성화 및 가계 가처분 소득 증대"
     ],
-    "cat": "TAX_POLICY_2025",
-    "catName": "부동산 및 금융 세제 정책",
+    "cat": "X",
+    "catName": "부동산 세금정책",
     "keyData": [
       {
         "항목": "상속세 최고세율",
@@ -3058,6 +3131,7 @@
     "id": "manual_tax_2025_reform",
     "date": "2025-07-25",
     "link": "https://www.korea.kr/news/policyNewsView.do?newsId=148946731",
+    "sourceUrl": "https://www.korea.kr/news/policyNewsView.do?newsId=148946731",
     "source": "재정경제부"
   },
   {
@@ -3120,8 +3194,8 @@
       "기존 현실화 로드맵 폐지 및 새로운 공시 체계 도입을 통해 정책 불확실성 해소",
       "집값 상승분이 반영된 공시가격 현실화율 동결로 실질적인 보유세 인상 압력 완화"
     ],
-    "cat": "TAX_POLICY_001",
-    "catName": "부동산 세제 및 공시가격 정책",
+    "cat": "X",
+    "catName": "부동산 세금정책",
     "keyData": [
       {
         "항목": "2025년 현실화율",
@@ -3157,6 +3231,7 @@
     "id": "manual_tax_2025_appraisal",
     "date": "2024-11-19",
     "link": "https://www.korea.kr/news/policyNewsView.do?newsId=148936451",
+    "sourceUrl": "https://www.korea.kr/news/policyNewsView.do?newsId=148936451",
     "source": "국토교통부"
   }
 ]
