@@ -5,7 +5,10 @@ import re
 import time
 from datetime import datetime
 from dotenv import load_dotenv
-from agent.data_connector import DataConnector
+try:
+    from agent.data_connector import DataConnector
+except ModuleNotFoundError:
+    from data_connector import DataConnector
 try:
     from agent.post_processor import load_posts, normalize_post, save_posts, validate_posts
 except ModuleNotFoundError:
