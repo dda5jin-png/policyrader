@@ -10,9 +10,9 @@ try:
 except ModuleNotFoundError:
     from data_connector import DataConnector
 try:
-    from agent.post_processor import load_posts, normalize_post, save_posts, validate_posts
+    from agent.post_processor import load_posts, normalize_post, normalize_posts, save_posts, validate_posts
 except ModuleNotFoundError:
-    from post_processor import load_posts, normalize_post, save_posts, validate_posts
+    from post_processor import load_posts, normalize_post, normalize_posts, save_posts, validate_posts
 
 # .env 파일 로드
 load_dotenv()
@@ -195,7 +195,8 @@ def analyze_post_with_retry(post):
 def run_analyzer(priority_ids=None, limit_count=10):
     print(f"🚀 [Analyzer] 분석 가동 (우선순위: {priority_ids})")
     raw_path, posts_path = 'agent/raw_data.json', 'public/posts.json'
-    if not os.path.exists(raw_path): return
+    if not os.path.exists(raw_path):
+        return {"processed": 0, "succeeded": 0, "failed": []}
     with open(raw_path, 'r', encoding='utf-8') as f:
         raw_data = json.load(f)
     
@@ -205,10 +206,18 @@ def run_analyzer(priority_ids=None, limit_count=10):
     to_analyze = [p for p in raw_data if p['id'] in (priority_ids or [])]
     new_ones = [p for p in raw_data if p['id'] not in post_map and p['id'] not in [x['id'] for x in to_analyze]]
     to_analyze.extend(new_ones[:limit_count])
+    failed_posts = []
+    succeeded = 0
 
     for idx, p in enumerate(to_analyze):
         print(f"\n[{idx+1}/{len(to_analyze)}] {p['title'][:30]}...")
-        result = analyze_post_with_retry(p)
+        try:
+            result = analyze_post_with_retry(p)
+        except Exception as error:
+            failed_posts.append({"id": p.get("id"), "title": p.get("title"), "error": str(error)})
+            print(f"  ❌ 분석 실패, 다음 자료로 넘어갑니다: {error}")
+            continue
+
         if result:
             result.update({"id": p['id'], "date": p['date'], "link": p['link'], "source": p['source']})
             normalized, warnings = normalize_post(result, source_post=p)
@@ -218,11 +227,26 @@ def run_analyzer(priority_ids=None, limit_count=10):
             # 즉시 업데이트
             save_posts(list(post_map.values()), posts_path)
             print("  ✅ 반영 완료")
+            succeeded += 1
             time.sleep(ANALYZER_BETWEEN_POST_DELAY_SECONDS) # 안전 대기
+
+    normalized_posts, normalization_warnings = normalize_posts(load_posts(posts_path))
+    if normalization_warnings:
+        print(f"ℹ️ [Analyzer] 기존 posts 데이터 {len(normalization_warnings)}건을 정규화했습니다.")
+        save_posts(normalized_posts, posts_path)
 
     final_issues = validate_posts(load_posts(posts_path))
     if final_issues:
         raise ValueError(f"posts.json validation failed: {final_issues[:5]}")
+
+    if failed_posts:
+        print(f"⚠️ [Analyzer] {len(failed_posts)}건 분석 실패")
+        for failed in failed_posts[:10]:
+            print(f"  - {failed['id']}: {failed['error']}")
+        if len(failed_posts) > 10:
+            print(f"  - ... {len(failed_posts) - 10}건 추가 실패")
+
+    return {"processed": len(to_analyze), "succeeded": succeeded, "failed": failed_posts}
 
 if __name__ == "__main__":
     run_analyzer()

@@ -32,8 +32,13 @@ def main():
 
     # 2. AI 분석 및 posts.json 업데이트
     try:
-        run_analyzer()
-        print("✅ [AI Analyzer] 분석 및 posts.json 업데이트 완료")
+        analyzer_summary = run_analyzer()
+        failed_count = len(analyzer_summary.get("failed", []))
+        succeeded_count = analyzer_summary.get("succeeded", 0)
+        print(f"✅ [AI Analyzer] 분석 및 posts.json 업데이트 완료 (성공: {succeeded_count}, 실패: {failed_count})")
+        if failed_count and succeeded_count == 0:
+            print("❌ [AI Analyzer] 모든 신규 자료 분석이 실패했습니다.")
+            return
     except Exception as e:
         print(f"❌ [AI Analyzer] 오류 발생: {e}")
         return
