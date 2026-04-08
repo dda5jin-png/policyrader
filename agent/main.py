@@ -11,6 +11,8 @@ from validate_posts import main as validate_posts_main
 
 def main():
     print("🚀 [Policy Radar] 자동 업데이트 프로세스 시작")
+    analyzer_limit_count = int(os.getenv("ANALYZER_LIMIT_COUNT", "10"))
+    print(f"ℹ️ [Config] ANALYZER_LIMIT_COUNT={analyzer_limit_count}")
     
     # 1. 뉴스 수집
     try:
@@ -32,7 +34,7 @@ def main():
 
     # 2. AI 분석 및 posts.json 업데이트
     try:
-        analyzer_summary = run_analyzer()
+        analyzer_summary = run_analyzer(limit_count=analyzer_limit_count)
         failed_count = len(analyzer_summary.get("failed", []))
         succeeded_count = analyzer_summary.get("succeeded", 0)
         print(f"✅ [AI Analyzer] 분석 및 posts.json 업데이트 완료 (성공: {succeeded_count}, 실패: {failed_count})")

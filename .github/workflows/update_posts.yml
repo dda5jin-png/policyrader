@@ -3,6 +3,7 @@ name: Update Policy Posts
 on:
   schedule:
     - cron: '0 0 * * *'  # 매일 한국시간 오전 9시 (UTC 00:00)
+    - cron: '0 6 * * *'  # 매일 한국시간 오후 3시 (UTC 06:00), 경량 수집
   workflow_dispatch:      # 수동 실행 허용
 
 jobs:
@@ -25,10 +26,27 @@ jobs:
           python -m pip install --upgrade pip
           if [ -f agent/requirements.txt ]; then pip install -r agent/requirements.txt; fi
 
+      - name: Configure run profile
+        run: |
+          if [ "${{ github.event.schedule }}" = "0 6 * * *" ]; then
+            echo "RUN_PROFILE=light" >> "$GITHUB_ENV"
+            echo "ANALYZER_LIMIT_COUNT=3" >> "$GITHUB_ENV"
+            echo "ANALYZER_MAX_RETRIES=1" >> "$GITHUB_ENV"
+            echo "ANALYZER_BETWEEN_POST_DELAY_SECONDS=5" >> "$GITHUB_ENV"
+          else
+            echo "RUN_PROFILE=standard" >> "$GITHUB_ENV"
+            echo "ANALYZER_LIMIT_COUNT=10" >> "$GITHUB_ENV"
+            echo "ANALYZER_MAX_RETRIES=3" >> "$GITHUB_ENV"
+            echo "ANALYZER_BETWEEN_POST_DELAY_SECONDS=30" >> "$GITHUB_ENV"
+          fi
+
       - name: Run agent script
         env:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
           DATA_GO_KR_API_KEY: ${{ secrets.DATA_GO_KR_API_KEY }}
+          ANALYZER_LIMIT_COUNT: ${{ env.ANALYZER_LIMIT_COUNT }}
+          ANALYZER_MAX_RETRIES: ${{ env.ANALYZER_MAX_RETRIES }}
+          ANALYZER_BETWEEN_POST_DELAY_SECONDS: ${{ env.ANALYZER_BETWEEN_POST_DELAY_SECONDS }}
         run: |
           python agent/main.py
 
@@ -39,7 +57,7 @@ jobs:
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
           git add public/posts.json
-          git commit -m "chore: auto-update policy posts [$(date +'%Y-%m-%d %H:%M:%S KST')]" || echo "No changes to commit"
+          git commit -m "chore: auto-update policy posts (${RUN_PROFILE}) [$(date +'%Y-%m-%d %H:%M:%S KST')]" || echo "No changes to commit"
           git push
 
       # Vercel Deploy Hook이 있다면 아래와 같이 추가하여 강제 빌드를 트리거할 수 있습니다.
