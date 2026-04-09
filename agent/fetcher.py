@@ -89,12 +89,20 @@ def fetch_period_api(start_date_str, end_date_str):
             # 대상 부처 필터링 (기획재정부/재정경제부 관련 명칭 포함)
             relevant_depts = ["국토", "금융", "기획재정", "재정경제", "행정안전", "국세"]
             is_tax_related = any(kw in title for kw in ['세법', '세제', '종부세', '양도세', '취득세', '재산세'])
-            
-            if any(d in dept for d in relevant_depts) or is_tax_related:
-                # Placeholder 체크: 본문이 없으면 스크래핑 시도
-                is_placeholder = "자세한 내용은 첨부파일" in content or len(content) < 100
-                full_text = content
-                
+            # 기존: 특정 부처만 고집함
+# relevant_depts = ["국토", "금융", "기획재정", "재정경제", "행정안전", "국세"]
+
+# 수정: 부처 상관없이 제목에 키워드(부동산 등)가 있으면 일단 가져오도록 변경!
+    is_relevant_dept = any(d in dept for d in ["국토", "금융", "기획재정", "재정경제", "행정안전", "국세", "중소벤처", "국무"])
+    is_keyword_match = any(kw in title for kw in TARGET_KEYWORDS)
+
+    if is_relevant_dept or is_keyword_match:
+if is_relevant_dept or is_keyword_match:
+        # Placeholder 체크: 본문이 없으면 스크래핑 시도
+        is_placeholder = "자세한 내용은 첨부파일" in content or len(content) < 100
+        full_text = content
+
+        if is_placeholder and link:            
                 if is_placeholder and link:
                     print(f"  🔍 본문 스크래핑 시도: {title[:30]}...")
                     scraped = scrape_full_content(link)
