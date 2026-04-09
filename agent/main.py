@@ -7,6 +7,7 @@ sys.path.append(os.path.join(os.path.dirname(__file__)))
 
 from fetcher import run_fetcher
 from ai_analyzer import run_analyzer
+from insight_aggregator import aggregate_insights
 from validate_posts import main as validate_posts_main
 
 def main():
@@ -44,6 +45,14 @@ def main():
     except Exception as e:
         print(f"❌ [AI Analyzer] 오류 발생: {e}")
         sys.exit(1)
+        
+    # 3. 기관 데이터 통합 및 인사이트 생성 (NEW)
+    try:
+        aggregate_insights()
+        print("✅ [Insight Aggregator] 기관 데이터 및 마켓 펄스 업데이트 완료")
+    except Exception as e:
+        print(f"❌ [Insight Aggregator] 오류 발생: {e}")
+        # 인사이트 실패는 전체 프로세스 중단 사유는 아니라고 판단하여 계속 진행
 
     try:
         original_argv = sys.argv[:]

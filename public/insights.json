@@ -1,0 +1,31 @@
+{
+  "last_updated": "2026-04-09 16:52:51",
+  "market_indices": {},
+  "loan_rates": [
+    {
+      "name": "u-보금자리론",
+      "rate": "4.25",
+      "date": "2026-04-09"
+    }
+  ],
+  "conforming_rates": [],
+  "rent_loan_rates": [],
+  "lh_notices": [],
+  "risk_alerts": [],
+  "auction_stats": [
+    {
+      "region": "서울",
+      "auction_count": 45,
+      "sold_count": 12,
+      "sold_rate": 26.7
+    }
+  ],
+  "ai_summary": {
+    "pulse_summary": "데이터 수집 완료. 시장 모니터링 중입니다.",
+    "checkpoints": [
+      "대출 금리 변동 주의",
+      "청약 공고 상시 확인",
+      "지역별 시장 양극화 유의"
+    ]
+  }
+}

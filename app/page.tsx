@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import Header from '../components/Header';
 import { Hero, SloganSection } from '../components/HeroSections';
+import MarketPulse from '../components/MarketPulse';
 import { Filters, PostCard, Post } from '../components/PostComponents';
 import PostModal from '../components/PostModal';
 import GoogleAd from '../components/AdComponent';
@@ -13,6 +14,7 @@ export default function Home() {
   const [filteredPosts, setFilteredPosts] = useState<Post[]>([]);
   const [category, setCategory] = useState('all');
   const [currentPost, setCurrentPost] = useState<Post | null>(null);
+  const [insightData, setInsightData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -29,6 +31,17 @@ export default function Home() {
         if (postId) {
           const post = data.find((p: Post) => p.id === postId);
           if (post) setCurrentPost(post);
+        }
+
+        // Fetch Institutional Insights
+        try {
+          const insightRes = await fetch('/insights.json?v=' + Date.now());
+          if (insightRes.ok) {
+            const iData = await insightRes.json();
+            setInsightData(iData);
+          }
+        } catch (err) {
+          console.warn("인사이트 데이터 로드 실패 (무시됨)");
         }
       } catch (e) {
         console.error("데이터 로드 실패:", e);
@@ -67,6 +80,8 @@ export default function Home() {
       <main className="pb-32">
         <Hero />
         <SloganSection />
+        
+        <MarketPulse data={insightData} />
         
         <Filters currentCat={category} setCat={setCategory} />
 

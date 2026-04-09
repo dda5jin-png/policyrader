@@ -24,7 +24,7 @@ GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
 genai.configure(api_key=GEMINI_API_KEY)
 
 # 가장 안정적인 1.5-flash를 시퀀스 처음에 배치하거나 목록에 포함 시킵니다.
-MODELS_TO_TRY = ['gemini-1.5-flash-latest', 'gemini-2.0-flash', 'gemini-flash-lite-latest', 'gemini-pro-latest']
+MODELS_TO_TRY = ['gemini-1.5-flash', 'gemini-2.0-flash', 'gemini-1.5-pro']
 MAX_ANALYZER_RETRIES = int(os.getenv("ANALYZER_MAX_RETRIES", "3"))
 ANALYZER_RETRY_BUFFER_SECONDS = int(os.getenv("ANALYZER_RETRY_BUFFER_SECONDS", "5"))
 ANALYZER_BETWEEN_POST_DELAY_SECONDS = int(os.getenv("ANALYZER_BETWEEN_POST_DELAY_SECONDS", "30"))
@@ -264,6 +264,41 @@ def run_analyzer(priority_ids=None, limit_count=10):
             print(f"  - ... {len(failed_posts) - 10}건 추가 실패")
 
     return {"processed": len(to_analyze), "succeeded": succeeded, "failed": failed_posts}
+
+def generate_market_pulse(insight_data):
+    """기관별 소스 데이터를 기반으로 한 종합 시장 맥락 요약 생성"""
+    print("📈 [Analyzer] Generating Market Pulse summary...")
+    
+    prompt = f"""
+    당신은 대한민국 '부동산 및 금융 세무 정책 수석 리서처'입니다. 
+    다음의 기관별 최신 데이터(JSON)를 분석하여 한 줄 평과 3가지 핵심 체크포인트를 요약하십시오.
+    
+    [데이터]:
+    {json.dumps(insight_data, ensure_ascii=False, indent=2)}
+    
+    [요청 사항]:
+    1. 마켓 한 줄 평: 현재 시장을 관통하는 가장 중요한 흐름을 30자 내외로 작성.
+    2. 핵심 체크포인트: 투자자나 실거주자가 반드시 알아야 할 변화 3가지를 '강점/기회' 또는 '리스크' 관점에서 작성.
+    3. 어조: 매우 전문적이고 경제적이며 단호한 어조 사용.
+    
+    응답 형식(JSON):
+    {{
+      "pulse_summary": "마켓 한 줄 평",
+      "checkpoints": ["포인트1", "포인트2", "포인트3"]
+    }}
+    """
+    
+    try:
+        model = get_model(MODELS_TO_TRY[0])
+        response = model.generate_content(prompt)
+        result = json.loads(clean_json_response(response.text))
+        return result
+    except Exception as e:
+        print(f"  ❌ Market Pulse 생성 실패: {e}")
+        return {
+            "pulse_summary": "데이터 수집 완료. 시장 모니터링 중입니다.",
+            "checkpoints": ["대출 금리 변동 주의", "청약 공고 상시 확인", "지역별 시장 양극화 유의"]
+        }
 
 if __name__ == "__main__":
     run_analyzer()
