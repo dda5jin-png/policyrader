@@ -3,7 +3,6 @@
 import React, { useState, useEffect } from 'react';
 import Header from '../components/Header';
 import { Hero, SloganSection } from '../components/HeroSections';
-import MarketPulse from '../components/MarketPulse';
 import { Filters, PostCard, Post } from '../components/PostComponents';
 import PostModal from '../components/PostModal';
 import GoogleAd from '../components/AdComponent';
@@ -81,7 +80,6 @@ export default function Home() {
         <Hero />
         <SloganSection />
         
-        <MarketPulse data={insightData} />
         
         <Filters currentCat={category} setCat={setCategory} />
 
