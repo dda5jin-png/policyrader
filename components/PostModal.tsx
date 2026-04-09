@@ -45,7 +45,7 @@ const PostModal: React.FC<PostModalProps> = ({ post, onClose, onCopyLink, onPrin
         <div className="bg-linear-to-br from-[var(--accent-soft)] to-transparent border border-[var(--accent-soft)] p-6 rounded-2xl italic leading-1.7 text-[var(--text-main)]">
           "{decodeHTMLEntities(post.expertOpinions[0]?.comment)}"
           <p className="mt-4 font-bold text-[0.8rem] text-right not-italic text-[var(--accent)]">
-            — 지능형 정책 리서치 ({post.expertOpinions[0]?.affiliation})
+            — 원문 기반 정책 리서치 ({post.expertOpinions[0]?.affiliation})
           </p>
         </div>
 
