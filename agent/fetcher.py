@@ -67,6 +67,14 @@ def fetch_period_api(start_date_str, end_date_str):
         response.raise_for_status()
         
         root = ET.fromstring(response.content)
+        
+        # resultCode 체크
+        result_code = root.findtext('.//resultCode')
+        result_msg = root.findtext('.//resultMsg')
+        if result_code and result_code != '0':
+            print(f"  ❌ API 에러 (코드: {result_code}, 메시지: {result_msg})")
+            return []
+
         items = root.findall('.//NewsItem')
         
         results = []
@@ -129,8 +137,8 @@ def fetch_via_api_range(start_date_limit, end_date_limit=None):
     
     while iter_date >= start_date_limit:
         e_str = iter_date.strftime("%Y%m%d")
-        # 7일 단위 블록 수집 (데이터 유실 방지 및 효율성)
-        s_date = iter_date - timedelta(days=6)
+        # 3일 단위 블록 수집 (API의 THREE_DAYS_OVER_ERROR 방지)
+        s_date = iter_date - timedelta(days=2)
         if s_date < start_date_limit: s_date = start_date_limit
         s_str = s_date.strftime("%Y%m%d")
         
