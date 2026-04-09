@@ -30,7 +30,7 @@ def main():
         
     except Exception as e:
         print(f"❌ [Fetcher] 오류 발생: {e}")
-        return
+        sys.exit(1)
 
     # 2. AI 분석 및 posts.json 업데이트
     try:
@@ -43,7 +43,7 @@ def main():
             return
     except Exception as e:
         print(f"❌ [AI Analyzer] 오류 발생: {e}")
-        return
+        sys.exit(1)
 
     try:
         original_argv = sys.argv[:]
@@ -57,7 +57,7 @@ def main():
     except Exception as e:
         sys.argv = original_argv
         print(f"❌ [Validator] 오류 발생: {e}")
-        return
+        sys.exit(1)
 
     print("🏁 [Policy Radar] 모든 프로세스 종료")
 

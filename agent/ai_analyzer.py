@@ -23,7 +23,8 @@ load_dotenv()
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
 genai.configure(api_key=GEMINI_API_KEY)
 
-MODELS_TO_TRY = ['gemini-2.0-flash', 'gemini-flash-lite-latest', 'gemini-flash-latest', 'gemini-pro-latest']
+# 가장 안정적인 1.5-flash를 시퀀스 처음에 배치하거나 목록에 포함 시킵니다.
+MODELS_TO_TRY = ['gemini-1.5-flash-latest', 'gemini-2.0-flash', 'gemini-flash-lite-latest', 'gemini-pro-latest']
 MAX_ANALYZER_RETRIES = int(os.getenv("ANALYZER_MAX_RETRIES", "3"))
 ANALYZER_RETRY_BUFFER_SECONDS = int(os.getenv("ANALYZER_RETRY_BUFFER_SECONDS", "5"))
 ANALYZER_BETWEEN_POST_DELAY_SECONDS = int(os.getenv("ANALYZER_BETWEEN_POST_DELAY_SECONDS", "30"))
@@ -115,7 +116,16 @@ def analyze_with_model(post, model_name):
         """
         model = get_model(model_name)
         response = model.generate_content(prompt)
-        return json.loads(clean_json_response(response.text))
+        
+        # 안전하게 텍스트 추출 (Blocked 등의 경우 예외 발생)
+        try:
+            text = response.text
+        except ValueError:
+            # Safety filter 등에 의해 텍스트가 없을 경우
+            print(f"  ⚠️ {model_name} 응답이 비어있거나 차단되었습니다.")
+            return None
+            
+        return json.loads(clean_json_response(text))
 
     return run_pag_pipeline(post, model_name=model_name)
 
@@ -164,13 +174,20 @@ def run_pag_pipeline(post, model_name=None):
     model = get_model(model_name)
     chat = model.start_chat(history=[])
     response = chat.send_message(baseline_prompt)
-    return json.loads(clean_json_response(response.text))
+    
+    try:
+        text = response.text
+    except ValueError:
+        print(f"  ⚠️ {model_name} 응답이 비어있거나 차단되었습니다.")
+        return None
+        
+    return json.loads(clean_json_response(text))
 
 def analyze_post_with_retry(post):
     """모델 교차 시도 + 할당량 대기 재시도"""
     attempts = 0
     last_error = None
-    model_sequence = ['gemini-2.0-flash', 'gemini-flash-lite-latest', 'gemini-flash-latest']
+    model_sequence = ['gemini-1.5-flash-latest', 'gemini-2.0-flash', 'gemini-flash-lite-latest']
 
     while attempts < MAX_ANALYZER_RETRIES:
         for model_name in model_sequence:
