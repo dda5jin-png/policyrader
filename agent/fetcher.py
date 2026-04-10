@@ -15,9 +15,13 @@ load_dotenv()
 # 설정
 # ══════════════════════════════════════════════
 TARGET_KEYWORDS = [
-    '부동산', '주택', '금융', '세제', '대출', '청약', '공시가격', '국토', '기본주택',
-    '가계부채', 'LTV', 'DSR', '종부세', '재산세', '양도세', '취득세', '금리', '역전세',
-    'GTX', '철도', '지하철', '신도시', '공공주택', '규제', '공사', '분양'
+    '부동산', '주택', '금융정책', '세제개편', '아파트 대출', '청약제도', '공시가격', '국토교통', 
+    '가계부채', 'LTV', 'DSR', '종부세', '재산세', '양도세', '취득세', '금리 인상', '금리 인하', '전세자금',
+    'GTX 노선', '신도시 개발', '공공주택', '부동산 규제', 'LH공사', '주택금융공사', '분양가상한제'
+]
+
+BLACKLIST_DEPTS = [
+    '식품의약품안전처', '보건복지부', '문화체육관광부', '교육부', '환경부', '기상청', '산림청', '경찰청', '소방청'
 ]
 
 # 공공데이터포털 인증키
@@ -94,11 +98,14 @@ def fetch_period_api(start_date_str, end_date_str):
             content = item.findtext('DataContents', '').strip()
             news_id = item.findtext('NewsItemId', '').strip()
 
-            # 수정: 부처 상관없이 제목에 키워드(부동산 등)가 있으면 일단 가져오도록 변경!
+            # 블랙리스트 부처 체크
+            is_blacklisted = any(bd in dept for bd in BLACKLIST_DEPTS)
+            
+            # 부처 상관없이 제목에 특정 핵심 키워드(부동산 등)가 있으면 일단 가져오도록 변경
             is_relevant_dept = any(d in dept for d in ["국토", "금융", "기획재정", "재정경제", "행정안전", "국세", "중소벤처", "국무"])
             is_keyword_match = any(kw in title for kw in TARGET_KEYWORDS)
 
-            if is_relevant_dept or is_keyword_match:
+            if (is_relevant_dept or is_keyword_match) and not is_blacklisted:
                 # Placeholder 체크: 본문이 없으면 스크래핑 시도
                 is_placeholder = "자세한 내용은 첨부파일" in content or len(content) < 100
                 full_text = content
