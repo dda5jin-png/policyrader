@@ -24,7 +24,7 @@ GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
 genai.configure(api_key=GEMINI_API_KEY)
 
 # 가장 안정적인 1.5-flash를 시퀀스 처음에 배치하거나 목록에 포함 시킵니다.
-MODELS_TO_TRY = ['gemini-1.5-flash', 'gemini-2.0-flash', 'gemini-1.5-pro']
+MODELS_TO_TRY = ['gemini-1.5-flash-latest', 'gemini-1.5-pro-latest', 'gemini-2.0-flash']
 MAX_ANALYZER_RETRIES = int(os.getenv("ANALYZER_MAX_RETRIES", "3"))
 ANALYZER_RETRY_BUFFER_SECONDS = int(os.getenv("ANALYZER_RETRY_BUFFER_SECONDS", "5"))
 ANALYZER_BETWEEN_POST_DELAY_SECONDS = int(os.getenv("ANALYZER_BETWEEN_POST_DELAY_SECONDS", "30"))
@@ -83,10 +83,45 @@ def wait_for_quota_reset(error, attempt_index):
     print(f"  ⏳ Gemini 할당량 제한 감지, {retry_seconds}초 대기 후 재시도합니다.")
     time.sleep(retry_seconds)
 
+def check_relevance(post, model_name):
+    """AI를 사용하여 해당 자료가 부동산/주택/거시금융 정책과 관련이 있는지 검사합니다."""
+    original_text = post.get('originalText', post.get('original_text', ''))
+    prompt = f"""
+    당신은 대한민국 '부동산 및 주택 정책 전문 리서처'입니다. 
+    다음 보도자료가 '부동산, 주택, 주거 복지, 국토 개발, 가계 대출(주택담보대출, 전세자금)'과 직접적으로 관련이 있는지 판단하십시오.
+    
+    [필터링 기준 - 중요]:
+    - YES (포함): 아파트/빌라 대출 정책, 전세 사기 대응, 청약 제도, 부동산 세금(종부세, 양도세), GTX/철도망, 신도시 개발, 공공주택 공급, 주택 시장 거시 건전성 관리.
+    - NO (제외): 
+        * 산업 금융 (예: 석유화학/조선/반도체 PF, 기업 구조조정 자금 지원)
+        * 보건/식약 (예: 제약 규제과학, 식품 안전)
+        * 일반 경제 (예: 중동 정세에 따른 일반 기업 지원, 배달 라이더 보험, 주유비 지원)
+        * 문화/교육/환경 (부동산 개발과 무관한 일반 정책)
+    
+    제목: {post['title']}
+    내용 요약: {original_text[:1000]}
+    
+    위 '제외' 기준에 하나라도 해당하거나, 부동산/주택과 직접 관련이 없다면 무조건 'NO'라고 하십시오.
+    관련이 확실할 때만 'YES'라고 응답하십시오. 응답은 'YES' 또는 'NO'로만 하십시오.
+    """
+    try:
+        model = get_model(model_name)
+        response = model.generate_content(prompt)
+        decision = response.text.strip().upper()
+        return "YES" in decision
+    except:
+        return True # 오류 발생 시 보수적으로 수집 유지
+
 def analyze_with_model(post, model_name):
     original_text = post.get('originalText', post.get('original_text', ''))
 
-    if model_name == 'gemini-flash-lite-latest':
+    # Lite Mode 처리 (기존 로직 유지)
+    if 'lite' in model_name:
+        # Lite 모드에서도 적합성 검사는 수행
+        if not check_relevance(post, model_name):
+            print(f"  🚫 {model_name}: (Lite) 부동산 정책과 무관하여 필터링합니다.")
+            return "FILTERED"
+
         print(f"  ⚡ [Lite Mode] {model_name} 단일 단계 분석을 수행합니다.")
         prompt = f"""
         당신은 대한민국 '부동산 및 금융 세무 정책 수석 리서처'입니다. 
@@ -126,6 +161,11 @@ def analyze_with_model(post, model_name):
             return None
             
         return json.loads(clean_json_response(text))
+
+    # 본격적인 분석 전 적합성 검사
+    if not check_relevance(post, model_name):
+        print(f"  🚫 {model_name}: 부동산 정책과 무관한 자료로 판명되어 필터링합니다.")
+        return "FILTERED"
 
     return run_pag_pipeline(post, model_name=model_name)
 
@@ -233,6 +273,10 @@ def run_analyzer(priority_ids=None, limit_count=10):
         except Exception as error:
             failed_posts.append({"id": p.get("id"), "title": p.get("title"), "error": str(error)})
             print(f"  ❌ 분석 실패, 다음 자료로 넘어갑니다: {error}")
+            continue
+
+        if result == "FILTERED":
+            print("  🗑️ 필터링됨 (부동산 무관)")
             continue
 
         if result:
