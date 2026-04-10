@@ -1,19 +1,42 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { authClient } from '@/lib/auth-client';
 
 const Header = () => {
   const { data: session, isPending } = authClient.useSession();
   const [loginLoading, setLoginLoading] = useState(false);
   const [isLight, setIsLight] = useState(false);
+  const [statusInfo, setStatusInfo] = useState<{
+    last_check?: string;
+    daily_scans?: number;
+    new_posts?: number;
+    status?: string;
+  }>({});
 
-  React.useEffect(() => {
+  useEffect(() => {
+    // 테마 설정
     const savedTheme = localStorage.getItem('theme');
     if (savedTheme === 'light') {
       setIsLight(true);
       document.documentElement.classList.add('light-mode');
     }
+
+    // 상태 정보 페칭
+    const fetchStatus = async () => {
+      try {
+        const res = await fetch('/insights.json');
+        if (res.ok) {
+          const data = await res.json();
+          if (data.system_status) {
+            setStatusInfo(data.system_status);
+          }
+        }
+      } catch (err) {
+        console.error('Failed to fetch status:', err);
+      }
+    };
+    fetchStatus();
   }, []);
 
   const toggleTheme = () => {
@@ -31,13 +54,13 @@ const Header = () => {
   return (
     <header className="sticky top-0 z-[1000] bg-[var(--glass)] backdrop-blur-[16px] border-b border-[var(--border)] px-5 py-4 pt-[max(16px,env(safe-area-inset-top))]">
       <div className="max-w-[900px] mx-auto flex justify-between items-center">
-        <a href="#" className="flex items-center gap-3 font-black text-[1.3rem] text-[var(--text-main)] no-underline tracking-[-0.5px]">
-          <div className="w-8 h-8 bg-linear-to-br from-[var(--accent)] to-[#e11d48] rounded-lg flex items-center justify-center shadow-[0_0_15px_var(--accent-soft)]">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="3">
+        <a href="#" className="flex items-center gap-2 sm:gap-3 font-black text-[1.05rem] sm:text-[1.3rem] text-[var(--text-main)] no-underline tracking-[-0.8px] sm:tracking-[-0.5px]">
+          <div className="w-7 h-7 sm:w-8 sm:h-8 bg-linear-to-br from-[var(--accent)] to-[#e11d48] rounded-lg flex items-center justify-center shadow-[0_0_15px_var(--accent-soft)]">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="3" className="sm:w-[20px] sm:h-[20px]">
               <path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" strokeLinecap="round"/>
             </svg>
           </div>
-          POLICY RADAR
+          <span className="shrink-0">POLICY RADAR</span>
         </a>
           {/* 
           {!isPending && (
@@ -102,8 +125,21 @@ const Header = () => {
                 </svg>
               )}
             </button>
-            <div id="status" className="text-[0.7rem] text-[var(--text-muted)] leading-tight hidden sm:block">
-              Real-time Data<br/>Pipeline Ready
+            <div id="status" className="text-[0.62rem] sm:text-[0.7rem] text-[var(--text-muted)] leading-tight text-right">
+              {statusInfo.last_check ? (
+                <>
+                  <div className="flex items-center justify-end gap-1 mb-0.5">
+                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                    <span className="font-bold text-[var(--text-main)]">{statusInfo.status || 'Active'}</span>
+                  </div>
+                  <div>Checked: {statusInfo.last_check.split(' ')[1]}</div>
+                  <div className="opacity-70">Today: {statusInfo.daily_scans} scans / {statusInfo.new_posts} novel</div>
+                </>
+              ) : (
+                <>
+                  Real-time Data<br/>Pipeline Ready
+                </>
+              )}
             </div>
         </div>
       </div>

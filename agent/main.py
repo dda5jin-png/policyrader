@@ -16,39 +16,48 @@ def main():
     print(f"ℹ️ [Config] ANALYZER_LIMIT_COUNT={analyzer_limit_count}")
     
     # 1. 뉴스 수집
+    total_fetched = 0
     try:
         raw_data = run_fetcher()
         if not raw_data:
             print("⚠️ [Fetcher] 새로운 데이터가 없습니다.")
-            return
+            # 데이터가 없어도 상태 업데이트를 위해 진행할 수 있도록 처리
+            raw_data = []
+        
+        total_fetched = len(raw_data)
             
         # raw_data.json 저장 (AI 분석을 위해)
-        # root에서 실행되므로 agent/raw_data.json 경로 유지
         raw_data_path = 'agent/raw_data.json'
         with open(raw_data_path, 'w', encoding='utf-8') as f:
             json.dump(raw_data, f, ensure_ascii=False, indent=2)
-        print(f"✅ [Fetcher] {len(raw_data)}건 수집 완료")
+        print(f"✅ [Fetcher] {total_fetched}건 수집 완료")
         
     except Exception as e:
         print(f"❌ [Fetcher] 오류 발생: {e}")
         sys.exit(1)
 
     # 2. AI 분석 및 posts.json 업데이트
+    succeeded_count = 0
     try:
         analyzer_summary = run_analyzer(limit_count=analyzer_limit_count)
         failed_count = len(analyzer_summary.get("failed", []))
         succeeded_count = analyzer_summary.get("succeeded", 0)
         print(f"✅ [AI Analyzer] 분석 및 posts.json 업데이트 완료 (성공: {succeeded_count}, 실패: {failed_count})")
-        if failed_count and succeeded_count == 0:
-            print("❌ [AI Analyzer] 모든 신규 자료 분석이 실패했습니다.")
-            return
     except Exception as e:
         print(f"❌ [AI Analyzer] 오류 발생: {e}")
-        sys.exit(1)
+        # AI 분석 실패 시에도 상태 기록을 위해 계속 진행 (succeeded_count=0)
+
         
-    # 3. 기관 데이터 통합 및 인사이트 생성 (NEW)
+    # 3. 기관 데이터 통합 및 인사이트 생성
     try:
-        aggregate_insights()
+        from datetime import datetime
+        status_info = {
+            "last_check": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+            "daily_scans": total_fetched,
+            "new_posts": succeeded_count,
+            "status": "Active"
+        }
+        aggregate_insights(status_info=status_info)
         print("✅ [Insight Aggregator] 기관 데이터 및 마켓 펄스 업데이트 완료")
     except Exception as e:
         print(f"❌ [Insight Aggregator] 오류 발생: {e}")

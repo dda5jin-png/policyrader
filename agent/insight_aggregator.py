@@ -4,12 +4,18 @@ from datetime import datetime
 from data_connector import DataConnector
 from ai_analyzer import generate_market_pulse
 
-def aggregate_insights():
+def aggregate_insights(status_info=None):
     print("📊 [Insight Aggregator] Institutional Data Collection Started...")
     connector = DataConnector()
     
     insights = {
         "last_updated": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+        "system_status": status_info or {
+            "last_check": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+            "daily_scans": 0,
+            "new_posts": 0,
+            "status": "Ready"
+        },
         "market_indices": {},
         "loan_rates": [],
         "conforming_rates": [],

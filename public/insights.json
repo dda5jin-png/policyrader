@@ -1,5 +1,11 @@
 {
-  "last_updated": "2026-04-10 11:07:08",
+  "last_updated": "2026-04-10 11:24:43",
+  "system_status": {
+    "last_check": "2026-04-10 11:24:43",
+    "daily_scans": 4,
+    "new_posts": 0,
+    "status": "Active"
+  },
   "market_indices": {},
   "loan_rates": [
     {
