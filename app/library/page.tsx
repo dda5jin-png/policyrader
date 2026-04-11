@@ -23,6 +23,7 @@ export default function LibraryPage() {
   const [savedPosts, setSavedPosts] = useState<SavedPostView[]>([]);
   const [pageLoading, setPageLoading] = useState(true);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [deletingPostId, setDeletingPostId] = useState<string | null>(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -92,6 +93,29 @@ export default function LibraryPage() {
   }, [supabase, user]);
 
   const displayName = profile?.name || user?.email || "회원";
+
+  const handleDeleteSavedPost = async (postId: string) => {
+    setDeletingPostId(postId);
+    setErrorMessage(null);
+
+    try {
+      const response = await fetch(`/api/library/save?postId=${encodeURIComponent(postId)}`, {
+        method: "DELETE",
+        credentials: "include",
+      });
+
+      if (!response.ok) {
+        throw new Error("delete_failed");
+      }
+
+      setSavedPosts((current) => current.filter((post) => post.id !== postId));
+    } catch (error) {
+      console.error("Failed to delete saved post", error);
+      setErrorMessage("서고에서 자료를 삭제하는 중 오류가 발생했습니다.");
+    } finally {
+      setDeletingPostId(null);
+    }
+  };
 
   if (loading || pageLoading) {
     return (
@@ -178,19 +202,32 @@ export default function LibraryPage() {
           ) : (
             <div className="mt-4 grid gap-4">
               {savedPosts.map((post) => (
-                <Link
+                <div
                   key={post.id}
-                  href={`/?id=${post.id}`}
                   className="rounded-3xl border border-[var(--border)] bg-[var(--primary)]/70 p-5 transition hover:border-[var(--accent)]"
                 >
-                  <div className="text-[0.75rem] text-[var(--text-muted)]">
-                    {post.date} · 저장됨 {new Date(post.saved_at).toLocaleDateString("ko-KR")}
+                  <div className="flex items-start justify-between gap-4">
+                    <Link href={`/?id=${post.id}`} className="min-w-0 flex-1">
+                      <div className="text-[0.75rem] text-[var(--text-muted)]">
+                        {post.date} · 저장됨 {new Date(post.saved_at).toLocaleDateString("ko-KR")}
+                      </div>
+                      <div className="mt-2 text-[1rem] font-bold text-[var(--text-main)]">
+                        {decodeHTMLEntities(post.headline)}
+                      </div>
+                      <div className="mt-2 text-[0.88rem] text-[var(--text-muted)]">{post.source}</div>
+                    </Link>
+                    <button
+                      type="button"
+                      className="shrink-0 rounded-2xl border border-rose-400/60 px-3 py-2 text-[0.82rem] font-bold text-rose-300 transition hover:bg-rose-500/10 disabled:cursor-not-allowed disabled:opacity-60"
+                      disabled={deletingPostId === post.id}
+                      onClick={() => {
+                        void handleDeleteSavedPost(post.id);
+                      }}
+                    >
+                      {deletingPostId === post.id ? "삭제 중..." : "삭제"}
+                    </button>
                   </div>
-                  <div className="mt-2 text-[1rem] font-bold text-[var(--text-main)]">
-                    {decodeHTMLEntities(post.headline)}
-                  </div>
-                  <div className="mt-2 text-[0.88rem] text-[var(--text-muted)]">{post.source}</div>
-                </Link>
+                </div>
               ))}
             </div>
           )}
