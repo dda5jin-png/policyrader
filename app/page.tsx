@@ -3,23 +3,23 @@
 import React, { useState, useEffect } from 'react';
 import Header from '../components/Header';
 import { Hero, SloganSection } from '../components/HeroSections';
-import { Filters, PostCard, Post } from '../components/PostComponents';
+import { Filters, PostCard } from '../components/PostComponents';
 import PostModal from '../components/PostModal';
 import GoogleAd from '../components/AdComponent';
+import type { PublicPost } from '@/lib/posts';
 import { copyLink, printPDF } from '../lib/utils';
 
 export default function Home() {
-  const [posts, setPosts] = useState<Post[]>([]);
-  const [filteredPosts, setFilteredPosts] = useState<Post[]>([]);
+  const [posts, setPosts] = useState<PublicPost[]>([]);
+  const [filteredPosts, setFilteredPosts] = useState<PublicPost[]>([]);
   const [category, setCategory] = useState('all');
-  const [currentPost, setCurrentPost] = useState<Post | null>(null);
-  const [insightData, setInsightData] = useState<any>(null);
+  const [currentPost, setCurrentPost] = useState<PublicPost | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     async function fetchPosts() {
       try {
-        const res = await fetch('/posts.json?v=' + Date.now());
+        const res = await fetch('/api/posts');
         const data = await res.json();
         setPosts(data);
         setFilteredPosts(data);
@@ -28,7 +28,7 @@ export default function Home() {
         const urlParams = new URLSearchParams(window.location.search);
         const postId = urlParams.get('id');
         if (postId) {
-          const post = data.find((p: Post) => p.id === postId);
+          const post = data.find((p: PublicPost) => p.id === postId);
           if (post) setCurrentPost(post);
         }
 
@@ -36,10 +36,9 @@ export default function Home() {
         try {
           const insightRes = await fetch('/insights.json?v=' + Date.now());
           if (insightRes.ok) {
-            const iData = await insightRes.json();
-            setInsightData(iData);
+            await insightRes.json();
           }
-        } catch (err) {
+        } catch {
           console.warn("인사이트 데이터 로드 실패 (무시됨)");
         }
       } catch (e) {
@@ -109,7 +108,7 @@ export default function Home() {
         post={currentPost} 
         onClose={handleCloseModal} 
         onCopyLink={copyLink} 
-        onPrintPDF={printPDF} 
+        onPrintPDF={printPDF}
       />
     </div>
   );

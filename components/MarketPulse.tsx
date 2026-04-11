@@ -30,7 +30,7 @@ const MarketPulse: React.FC<MarketPulseProps> = ({ data }) => {
           {data.ai_summary && (
             <div className="bg-white/60 backdrop-blur-sm rounded-2xl p-5 border border-white/80">
               <p className="text-[1rem] font-bold text-gray-800 mb-3 block">
-                "{data.ai_summary.pulse_summary}"
+                &ldquo;{data.ai_summary.pulse_summary}&rdquo;
               </p>
               <div className="flex flex-wrap gap-2">
                 {data.ai_summary.checkpoints.map((pt, idx) => (

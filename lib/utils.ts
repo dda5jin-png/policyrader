@@ -1,4 +1,4 @@
-import { Post } from "../components/PostComponents";
+import type { PremiumPostPayload, PublicPost } from "@/lib/posts";
 
 export const decodeHTMLEntities = (text: string): string => {
   if (!text || typeof text !== 'string') return text;
@@ -38,7 +38,7 @@ export const copyLink = (id: string) => {
   }
 };
 
-export const printPDF = (p: Post) => {
+export const printPDF = (p: PublicPost & Partial<PremiumPostPayload>) => {
   const catColor: Record<string, string> = { F:'#166534', X:'#92400e', S:'#1e40af', T:'#991b1b', R:'#9a3412', P:'#6b21a8' };
   const catBg: Record<string, string> = { F:'#dcfce7', X:'#fef3c7', S:'#dbeafe', T:'#fee2e2', R:'#ffedd5', P:'#f3e8ff' };
 

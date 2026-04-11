@@ -1,5 +1,6 @@
 import React from 'react';
 import { decodeHTMLEntities } from '../lib/utils';
+import type { PublicPost } from '@/lib/posts';
 
 export const CAT_INFO: Record<string, string> = {
   all: "전체 부동산 관련 정책 자료를 모두 표시합니다.",
@@ -69,25 +70,8 @@ export const Filters: React.FC<FiltersProps> = ({ currentCat, setCat }) => (
   </div>
 );
 
-export interface Post {
-  id: string;
-  cat: string;
-  catName?: string;
-  date: string;
-  headline: string;
-  source: string;
-  sourceUrl: string;
-  summary: string[];
-  expertOpinions: Array<{ name: string; affiliation: string; comment: string }>;
-  keyData: Array<{ 항목: string; 수치: string; 적용대상: string }>;
-  checklist: string[];
-  regionalImpact?: string;
-  yieldImpact?: string;
-  evidenceText?: string;
-}
-
 interface PostCardProps {
-  post: Post;
+  post: PublicPost;
   onClick: (id: string) => void;
   index: number;
 }

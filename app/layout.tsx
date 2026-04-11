@@ -1,6 +1,9 @@
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
 
+import { AuthProvider } from "@/components/AuthProvider";
+import { getAuthState } from "@/lib/auth/session";
+
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://policyradar.co.kr';
 
 export const metadata: Metadata = {
@@ -55,6 +58,8 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const authStatePromise = getAuthState();
+
   return (
     <html lang="ko">
       <head>
@@ -63,8 +68,24 @@ export default function RootLayout({
              crossOrigin="anonymous"></script>
       </head>
       <body>
-        {children}
+        <AuthLayout authStatePromise={authStatePromise}>{children}</AuthLayout>
       </body>
     </html>
+  );
+}
+
+async function AuthLayout({
+  children,
+  authStatePromise,
+}: Readonly<{
+  children: React.ReactNode;
+  authStatePromise: ReturnType<typeof getAuthState>;
+}>) {
+  const authState = await authStatePromise;
+
+  return (
+    <AuthProvider initialUser={authState.user} initialProfile={authState.profile}>
+        {children}
+    </AuthProvider>
   );
 }

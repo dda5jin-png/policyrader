@@ -8,6 +8,15 @@ export const Hero = () => (
     <h1 className="text-[2.2rem] font-extrabold leading-[1.2] mb-5 text-[var(--text-main)]">
       오늘 정부가 발표한 부동산 정책<br/>원문으로 바로 확인하세요.
     </h1>
+    <div className="mx-auto mt-6 max-w-[620px] rounded-2xl border border-[var(--border)] bg-[var(--card-bg)]/80 p-5 text-left shadow-sm">
+      <div className="mb-3 text-[0.78rem] font-black uppercase tracking-[1px] text-[var(--accent)]">이용방법</div>
+      <div className="space-y-2 text-[0.88rem] leading-[1.6] text-[var(--text-muted)]">
+        <div>1. 아래 카드에서 원하는 정책 자료를 클릭해 상세 내용을 바로 확인하세요.</div>
+        <div>2. 비회원도 요약, 기대효과, 지표 정리, 체크리스트까지 그대로 볼 수 있습니다.</div>
+        <div>3. 링크 생성, PDF 출력, 서고 저장은 로그인 후 사용할 수 있습니다.</div>
+        <div>4. 저장한 자료는 로그인 후 상단의 `내 서고`에서 다시 볼 수 있습니다.</div>
+      </div>
+    </div>
   </section>
 );
 
@@ -36,7 +45,7 @@ export const SloganSection = () => (
       <hr className="border-t border-[var(--border)] my-4 last:mb-0" />
       <div className="flex items-start gap-2 text-[0.8rem] text-[#f59e0b] font-medium leading-[1.6]">
         <span className="flex-shrink-0 text-[0.95rem] mt-px">※</span>
-        정책 분석 리포트 및 부가기능은 유료 전환 전 무료 제공 중입니다.
+        기본 요약은 공개 제공 중이며, 추가 인사이트와 확장 기능은 회원 전용 또는 향후 유료 기능으로 확장됩니다.
       </div>
     </div>
   </div>
