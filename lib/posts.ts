@@ -38,7 +38,7 @@ export interface PremiumPostPayload {
   yieldImpact?: string;
 }
 
-const postsPath = path.join(process.cwd(), "posts.json");
+const postsPath = path.join(process.cwd(), "public", "posts.json");
 
 export async function loadFullPosts(): Promise<FullPost[]> {
   const file = await readFile(postsPath, "utf-8");
