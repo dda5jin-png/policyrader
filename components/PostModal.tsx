@@ -254,7 +254,17 @@ const PostModal: React.FC<PostModalProps> = ({ post, onClose, onCopyLink, onPrin
             <span className="whitespace-nowrap">{savePending ? '저장 중...' : '서고 저장'}</span>
           </button>
           
-          <button className="w-full sm:w-auto sm:flex-1 sm:max-w-[160px] p-3.5 rounded-xl border-none bg-[var(--accent)] text-white text-[0.85rem] font-bold cursor-pointer flex items-center justify-center gap-2 transition-all hover:opacity-90" onClick={() => window.open(post.sourceUrl)}>
+          <button
+            className="w-full sm:w-auto sm:flex-1 sm:max-w-[160px] p-3.5 rounded-xl border-none bg-[var(--accent)] text-white text-[0.85rem] font-bold cursor-pointer flex items-center justify-center gap-2 transition-all hover:opacity-90"
+            onClick={() => {
+              if (!user) {
+                openLoginPrompt();
+                return;
+              }
+
+              window.open(post.sourceUrl);
+            }}
+          >
             <span className="whitespace-nowrap">원문보기</span>
           </button>
         </div>
@@ -269,7 +279,7 @@ const PostModal: React.FC<PostModalProps> = ({ post, onClose, onCopyLink, onPrin
           onClose={() => setShowPaywall(false)}
           nextPath={`/?id=${post.id}`}
           title="이 기능은 회원가입해야 이용할 수 있어요."
-          description="콘텐츠 열람은 계속 공개됩니다. 링크 생성, PDF 출력, 서고 저장은 회원 기능으로 제공됩니다."
+          description="비회원은 링크 생성, PDF 출력, 원문 바로가기 기능이 제한됩니다."
         />
       ) : null}
     </>

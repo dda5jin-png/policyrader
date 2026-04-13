@@ -143,7 +143,7 @@ export default function AuthForm({ mode }: AuthFormProps) {
       {error ? <p className="mt-4 text-[0.82rem] text-rose-400">{error}</p> : null}
 
       <div className="mt-6 rounded-2xl bg-[var(--accent-soft)]/60 p-4 text-[0.82rem] leading-relaxed text-[var(--text-muted)]">
-        로그인하면 링크 생성, PDF 출력, 서고 저장 같은 계정 기능을 사용할 수 있습니다.
+        로그인하면 링크 생성, PDF 출력, 원문 바로가기, 서고 저장 기능을 사용할 수 있습니다.
       </div>
 
       {!supabase ? (

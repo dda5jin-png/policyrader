@@ -13,7 +13,7 @@ interface PaywallModalProps {
 const PaywallModal: React.FC<PaywallModalProps> = ({
   onClose,
   title = '이 기능은 회원가입 후 사용할 수 있어요.',
-  description = '콘텐츠 열람은 계속 공개하고, 링크 생성·PDF 출력·서고 저장 같은 계정 기능만 회원에게 제공합니다.',
+  description = '비회원은 링크 생성, PDF 출력, 원문 바로가기 기능이 제한됩니다.',
   nextPath = '/',
   variant = 'auth',
 }) => {
