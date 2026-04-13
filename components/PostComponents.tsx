@@ -101,14 +101,14 @@ export const PostCard: React.FC<PostCardProps> = ({ post, onClick, index }) => (
       <span>•</span>
       <span>Premium Research</span>
     </div>
-    <div className="mt-4">
-      <Link
-        href={`/posts/${post.id}`}
-        className="inline-flex items-center text-[0.82rem] font-bold text-[var(--accent)] underline underline-offset-4"
-        onClick={(event) => event.stopPropagation()}
-      >
-        상세 페이지 보기
-      </Link>
-    </div>
+    <Link
+      href={`/posts/${post.id}`}
+      className="sr-only"
+      onClick={(event) => event.stopPropagation()}
+      tabIndex={-1}
+      aria-hidden="true"
+    >
+      {decodeHTMLEntities(post.headline)} 상세 페이지
+    </Link>
   </div>
 );
