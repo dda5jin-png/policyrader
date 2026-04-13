@@ -21,7 +21,7 @@ export const decodeHTMLEntities = (text: string): string => {
 };
 
 export const copyLink = (id: string) => {
-  const url = `${window.location.origin}${window.location.pathname}?id=${id}`;
+  const url = `${window.location.origin}/posts/${id}`;
   if (navigator.clipboard && navigator.clipboard.writeText) {
     navigator.clipboard.writeText(url).then(() => {
       alert('🔗 링크가 복사되었습니다!');
@@ -117,7 +117,7 @@ export const printPDF = (p: PublicPost & Partial<PremiumPostPayload>) => {
     ${checklistHTML}
     <div class="page-footer">
       <span>${p.sourceUrl}</span>
-      <span>dda5jin-png.github.io/policyrader/</span>
+      <span>${window.location.origin}/posts/${p.id}</span>
     </div>
   </body></html>`);
   win.document.close();

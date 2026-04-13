@@ -2,9 +2,9 @@ import type { Metadata, Viewport } from "next";
 import "./globals.css";
 
 import { AuthProvider } from "@/components/AuthProvider";
+import Footer from "@/components/Footer";
 import { getAuthState } from "@/lib/auth/session";
-
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://policyradar.co.kr';
+import { SITE_URL } from "@/lib/site";
 
 export const metadata: Metadata = {
   title: "폴리시레이더 | 정부 부동산 정책 원문 · 매일 업데이트",
@@ -12,6 +12,9 @@ export const metadata: Metadata = {
   keywords: ["부동산정책", "국토부보도자료", "정부부동산정책", "금융정책", "부동산분석", "LTV", "DSR", "국토교통부", "금융위원회", "정책레이더", "청약정책", "임대차법령"],
   authors: [{ name: "Policy Radar Team" }],
   metadataBase: new URL(SITE_URL),
+  alternates: {
+    canonical: SITE_URL,
+  },
   openGraph: {
     title: "오늘 발표된 부동산 정책 원문 — 분석·체크리스트·PDF까지",
     description: "국토부·기재부 보도자료를 원문 그대로. 핵심 지표 분석·체크리스트·PDF 출력까지 한 곳에서.",
@@ -85,7 +88,8 @@ async function AuthLayout({
 
   return (
     <AuthProvider initialUser={authState.user} initialProfile={authState.profile}>
-        {children}
+      {children}
+      <Footer />
     </AuthProvider>
   );
 }

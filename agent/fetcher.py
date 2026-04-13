@@ -26,7 +26,7 @@ BLACKLIST_DEPTS = [
 
 # 공공데이터포털 인증키
 API_KEY = os.getenv("DATA_GO_KR_API_KEY")
-BASE_URL = "http://apis.data.go.kr/1371000/pressReleaseService/pressReleaseList"
+BASE_URL = "https://apis.data.go.kr/1371000/pressReleaseService/pressReleaseList"
 POSTS_PATH = "public/posts.json"
 
 def scrape_full_content(url):

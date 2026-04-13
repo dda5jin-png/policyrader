@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import React from 'react';
 import { decodeHTMLEntities } from '../lib/utils';
 import type { PublicPost } from '@/lib/posts';
@@ -92,10 +93,22 @@ export const PostCard: React.FC<PostCardProps> = ({ post, onClick, index }) => (
     <h2 className="text-[1.2rem] font-bold mb-4 text-[var(--text-main)] leading-1.4 line-clamp-2">
       {decodeHTMLEntities(post.headline)}
     </h2>
+    <p className="mb-4 text-[0.92rem] leading-relaxed text-[var(--text-muted)] line-clamp-3">
+      {decodeHTMLEntities(post.summary[0] || post.evidenceText || '')}
+    </p>
     <div className="flex items-center gap-4 text-[0.8rem] text-[var(--text-muted)]">
       <span>{post.source}</span>
       <span>•</span>
       <span>Premium Research</span>
+    </div>
+    <div className="mt-4">
+      <Link
+        href={`/posts/${post.id}`}
+        className="inline-flex items-center text-[0.82rem] font-bold text-[var(--accent)] underline underline-offset-4"
+        onClick={(event) => event.stopPropagation()}
+      >
+        상세 페이지 보기
+      </Link>
     </div>
   </div>
 );
