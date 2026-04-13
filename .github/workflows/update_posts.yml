@@ -2,8 +2,8 @@ name: Update Policy Posts
 
 on:
   schedule:
-    - cron: '0 0 * * *'  # 매일 한국시간 오전 9시 (UTC 00:00)
-    - cron: '0 6 * * *'  # 매일 한국시간 오후 3시 (UTC 06:00), 경량 수집
+    - cron: '7 0 * * *'  # 매일 한국시간 오전 9시 07분 (UTC 00:07)
+    - cron: '7 6 * * *'  # 매일 한국시간 오후 3시 07분 (UTC 06:07), 경량 수집
   workflow_dispatch:      # 수동 실행 허용
 
 jobs:
@@ -28,7 +28,7 @@ jobs:
 
       - name: Configure run profile
         run: |
-          if [ "${{ github.event.schedule }}" = "0 6 * * *" ]; then
+          if [ "${{ github.event.schedule }}" = "7 6 * * *" ]; then
             echo "RUN_PROFILE=light" >> "$GITHUB_ENV"
             echo "ANALYZER_LIMIT_COUNT=3" >> "$GITHUB_ENV"
             echo "ANALYZER_MAX_RETRIES=1" >> "$GITHUB_ENV"
