@@ -29,13 +29,13 @@ jobs:
       - name: Configure run profile
         run: |
           if [ "${{ github.event.schedule }}" = "7 6 * * *" ]; then
-            echo "RUN_PROFILE=light" >> "$GITHUB_ENV"
-            echo "ANALYZER_LIMIT_COUNT=3" >> "$GITHUB_ENV"
-            echo "ANALYZER_MAX_RETRIES=1" >> "$GITHUB_ENV"
-            echo "ANALYZER_BETWEEN_POST_DELAY_SECONDS=5" >> "$GITHUB_ENV"
+            echo "RUN_PROFILE=afternoon" >> "$GITHUB_ENV"
+            echo "ANALYZER_LIMIT_COUNT=8" >> "$GITHUB_ENV"
+            echo "ANALYZER_MAX_RETRIES=2" >> "$GITHUB_ENV"
+            echo "ANALYZER_BETWEEN_POST_DELAY_SECONDS=15" >> "$GITHUB_ENV"
           else
-            echo "RUN_PROFILE=standard" >> "$GITHUB_ENV"
-            echo "ANALYZER_LIMIT_COUNT=10" >> "$GITHUB_ENV"
+            echo "RUN_PROFILE=morning" >> "$GITHUB_ENV"
+            echo "ANALYZER_LIMIT_COUNT=5" >> "$GITHUB_ENV"
             echo "ANALYZER_MAX_RETRIES=3" >> "$GITHUB_ENV"
             echo "ANALYZER_BETWEEN_POST_DELAY_SECONDS=30" >> "$GITHUB_ENV"
           fi
@@ -60,8 +60,15 @@ jobs:
           git commit -m "chore: auto-update policy posts and insights (${RUN_PROFILE}) [$(date +'%Y-%m-%d %H:%M:%S KST')]" || echo "No changes to commit"
           git push
 
-      # Vercel Deploy Hook이 있다면 아래와 같이 추가하여 강제 빌드를 트리거할 수 있습니다.
-      # - name: Trigger Vercel Deploy
-      #   if: success()
-      #   run: |
-      #     curl -X POST "${{ secrets.VERCEL_DEPLOY_HOOK_URL }}"
+      - name: Trigger Vercel Deploy
+        if: success()
+        continue-on-error: true
+        env:
+          VERCEL_DEPLOY_HOOK_URL: ${{ secrets.VERCEL_DEPLOY_HOOK_URL }}
+        run: |
+          if [ -n "$VERCEL_DEPLOY_HOOK_URL" ]; then
+            curl -X POST "$VERCEL_DEPLOY_HOOK_URL"
+            echo "✅ Vercel 배포 트리거 완료"
+          else
+            echo "⚠️ VERCEL_DEPLOY_HOOK_URL secret이 설정되지 않아 건너뜁니다."
+          fi
