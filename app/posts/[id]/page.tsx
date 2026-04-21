@@ -91,7 +91,8 @@ export default async function PostDetailPage({
         </h1>
 
         <p className="mt-6 text-[1rem] leading-7 text-[var(--text-muted)]">
-          폴리시레이더는 정부 보도자료 핵심 내용을 공개 요약으로 제공하고, 추가 분석은 회원 기능으로 분리합니다.
+          폴리시레이더는 정부 보도자료 원문을 바탕으로 정책 요약, 주요 수치, 확인해야 할 체크리스트를 공개 아카이브로 정리합니다.
+          링크 생성, PDF 출력, 서고 저장 같은 개인화 기능은 로그인 후 이용할 수 있습니다.
         </p>
 
         <section className="mt-10">
@@ -121,6 +122,78 @@ export default async function PostDetailPage({
           </section>
         ) : null}
 
+        {post.keyData.length > 0 ? (
+          <section className="mt-10">
+            <h2 className="mb-4 text-[0.8rem] font-extrabold uppercase tracking-[1px] text-[var(--accent)]">
+              공개 지표 정리
+            </h2>
+            <div className="overflow-x-auto rounded-2xl border border-[var(--border)]">
+              <table className="w-full min-w-[560px] border-collapse">
+                <thead>
+                  <tr className="bg-[var(--accent-soft)]/20 text-left">
+                    <th className="border-b border-[var(--border)] px-4 py-3 text-[0.78rem] text-[var(--text-muted)]">항목</th>
+                    <th className="border-b border-[var(--border)] px-4 py-3 text-[0.78rem] text-[var(--text-muted)]">수치</th>
+                    <th className="border-b border-[var(--border)] px-4 py-3 text-[0.78rem] text-[var(--text-muted)]">적용 대상</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {post.keyData.map((item, index) => (
+                    <tr key={`${post.id}-keydata-${index}`} className="border-b border-[var(--border)] last:border-b-0">
+                      <td className="px-4 py-3 text-[0.92rem] leading-6 text-[var(--text-main)]">{decodeHTMLEntities(item.항목)}</td>
+                      <td className="px-4 py-3 text-[0.92rem] font-bold leading-6 text-[var(--accent)]">{decodeHTMLEntities(item.수치)}</td>
+                      <td className="px-4 py-3 text-[0.92rem] leading-6 text-[var(--text-muted)]">{decodeHTMLEntities(item.적용대상)}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </section>
+        ) : null}
+
+        {post.regionalImpact || post.yieldImpact ? (
+          <section className="mt-10">
+            <h2 className="mb-4 text-[0.8rem] font-extrabold uppercase tracking-[1px] text-[var(--accent)]">
+              정책 영향 요약
+            </h2>
+            <div className="grid gap-4">
+              {post.regionalImpact ? (
+                <div className="rounded-2xl border border-[var(--border)] bg-black/10 px-5 py-5">
+                  <h3 className="text-[0.95rem] font-bold text-[var(--text-main)]">지역·대상별 영향</h3>
+                  <p className="mt-3 text-[0.95rem] leading-7 text-[var(--text-muted)]">
+                    {decodeHTMLEntities(post.regionalImpact)}
+                  </p>
+                </div>
+              ) : null}
+              {post.yieldImpact ? (
+                <div className="rounded-2xl border border-[var(--border)] bg-black/10 px-5 py-5">
+                  <h3 className="text-[0.95rem] font-bold text-[var(--text-main)]">시장·수익률 관점</h3>
+                  <p className="mt-3 text-[0.95rem] leading-7 text-[var(--text-muted)]">
+                    {decodeHTMLEntities(post.yieldImpact)}
+                  </p>
+                </div>
+              ) : null}
+            </div>
+          </section>
+        ) : null}
+
+        {post.checklist.length > 0 ? (
+          <section className="mt-10">
+            <h2 className="mb-4 text-[0.8rem] font-extrabold uppercase tracking-[1px] text-[var(--accent)]">
+              확인 체크리스트
+            </h2>
+            <div className="space-y-3">
+              {post.checklist.map((item, index) => (
+                <p
+                  key={`${post.id}-checklist-${index}`}
+                  className="rounded-2xl border-l-4 border-[var(--accent)] bg-[var(--accent-soft)]/20 px-4 py-4 text-[0.95rem] leading-7 text-[var(--text-main)]"
+                >
+                  {decodeHTMLEntities(item)}
+                </p>
+              ))}
+            </div>
+          </section>
+        ) : null}
+
         <section className="mt-10">
           <h2 className="mb-4 text-[0.8rem] font-extrabold uppercase tracking-[1px] text-[var(--accent)]">
             원문 확인
@@ -140,7 +213,7 @@ export default async function PostDetailPage({
             회원 기능 안내
           </h2>
           <p className="mt-2 text-[0.95rem] leading-7 text-[var(--text-muted)]">
-            상세 영향 분석, 체크리스트, 서고 저장, PDF 출력은 로그인 후 이용할 수 있습니다.
+            링크 생성, PDF 출력, 서고 저장은 로그인 후 이용할 수 있습니다. 공개 페이지는 검색과 정책 확인을 위해 계속 열어둡니다.
           </p>
           <div className="mt-4 flex flex-wrap gap-3">
             <Link
