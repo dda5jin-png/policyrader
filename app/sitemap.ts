@@ -1,5 +1,6 @@
 import { MetadataRoute } from 'next'
 
+import { GUIDES } from "@/lib/guides";
 import { loadFullPosts } from "@/lib/posts";
 import { SITE_URL } from "@/lib/site";
 
@@ -11,6 +12,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       lastModified: new Date(),
       changeFrequency: 'daily',
       priority: 1,
+    },
+    {
+      url: `${SITE_URL}/guides`,
+      lastModified: new Date(),
+      changeFrequency: 'monthly',
+      priority: 0.8,
     },
     {
       url: `${SITE_URL}/about`,
@@ -45,5 +52,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.8,
   }));
 
-  return [...staticPages, ...postPages];
+  const guidePages: MetadataRoute.Sitemap = GUIDES.map((guide) => ({
+    url: `${SITE_URL}/guides/${guide.slug}`,
+    lastModified: guide.updatedAt,
+    changeFrequency: 'monthly',
+    priority: 0.7,
+  }));
+
+  return [...staticPages, ...guidePages, ...postPages];
 }

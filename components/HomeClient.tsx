@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from 'react';
 
 import Header from '@/components/Header';
-import { Hero, SloganSection } from '@/components/HeroSections';
+import { Hero, PolicyGuideSection, SloganSection } from '@/components/HeroSections';
 import { Filters, PostCard } from '@/components/PostComponents';
 import PostModal from '@/components/PostModal';
 import GoogleAd from '@/components/AdComponent';
@@ -79,6 +79,7 @@ export default function HomeClient({
       <main className="pb-32">
         <Hero />
         <SloganSection />
+        <PolicyGuideSection />
         <Filters currentCat={category} setCat={setCategory} />
 
         <div className="max-w-[900px] mx-auto px-5">

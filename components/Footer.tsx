@@ -11,6 +11,9 @@ export default function Footer() {
           </p>
         </div>
         <div className="flex flex-wrap gap-4">
+          <Link href="/guides" className="underline underline-offset-4">
+            정책 가이드
+          </Link>
           <Link href="/about" className="underline underline-offset-4">
             서비스 소개
           </Link>

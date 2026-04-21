@@ -1,4 +1,7 @@
+import Link from "next/link";
 import React from 'react';
+
+import { GUIDE_SUMMARIES } from "@/lib/guides";
 
 export const Hero = () => (
   <section className="px-6 py-[60px] text-center max-w-[900px] mx-auto">
@@ -16,6 +19,46 @@ export const Hero = () => (
         <div>3. 비회원은 링크 생성, PDF 출력, 원문 바로가기 기능이 제한됩니다.</div>
         <div>4. 저장한 자료는 로그인 후 상단의 `내 서고`에서 다시 볼 수 있습니다.</div>
       </div>
+    </div>
+  </section>
+);
+
+export const PolicyGuideSection = () => (
+  <section className="max-w-[900px] mx-auto mb-10 px-5">
+    <div className="mb-4 flex flex-wrap items-end justify-between gap-3">
+      <div>
+        <div className="text-[0.78rem] font-black uppercase tracking-[1px] text-[var(--accent)]">
+          정책 기초 가이드
+        </div>
+        <h2 className="mt-2 text-[1.45rem] font-black text-[var(--text-main)]">
+          보도자료를 읽기 전에 기준부터 잡기
+        </h2>
+      </div>
+      <Link
+        href="/guides"
+        className="text-[0.88rem] font-bold text-[var(--accent)] underline underline-offset-4"
+      >
+        전체 가이드 보기
+      </Link>
+    </div>
+    <div className="grid gap-4 sm:grid-cols-2">
+      {GUIDE_SUMMARIES.map((guide) => (
+        <Link
+          key={guide.slug}
+          href={`/guides/${guide.slug}`}
+          className="rounded-2xl border border-[var(--border)] bg-[var(--card-bg)] p-5 shadow-sm transition hover:-translate-y-0.5 hover:border-[var(--accent)]/50"
+        >
+          <div className="text-[0.7rem] font-black uppercase tracking-[1px] text-[var(--accent)]">
+            {guide.eyebrow}
+          </div>
+          <h3 className="mt-2 text-[1rem] font-black leading-snug text-[var(--text-main)]">
+            {guide.title}
+          </h3>
+          <p className="mt-2 text-[0.86rem] leading-6 text-[var(--text-muted)]">
+            {guide.description}
+          </p>
+        </Link>
+      ))}
     </div>
   </section>
 );
