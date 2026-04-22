@@ -102,7 +102,7 @@ export const printPDF = (p: PublicPost & Partial<PremiumPostPayload>) => {
     </style>
   </head><body>
     <div class="page-header">
-      <div class="logo">Policy Radar | AI Intelligence Pipeline</div>
+      <div class="logo">Policy Radar | Policy Research Archive</div>
       <div class="header-meta">${p.date}<br>출처: ${p.source}</div>
     </div>
     <div class="badge">${p.catName || ''}</div>

@@ -1,42 +1,26 @@
 @import "tailwindcss";
 
 :root {
-  --primary: #0f172a;
-  --accent: #f43f5e;
-  --accent-soft: rgba(244, 63, 94, 0.1);
-  --bg: #030712;
-  --card-bg: rgba(30, 41, 59, 0.5);
-  --border: rgba(255, 255, 255, 0.08);
-  --text-main: #f8fafc;
-  --text-muted: #94a3b8;
-  --glass: rgba(15, 23, 42, 0.8);
-  --blur: blur(16px);
-  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.4), 0 4px 6px -4px rgba(0, 0, 0, 0.4);
-  --radius: 16px;
-  --foreground: #f8fafc;
-  --background: #030712;
-}
-
-:root.light-mode {
-  --primary: #f8fafc;
-  --bg: #f8fafc;
+  --primary: #ffffff;
+  --accent: #be123c;
+  --accent-soft: rgba(190, 18, 60, 0.08);
+  --bg: #ffffff;
   --card-bg: #ffffff;
-  --border: rgba(0, 0, 0, 0.08);
+  --border: #e2e8f0;
   --text-main: #0f172a;
   --text-muted: #475569;
-  --glass: rgba(255, 255, 255, 0.8);
+  --glass: rgba(255, 255, 255, 0.92);
+  --blur: blur(16px);
+  --shadow-lg: 0 18px 45px rgba(15, 23, 42, 0.08);
+  --radius: 8px;
   --foreground: #0f172a;
   --background: #ffffff;
-  --accent-soft: rgba(244, 63, 94, 0.05);
 }
 
 
 body {
   font-family: 'Pretendard', sans-serif;
   background-color: var(--bg);
-  background-image: 
-    radial-gradient(at 0% 0%, var(--accent-soft) 0px, transparent 50%),
-    radial-gradient(at 100% 100%, rgba(15, 23, 42, 0.05) 0px, transparent 50%);
   color: var(--text-main);
   line-height: 1.6;
   min-height: 100vh;
@@ -44,6 +28,18 @@ body {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
+}
+
+a {
+  text-decoration-thickness: 1px;
+  text-underline-offset: 4px;
+}
+
+button,
+input,
+select,
+textarea {
+  border-radius: 0;
 }
 
 * {

@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
+import Header from "@/components/Header";
 import { GUIDES, getGuideBySlug } from "@/lib/guides";
 import { SITE_URL } from "@/lib/site";
 
@@ -61,8 +62,10 @@ export default async function GuideDetailPage({
   }
 
   return (
-    <main className="min-h-screen bg-[var(--primary)] px-5 py-12">
-      <article className="mx-auto max-w-4xl rounded-[28px] border border-[var(--border)] bg-[var(--card-bg)] p-6 shadow-[var(--shadow-lg)] sm:p-10">
+    <>
+      <Header />
+      <main className="min-h-screen bg-white px-5 py-12">
+      <article className="mx-auto max-w-4xl">
         <div className="mb-8 flex flex-wrap items-center gap-3 text-[0.82rem] text-[var(--text-muted)]">
           <Link
             href="/guides"
@@ -84,7 +87,7 @@ export default async function GuideDetailPage({
           {guide.summary}
         </p>
 
-        <section className="mt-9 rounded-2xl border border-[var(--border)] bg-[var(--accent-soft)]/20 p-5">
+        <section className="mt-9 border-y border-[var(--border)] bg-[var(--accent-soft)] px-5 py-5">
           <h2 className="text-[0.82rem] font-extrabold uppercase tracking-[1px] text-[var(--accent)]">
             먼저 기억할 것
           </h2>
@@ -92,7 +95,7 @@ export default async function GuideDetailPage({
             {guide.keyTakeaways.map((item) => (
               <p
                 key={item}
-                className="rounded-xl border border-[var(--border)] bg-black/10 px-4 py-3 text-[0.95rem] leading-7 text-[var(--text-main)]"
+                className="border-l-4 border-[var(--accent)] bg-white px-4 py-3 text-[0.95rem] leading-7 text-[var(--text-main)]"
               >
                 {item}
               </p>
@@ -126,7 +129,7 @@ export default async function GuideDetailPage({
             {guide.checklist.map((item) => (
               <p
                 key={item}
-                className="rounded-2xl border-l-4 border-[var(--accent)] bg-black/10 px-4 py-4 text-[0.95rem] leading-7 text-[var(--text-main)]"
+                className="border-l-4 border-[var(--accent)] bg-slate-50 px-4 py-4 text-[0.95rem] leading-7 text-[var(--text-main)]"
               >
                 {item}
               </p>
@@ -139,7 +142,7 @@ export default async function GuideDetailPage({
           <ReferenceBlock title="공식 자료" references={guide.officialRefs} />
         </section>
 
-        <section className="mt-10 rounded-2xl border border-[var(--border)] bg-black/10 p-5">
+        <section className="mt-10 border-y border-[var(--border)] bg-slate-50 p-5">
           <h2 className="text-[1rem] font-bold text-[var(--text-main)]">
             안내
           </h2>
@@ -150,6 +153,7 @@ export default async function GuideDetailPage({
         </section>
       </article>
     </main>
+    </>
   );
 }
 
@@ -161,7 +165,7 @@ function ReferenceBlock({
   references: Array<{ label: string; href: string; note: string }>;
 }) {
   return (
-    <div className="rounded-2xl border border-[var(--border)] bg-black/10 p-5">
+    <div className="border-y border-[var(--border)] bg-slate-50 p-5">
       <h2 className="text-[0.82rem] font-extrabold uppercase tracking-[1px] text-[var(--accent)]">
         {title}
       </h2>

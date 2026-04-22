@@ -49,7 +49,7 @@ const PostModal: React.FC<PostModalProps> = ({ post, onClose, onCopyLink, onPrin
         setPremiumData(payload);
       } catch (error) {
         if (!(error instanceof DOMException && error.name === 'AbortError')) {
-          console.error('프리미엄 데이터 로드 실패', error);
+          console.error('심층 데이터 로드 실패', error);
         }
       } finally {
         setPremiumLoading(false);
@@ -173,7 +173,7 @@ const PostModal: React.FC<PostModalProps> = ({ post, onClose, onCopyLink, onPrin
         ) : null}
 
         {premiumLoading ? (
-          <div className="mt-6 text-[0.82rem] text-[var(--text-muted)]">프리미엄 분석을 불러오는 중...</div>
+          <div className="mt-6 text-[0.82rem] text-[var(--text-muted)]">심층 자료를 불러오는 중...</div>
         ) : null}
 
         <div className="flex flex-col sm:flex-row gap-3 mt-8 justify-center items-center">
@@ -279,7 +279,7 @@ const PostModal: React.FC<PostModalProps> = ({ post, onClose, onCopyLink, onPrin
           onClose={() => setShowPaywall(false)}
           nextPath={`/?id=${post.id}`}
           title="이 기능은 회원가입해야 이용할 수 있어요."
-          description="비회원은 링크 생성, PDF 출력, 원문 바로가기 기능이 제한됩니다."
+          description="관심 정책자료 저장과 이후 확인을 위해 계정 연결이 필요합니다."
         />
       ) : null}
     </>

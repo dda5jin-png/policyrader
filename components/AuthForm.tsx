@@ -92,10 +92,10 @@ export default function AuthForm({ mode }: AuthFormProps) {
           {mode === "login" ? "로그인" : "회원가입"}
         </div>
         <h1 className="text-[1.8rem] font-black leading-tight text-[var(--text-main)]">
-          {mode === "login" ? "프리미엄 인사이트를 이어서 보세요." : "3초 만에 가입하고 잠금을 해제하세요."}
+          {mode === "login" ? "저장한 정책자료를 이어서 확인하세요." : "정책자료 서고를 만들어 보세요."}
         </h1>
         <p className="mt-3 text-[0.92rem] leading-relaxed text-[var(--text-muted)]">
-          공개 콘텐츠는 그대로 열어두고, 로그인한 사용자에게만 추가 인사이트와 내 서고 구조를 연결합니다.
+          로그인하면 관심 정책자료를 저장하고 이후 업데이트 확인에 활용할 수 있습니다.
         </p>
       </div>
 
@@ -143,7 +143,7 @@ export default function AuthForm({ mode }: AuthFormProps) {
       {error ? <p className="mt-4 text-[0.82rem] text-rose-400">{error}</p> : null}
 
       <div className="mt-6 rounded-2xl bg-[var(--accent-soft)]/60 p-4 text-[0.82rem] leading-relaxed text-[var(--text-muted)]">
-        로그인하면 링크 생성, PDF 출력, 원문 바로가기, 서고 저장 기능을 사용할 수 있습니다.
+        로그인하면 관심 자료 저장과 개인 서고 기능을 사용할 수 있습니다.
       </div>
 
       {!supabase ? (

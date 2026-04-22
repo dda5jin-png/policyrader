@@ -2,7 +2,6 @@
 import React from 'react';
 
 const GoogleAd = ({ className = '' }: { className?: string }) => {
-  // 광고 영역 일시 숨김 처리 (요청 시 null 반환 대신 hidden 스타일 또는 주석 처리 가능)
   return null; 
 
   return (
@@ -13,8 +12,8 @@ const GoogleAd = ({ className = '' }: { className?: string }) => {
       </div>
       
       <div className="text-center space-y-2">
-        <div className="text-[var(--text-muted)] text-[0.8rem] font-medium">Google Ad Placement</div>
-        <div className="text-[0.65rem] text-[var(--border)] italic">본 영역은 구글 애드센스 광고가 노출되는 자리입니다</div>
+        <div className="text-[var(--text-muted)] text-[0.8rem] font-medium">Content Notice</div>
+        <div className="text-[0.65rem] text-[var(--border)] italic">본문 흐름을 방해하지 않는 안내 영역입니다</div>
       </div>
 
       {/* Decorative pulse for placeholder effect */}

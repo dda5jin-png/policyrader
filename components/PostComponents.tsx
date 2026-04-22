@@ -99,7 +99,7 @@ export const PostCard: React.FC<PostCardProps> = ({ post, onClick, index }) => (
     <div className="flex items-center gap-4 text-[0.8rem] text-[var(--text-muted)]">
       <span>{post.source}</span>
       <span>•</span>
-      <span>Premium Research</span>
+      <span>Policy Research</span>
     </div>
     <Link
       href={`/posts/${post.id}`}

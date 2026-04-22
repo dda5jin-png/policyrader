@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
+import Header from "@/components/Header";
 import { CAT_NAMES } from "@/components/PostComponents";
 import { getFullPostById, loadFullPosts } from "@/lib/posts";
 import { SITE_URL } from "@/lib/site";
@@ -69,8 +70,10 @@ export default async function PostDetailPage({
   }
 
   return (
-    <main className="min-h-screen bg-[var(--primary)] px-5 py-12">
-      <article className="mx-auto max-w-4xl rounded-[28px] border border-[var(--border)] bg-[var(--card-bg)] p-6 shadow-[var(--shadow-lg)] sm:p-10">
+    <>
+      <Header />
+      <main className="min-h-screen bg-white px-5 py-12">
+      <article className="mx-auto max-w-4xl">
         <div className="mb-6 flex flex-wrap items-center gap-3 text-[0.78rem] text-[var(--text-muted)]">
           <Link
             href="/"
@@ -90,9 +93,10 @@ export default async function PostDetailPage({
           {decodeHTMLEntities(post.headline)}
         </h1>
 
-        <p className="mt-6 text-[1rem] leading-7 text-[var(--text-muted)]">
-          폴리시레이더는 정부 보도자료 원문을 바탕으로 정책 요약, 주요 수치, 확인해야 할 체크리스트를 공개 아카이브로 정리합니다.
-          링크 생성, PDF 출력, 서고 저장 같은 개인화 기능은 로그인 후 이용할 수 있습니다.
+        <p className="mt-6 text-[1rem] leading-8 text-[var(--text-muted)]">
+          이 문서는 원문 발표 내용과 정책 해석을 분리해 정리한 자료입니다. 정책 개요,
+          핵심 요약, 기대효과 및 시장 영향, 관련 지표, 인사이트, 원문 출처 순서로 구성해
+          동일한 기준에서 다른 정책과 비교할 수 있도록 했습니다.
         </p>
 
         <section className="mt-10">
@@ -103,7 +107,7 @@ export default async function PostDetailPage({
             {post.summary.map((summary, index) => (
               <p
                 key={`${post.id}-summary-${index}`}
-                className="rounded-2xl border border-[var(--border)] bg-[var(--accent-soft)]/20 px-4 py-4 text-[0.98rem] leading-7 text-[var(--text-main)]"
+                className="border-l-4 border-[var(--accent)] bg-rose-50 px-4 py-4 text-[0.98rem] leading-7 text-[var(--text-main)]"
               >
                 {decodeHTMLEntities(summary)}
               </p>
@@ -116,7 +120,7 @@ export default async function PostDetailPage({
             <h2 className="mb-4 text-[0.8rem] font-extrabold uppercase tracking-[1px] text-[var(--text-muted)]">
               공개 근거 문장
             </h2>
-            <p className="rounded-2xl border border-[var(--border)] px-5 py-5 text-[0.96rem] leading-7 text-[var(--text-muted)]">
+            <p className="border-y border-[var(--border)] px-5 py-5 text-[0.96rem] leading-7 text-[var(--text-muted)]">
               {decodeHTMLEntities(post.evidenceText)}
             </p>
           </section>
@@ -127,7 +131,7 @@ export default async function PostDetailPage({
             <h2 className="mb-4 text-[0.8rem] font-extrabold uppercase tracking-[1px] text-[var(--accent)]">
               공개 지표 정리
             </h2>
-            <div className="overflow-x-auto rounded-2xl border border-[var(--border)]">
+            <div className="overflow-x-auto border border-[var(--border)]">
               <table className="w-full min-w-[560px] border-collapse">
                 <thead>
                   <tr className="bg-[var(--accent-soft)]/20 text-left">
@@ -157,7 +161,7 @@ export default async function PostDetailPage({
             </h2>
             <div className="grid gap-4">
               {post.regionalImpact ? (
-                <div className="rounded-2xl border border-[var(--border)] bg-black/10 px-5 py-5">
+                <div className="border-y border-[var(--border)] bg-slate-50 px-5 py-5">
                   <h3 className="text-[0.95rem] font-bold text-[var(--text-main)]">지역·대상별 영향</h3>
                   <p className="mt-3 text-[0.95rem] leading-7 text-[var(--text-muted)]">
                     {decodeHTMLEntities(post.regionalImpact)}
@@ -165,7 +169,7 @@ export default async function PostDetailPage({
                 </div>
               ) : null}
               {post.yieldImpact ? (
-                <div className="rounded-2xl border border-[var(--border)] bg-black/10 px-5 py-5">
+                <div className="border-y border-[var(--border)] bg-slate-50 px-5 py-5">
                   <h3 className="text-[0.95rem] font-bold text-[var(--text-main)]">시장·수익률 관점</h3>
                   <p className="mt-3 text-[0.95rem] leading-7 text-[var(--text-muted)]">
                     {decodeHTMLEntities(post.yieldImpact)}
@@ -185,7 +189,7 @@ export default async function PostDetailPage({
               {post.checklist.map((item, index) => (
                 <p
                   key={`${post.id}-checklist-${index}`}
-                  className="rounded-2xl border-l-4 border-[var(--accent)] bg-[var(--accent-soft)]/20 px-4 py-4 text-[0.95rem] leading-7 text-[var(--text-main)]"
+                  className="border-l-4 border-[var(--accent)] bg-slate-50 px-4 py-4 text-[0.95rem] leading-7 text-[var(--text-main)]"
                 >
                   {decodeHTMLEntities(item)}
                 </p>
@@ -202,35 +206,22 @@ export default async function PostDetailPage({
             href={post.sourceUrl}
             target="_blank"
             rel="noreferrer"
-            className="inline-flex rounded-xl bg-[var(--accent)] px-4 py-3 text-[0.92rem] font-bold text-white"
+            className="inline-flex bg-[var(--accent)] px-4 py-3 text-[0.92rem] font-bold text-white"
           >
             정부 원문 보기
           </a>
         </section>
 
-        <section className="mt-10 rounded-2xl border border-[var(--border)] bg-black/10 px-5 py-5">
+        <section className="mt-10 border-y border-[var(--border)] bg-slate-50 px-5 py-5">
           <h2 className="text-[1rem] font-bold text-[var(--text-main)]">
-            회원 기능 안내
+            자료 이용 안내
           </h2>
           <p className="mt-2 text-[0.95rem] leading-7 text-[var(--text-muted)]">
-            링크 생성, PDF 출력, 서고 저장은 로그인 후 이용할 수 있습니다. 공개 페이지는 검색과 정책 확인을 위해 계속 열어둡니다.
+            본문은 정책 이해를 돕기 위한 참고 자료입니다. 실제 거래, 신고, 대출, 청약 판단은 원문 공고와 담당 기관의 최신 안내를 확인한 뒤 진행해야 합니다.
           </p>
-          <div className="mt-4 flex flex-wrap gap-3">
-            <Link
-              href={`/signup?next=/posts/${post.id}`}
-              className="rounded-xl bg-[var(--accent)] px-4 py-3 text-[0.88rem] font-bold text-white"
-            >
-              회원가입
-            </Link>
-            <Link
-              href={`/login?next=/posts/${post.id}`}
-              className="rounded-xl border border-[var(--border)] px-4 py-3 text-[0.88rem] font-bold text-[var(--text-main)]"
-            >
-              로그인
-            </Link>
-          </div>
         </section>
       </article>
     </main>
+    </>
   );
 }

@@ -1,8 +1,8 @@
 import HomeClient from "@/components/HomeClient";
-import { getPublicPosts } from "@/lib/posts";
+import { loadFullPosts } from "@/lib/posts";
 
 export default async function HomePage() {
-  const posts = await getPublicPosts();
+  const posts = await loadFullPosts();
 
   return <HomeClient initialPosts={posts} />;
 }
