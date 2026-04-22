@@ -12,8 +12,8 @@ export default function ContactPage() {
           <p>
             이메일:
             {" "}
-            <a href="mailto:contact@policyradar.co.kr" className="font-bold text-[var(--accent)] underline">
-              contact@policyradar.co.kr
+            <a href="mailto:kiap.center@gmail.com" className="font-bold text-[var(--accent)] underline">
+              kiap.center@gmail.com
             </a>
           </p>
           <p>정정 요청 시 정책 제목, 원문 URL, 수정이 필요한 부분, 확인 가능한 근거를 함께 보내면 검토가 빠릅니다.</p>
