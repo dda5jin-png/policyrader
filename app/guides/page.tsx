@@ -19,13 +19,13 @@ export default function GuidesPage() {
     <>
       <Header />
       <main className="mx-auto max-w-6xl px-5 py-14">
-        <p className="text-[0.78rem] font-bold uppercase text-[var(--accent)]">Reference / Guide</p>
+        <p className="text-[0.78rem] font-bold uppercase text-[var(--accent)]">Policy Guide</p>
         <h1 className="mt-3 max-w-3xl text-[2.2rem] font-black leading-tight text-slate-950">
-          부동산 정책을 읽기 위한 학습형 레퍼런스
+          부동산 정책 이해를 위한 기초 가이드
         </h1>
         <p className="mt-5 max-w-3xl text-[1rem] leading-8 text-slate-700">
-          정책자료를 해석할 때 반복적으로 등장하는 기초 개념을 별도 블로그가 아니라 플랫폼 내부의 참조 영역으로 통합했습니다.
-          기준일은 {GUIDES_UPDATED_AT}이며, 실제 신고·대출·계약 전에는 담당 기관의 최신 공고를 확인해야 합니다.
+          정책자료를 해석할 때 반복적으로 등장하는 기초 개념과 공식 근거를 정리했습니다.
+          기준일은 {GUIDES_UPDATED_AT}이며, 실제 신고·대출·계약 전에는 담당 기관의 최신 안내를 확인해야 합니다.
         </p>
 
         <div className="mt-10 divide-y divide-[var(--border)] border-y border-[var(--border)]">
