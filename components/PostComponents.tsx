@@ -102,7 +102,7 @@ export const PostCard: React.FC<PostCardProps> = ({ post, onClick, index }) => (
       <span>Policy Research</span>
     </div>
     <Link
-      href={`/posts/${post.id}`}
+      href={`/${post.post_type || "insight"}/${post.id}`}
       className="sr-only"
       onClick={(event) => event.stopPropagation()}
       tabIndex={-1}

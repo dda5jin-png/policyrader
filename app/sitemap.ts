@@ -46,7 +46,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   ];
 
   const postPages: MetadataRoute.Sitemap = posts.map((post) => ({
-    url: `${SITE_URL}/posts/${post.id}`,
+    url: `${SITE_URL}/${post.post_type || "insight"}/${post.id}`,
     lastModified: post.date,
     changeFrequency: 'weekly',
     priority: 0.8,

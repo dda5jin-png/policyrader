@@ -170,14 +170,52 @@ def normalize_post(post: Dict[str, Any], source_post: Optional[Dict[str, Any]] =
         normalized.setdefault("link", source_post.get("link"))
         normalized.setdefault("views", source_post.get("views", 0))
 
-    for field in ["summary", "checklist"]:
-        raw_items = normalized.get(field)
-        items = [_clean_text(item) for item in raw_items] if isinstance(raw_items, list) else []
-        items = [item for item in items if item]
-        if not items:
-            items = _fallback_summary(normalized, source_post) if field == "summary" else _fallback_checklist(normalized, cat)
-            warnings.append(f"{field} fallback applied")
-        normalized[field] = items
+    # checklist 처리
+    checklist_raw = normalized.get("checklist", [])
+    if isinstance(checklist_raw, str):
+        checklist_items = [_clean_text(checklist_raw)]
+    elif isinstance(checklist_raw, list):
+        checklist_items = [_clean_text(item) for item in checklist_raw]
+    else:
+        checklist_items = []
+        
+    checklist_items = [item for item in checklist_items if item]
+    if not checklist_items:
+        checklist_items = _fallback_checklist(normalized, cat)
+        warnings.append("checklist fallback applied")
+    normalized["checklist"] = checklist_items
+
+    # post_type 및 4단 구조(content_sections) 처리
+    post_type = _clean_text(normalized.get("post_type", ""))
+    if post_type not in ["insight", "analysis", "opinion"]:
+        post_type = "insight"
+    normalized["post_type"] = post_type
+
+    sections = normalized.get("content_sections", {})
+    if sections and isinstance(sections, dict):
+        for sec_key in ["summary", "meaning", "market_impact", "investor_insight"]:
+            if not _clean_text(sections.get(sec_key)):
+                sections[sec_key] = _fallback_summary(normalized, source_post)[0] if sec_key == "summary" else "내용 확인 필요"
+        normalized["content_sections"] = sections
+        # To maintain compatibility or allow UI to pick, we optionally don't touch top-level summary,
+        # but let's remove it if it exists so we don't duplicate.
+        if "summary" in normalized and not isinstance(normalized["summary"], list):
+            pass # We leave it for now
+    else:
+        # 과거 데이터: summary 리스트 처리
+        summary_raw = normalized.get("summary", [])
+        if isinstance(summary_raw, str):
+            summary_items = [_clean_text(summary_raw)]
+        elif isinstance(summary_raw, list):
+            summary_items = [_clean_text(item) for item in summary_raw]
+        else:
+            summary_items = []
+            
+        summary_items = [item for item in summary_items if item]
+        if not summary_items:
+            summary_items = _fallback_summary(normalized, source_post)
+            warnings.append("summary fallback applied")
+        normalized["summary"] = summary_items
 
     key_data = normalized.get("keyData")
     key_data_items = []
@@ -253,9 +291,17 @@ def validate_posts(posts: List[Dict[str, Any]]) -> List[str]:
             if not _clean_text(post.get(field)):
                 issues.append(f"{post_id}: missing {field}")
 
-        for field in ["summary", "keyData", "expertOpinions", "checklist"]:
-            if not isinstance(post.get(field), list) or not post.get(field):
+        # "summary" can be missing if "content_sections" is present
+        has_summary = bool(post.get("summary")) or bool(post.get("content_sections"))
+        if not has_summary:
+            issues.append(f"{post_id}: missing summary or content_sections")
+            
+        for field in ["keyData", "expertOpinions", "checklist"]:
+            val = post.get(field)
+            if not val:
                 issues.append(f"{post_id}: missing or empty {field}")
+            elif not isinstance(val, list):
+                issues.append(f"{post_id}: {field} must be a list")
 
     return issues
 

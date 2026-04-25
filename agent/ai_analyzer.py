@@ -128,22 +128,26 @@ def analyze_with_model(post, model_name):
         다음 보도자료를 전문적으로 분석하여 JSON으로 응답하십시오.
         
         [필수 분석 항목]:
-        1. regionalImpact: 지역별(강남, 수도권, 지방 등) 세제 혜택 수치 변화 및 차별적 영향
-        2. yieldImpact: 취득세/재산세/양도세 변화에 따른 실질 투자 수익률(ROI) 및 시장 전망 분석
-        3. evidenceText: 이 분석의 근거가 되는 원문의 핵심 구절 (텍스트로만)
-        
+        1. 핵심 의미 전달: 글머리기호(Bullet points)를 절대 사용하지 말고, 완성된 서술형 단락으로 최소 1,200자 이상 작성할 것.
+        2. 4단 구조(content_sections): 요약, 해석, 시장 영향, 투자자 인사이트를 별도의 서술형 단락으로 구성할 것.
+        3. 정책 분류(post_type): 이 글의 성격에 따라 "insight", "analysis", "opinion" 중 하나를 선택할 것.
+
         제목: {post['title']}
         본문: {original_text[:5000]}
         
         응답 JSON 구조:
         {{
           "headline": "...",
-          "summary": ["..."],
+          "post_type": "insight / analysis / opinion 중 하나",
           "cat": "...",
           "catName": "...",
+          "content_sections": {{
+            "summary": "정책 핵심 요약 (최소 300자 이상, 서술형 문장, 글머리기호 금지)",
+            "meaning": "정책이 의미하는 것과 해석 (최소 300자 이상, 서술형 문장)",
+            "market_impact": "부동산 및 시장 영향 분석 (누가 이득/손해를 보는지, 최소 300자 이상, 서술형 문장)",
+            "investor_insight": "개인/투자자 관점 인사이트와 대응 전략 (최소 300자 이상, 서술형 문장)"
+          }},
           "keyData": [{{ "항목": "...", "수치": "...", "적용대상": "..." }}],
-          "regionalImpact": "...",
-          "yieldImpact": "...",
           "evidenceText": "...",
           "expertOpinions": [{{ "comment": "...", "affiliation": "정책 분석팀" }}],
           "checklist": ["..."]
@@ -187,10 +191,10 @@ def run_pag_pipeline(post, model_name=None):
     제공된 보도자료와 [실제 시장 데이터]를 결합하여 전문적인 인텔리전스 리포트를 JSON으로 추출하십시오.
     
     [가드레일 - 핵심]:
-    1. 지역별 세무 시뮬레이션(Regional Impact): 강남 vs 비강남 등 지역별 공시가격 변화에 따른 '보유세(재산세/종부세) 절감액' 또는 '취득세 부담액'을 수치(원화)로 추정하여 리포팅하십시오.
-    2. 수익률 인사이트(Yield Impact): 취득세/재산세 변화와 현재 금리 환경을 결합하여, 실질 투자 수익률(ROI)이 전후 대비 몇 %p 변화하는지 분석하십시오.
-    3. 근거 명시(Evidence): 분석된 수치와 결론의 근거가 되는 원문의 특정 구절이나 부처 발표 문서명을 'evidenceText' 필드에 텍스트로 명시하십시오.
-    
+    1. 4단 구조 서술형성: 요약, 해석, 시장 영향, 인사이트의 4가지 파트를 반드시 서술형 문장(단락)으로 작성하고, 절대로 글머리기호(Bullet)를 사용하지 마십시오. 파트별 최소 300자 이상 기록해야 합니다.
+    2. 포스트 타입(post_type) 분류: 글 성격에 맞게 insight (일반 정책 해석), analysis (데이터/통계 위주 분석), opinion (주관적/종합적 시장 의견) 중 하나로 자동 배정하십시오.
+    3. 근거 명시(Evidence): 분석된 수치와 결론의 근거가 되는 원문의 특정 구절이나 데이터를 'evidenceText' 필드에 텍스트로 명시하십시오.
+
     {context_str}
     
     [보도자료 제목]: {post['title']}
@@ -199,12 +203,16 @@ def run_pag_pipeline(post, model_name=None):
     반드시 다음 JSON 구조로 응답하십시오:
     {{
       "headline": "보도자료를 관통하는 임팩트 있는 제목",
-      "summary": ["핵심 요약 3줄"],
+      "post_type": "insight / analysis / opinion 중 하나",
       "cat": "category_id",
       "catName": "카테고리명",
+      "content_sections": {{
+        "summary": "정책 핵심 요약 (최소 300자 이상, 서술형 단락, 글머리기호 금지)",
+        "meaning": "정책이 의미하는 것과 행간 해석 (최소 300자 이상, 서술형 단락)",
+        "market_impact": "부동산 및 시장에 미치는 파급력 (최소 300자 이상, 서술형 단락)",
+        "investor_insight": "실수요자/투자자 관점 대응 전략과 인사이트 (최소 300자 이상, 서술형 단락)"
+      }},
       "keyData": [{{ "항목": "상세항목", "수치": "구체적수치", "적용대상": "대상자" }}],
-      "regionalImpact": "실제 수치가 포함된 지역별 세액 변화 분석 결과",
-      "yieldImpact": "ROI 변화폭 및 투자 관점의 전문 리포트",
       "evidenceText": "분석의 근거가 되는 원문 출처 (텍스트로만)",
       "expertOpinions": [{{ "comment": "정책의 핵심을 찌르는 수석 리서처의 총평", "affiliation": "정책 분석팀" }}],
       "checklist": ["투자자/실거주자가 체크해야 할 리스트"]

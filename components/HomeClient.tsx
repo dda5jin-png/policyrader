@@ -225,7 +225,7 @@ function PolicyDetail({ post, onBack }: { post: FullPost; onBack: () => void }) 
     setSavePending(false);
   }, [post.id]);
 
-  const detailUrl = typeof window === 'undefined' ? `/posts/${post.id}` : `${window.location.origin}/posts/${post.id}`;
+  const detailUrl = typeof window === 'undefined' ? `/${post.post_type || "insight"}/${post.id}` : `${window.location.origin}/${post.post_type || "insight"}/${post.id}`;
 
   const copyLink = async () => {
     if (navigator.clipboard) {

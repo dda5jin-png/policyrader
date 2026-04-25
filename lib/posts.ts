@@ -11,6 +11,13 @@ export interface FullPost {
   sourceUrl: string;
   link?: string;
   summary: string[];
+  post_type?: "insight" | "analysis" | "opinion";
+  content_sections?: {
+    summary: string;
+    meaning: string;
+    market_impact: string;
+    investor_insight: string;
+  };
   expertOpinions: Array<{ name: string; affiliation: string; comment: string }>;
   keyData: Array<{ 항목: string; 수치: string; 적용대상: string }>;
   checklist: string[];
@@ -28,6 +35,13 @@ export interface PublicPost {
   source: string;
   sourceUrl: string;
   summary: string[];
+  post_type?: "insight" | "analysis" | "opinion";
+  content_sections?: {
+    summary: string;
+    meaning: string;
+    market_impact: string;
+    investor_insight: string;
+  };
   evidenceText?: string;
 }
 
@@ -62,7 +76,14 @@ function cleanPost(post: FullPost): FullPost {
     source: cleanText(post.source),
     sourceUrl: post.sourceUrl || post.link || "",
     link: post.link,
-    summary: post.summary.map(cleanText),
+    summary: post.summary?.map(cleanText) || [],
+    post_type: post.post_type,
+    content_sections: post.content_sections ? {
+      summary: cleanText(post.content_sections.summary),
+      meaning: cleanText(post.content_sections.meaning),
+      market_impact: cleanText(post.content_sections.market_impact),
+      investor_insight: cleanText(post.content_sections.investor_insight),
+    } : undefined,
     evidenceText: post.evidenceText ? cleanText(post.evidenceText) : undefined,
     regionalImpact: post.regionalImpact ? cleanText(post.regionalImpact) : undefined,
     yieldImpact: post.yieldImpact ? cleanText(post.yieldImpact) : undefined,
@@ -97,6 +118,8 @@ export function toPublicPost(post: FullPost): PublicPost {
     source: post.source,
     sourceUrl: post.sourceUrl,
     summary: post.summary,
+    post_type: post.post_type,
+    content_sections: post.content_sections,
     evidenceText: post.evidenceText,
   };
 }
