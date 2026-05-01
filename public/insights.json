@@ -1,8 +1,8 @@
 {
-  "last_updated": "2026-04-30 08:38:33",
+  "last_updated": "2026-05-01 04:06:49",
   "system_status": {
-    "last_check": "2026-04-30 08:38:33",
-    "daily_scans": 10,
+    "last_check": "2026-05-01 04:06:49",
+    "daily_scans": 11,
     "new_posts": 0,
     "status": "Active"
   },
@@ -11,7 +11,7 @@
     {
       "name": "u-보금자리론",
       "rate": "4.25",
-      "date": "2026-04-30"
+      "date": "2026-05-01"
     }
   ],
   "conforming_rates": [],
