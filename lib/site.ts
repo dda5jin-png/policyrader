@@ -1,2 +1,2 @@
 export const SITE_URL =
-  process.env.NEXT_PUBLIC_SITE_URL || 'https://www.policyradar.co.kr';
+  process.env.NEXT_PUBLIC_SITE_URL || 'https://policyradar.co.kr';

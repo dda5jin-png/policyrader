@@ -7,8 +7,8 @@ import { getAuthState } from "@/lib/auth/session";
 import { SITE_URL } from "@/lib/site";
 
 export const metadata: Metadata = {
-  title: "폴리시레이더 | 부동산 정책 분석·데이터 레퍼런스",
-  description: "국토교통부, 금융위원회, 한국은행 등 공공기관 자료와 통계 지표를 연결해 부동산 정책의 근거, 영향, 확인 항목을 정리합니다.",
+  title: "PolicyRadar | 정책 원문·지표 기반 해설 아카이브",
+  description: "정부·공공기관 정책 원문과 공개 통계를 연결해 정책의 핵심 내용, 관련 지표, 체크리스트, 확인해야 할 쟁점을 정리합니다.",
   keywords: ["부동산정책", "국토부보도자료", "정부부동산정책", "금융정책", "부동산분석", "LTV", "DSR", "국토교통부", "금융위원회", "정책레이더", "청약정책", "임대차법령"],
   authors: [{ name: "Policy Radar Team" }],
   metadataBase: new URL(SITE_URL),
@@ -16,8 +16,8 @@ export const metadata: Metadata = {
     canonical: SITE_URL,
   },
   openGraph: {
-    title: "폴리시레이더 | 부동산 정책 분석·데이터 레퍼런스",
-    description: "공공기관 정책자료와 관련 지표를 문서형 구조로 정리하는 부동산 정책 리서치 플랫폼입니다.",
+    title: "PolicyRadar | 정책 원문·지표 기반 해설 아카이브",
+    description: "공공기관 정책자료와 관련 지표를 문서형 구조로 정리하는 정책 정보 아카이브입니다.",
     url: SITE_URL,
     siteName: "폴리시레이더",
     images: [
@@ -25,7 +25,7 @@ export const metadata: Metadata = {
         url: "/logo.svg",
         width: 1200,
         height: 630,
-        alt: "폴리시레이더 - 정부 부동산 정책 원문 서비스",
+        alt: "PolicyRadar - 정책 원문과 지표 기반 해설 아카이브",
       },
     ],
     locale: "ko_KR",
@@ -33,8 +33,8 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "폴리시레이더 | 부동산 정책 분석·데이터 레퍼런스",
-    description: "공공기관 정책자료와 관련 지표를 문서형 구조로 정리하는 부동산 정책 리서치 플랫폼입니다.",
+    title: "PolicyRadar | 정책 원문·지표 기반 해설 아카이브",
+    description: "공공기관 정책자료와 관련 지표를 문서형 구조로 정리하는 정책 정보 아카이브입니다.",
     images: ["/logo.svg"],
   },
   appleWebApp: {
@@ -51,8 +51,6 @@ export const viewport: Viewport = {
   themeColor: "#ffffff",
   width: "device-width",
   initialScale: 1,
-  maximumScale: 1,
-  userScalable: false,
   viewportFit: "cover",
 };
 

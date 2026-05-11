@@ -26,9 +26,9 @@ export async function generateMetadata({ params }: { params: Promise<{ post_type
     return { title: "정책을 찾을 수 없습니다 | 폴리시레이더" };
   }
 
-  const title = `${decodeHTMLEntities(post.headline)} | 폴리시레이더`;
+  const title = `${decodeHTMLEntities(post.headline)} 핵심 요약과 관련 지표 분석 | PolicyRadar`;
   const description = decodeHTMLEntities(
-    post.content_sections?.summary.slice(0, 160) || post.summary?.join(" ").slice(0, 160) || post.evidenceText || ""
+    `${post.source}이 발표한 ${post.headline}의 핵심 내용, 지원 대상, 시행 시기, 관련 지표, 확인해야 할 체크리스트를 원문 기반으로 정리했습니다.`.slice(0, 160)
   );
   const url = `${SITE_URL}/${post_type}/${post.id}`;
 

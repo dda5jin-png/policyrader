@@ -11,9 +11,13 @@ export async function getAuthState(): Promise<AuthState> {
   }
 
   const supabase = await createServerSupabaseClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const { data, error } = await supabase.auth.getUser();
+
+  if (error) {
+    return { user: null, profile: null };
+  }
+
+  const user = data.user;
 
   if (!user) {
     return { user: null, profile: null };

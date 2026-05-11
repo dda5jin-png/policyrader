@@ -1,4 +1,20 @@
+import type { Metadata } from "next";
+
 import Header from "@/components/Header";
+import { SITE_URL } from "@/lib/site";
+
+export const metadata: Metadata = {
+  title: "문의 | PolicyRadar",
+  description: "PolicyRadar 운영 문의, 오류 제보, 원문 링크 오류 제보, 정책 자료 추천 제보 안내입니다.",
+  alternates: { canonical: `${SITE_URL}/contact` },
+  openGraph: {
+    title: "문의 | PolicyRadar",
+    description: "정책 자료 오류와 원문 링크 오류, 자료 추천을 접수합니다.",
+    url: `${SITE_URL}/contact`,
+    type: "article",
+    locale: "ko_KR",
+  },
+};
 
 export default function ContactPage() {
   return (
@@ -16,7 +32,9 @@ export default function ContactPage() {
               kiap.center@gmail.com
             </a>
           </p>
-          <p>정정 요청 시 정책 제목, 원문 URL, 수정이 필요한 부분, 확인 가능한 근거를 함께 보내면 검토가 빠릅니다.</p>
+          <p>오류 제보는 정책 제목, 원문 URL, 수정이 필요한 부분, 확인 가능한 근거를 함께 보내면 검토가 빠릅니다.</p>
+          <p>원문 링크가 바뀌었거나 삭제된 경우에도 알려주세요. 가능한 경우 정부·공공기관의 새 링크나 보관 가능한 공식 자료를 기준으로 갱신합니다.</p>
+          <p>새로 다루면 좋을 정책 자료 추천도 받습니다. 추천 시 발표 기관, 발표일, 원문 링크, 왜 확인이 필요한 정책인지 간단한 설명을 함께 보내주세요.</p>
         </div>
       </main>
     </>
