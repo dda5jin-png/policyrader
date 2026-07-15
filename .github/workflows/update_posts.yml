@@ -44,6 +44,8 @@ jobs:
         env:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
           DATA_GO_KR_API_KEY: ${{ secrets.DATA_GO_KR_API_KEY }}
+          BOK_ECOS_API_KEY: ${{ secrets.BOK_ECOS_API_KEY }}
+          REB_RONE_API_KEY: ${{ secrets.REB_RONE_API_KEY }}
           ANALYZER_LIMIT_COUNT: ${{ env.ANALYZER_LIMIT_COUNT }}
           ANALYZER_MAX_RETRIES: ${{ env.ANALYZER_MAX_RETRIES }}
           ANALYZER_BETWEEN_POST_DELAY_SECONDS: ${{ env.ANALYZER_BETWEEN_POST_DELAY_SECONDS }}

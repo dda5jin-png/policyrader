@@ -376,8 +376,7 @@ class DataConnector:
                 })
             return accidents
         except Exception:
-            # Mock data for demonstration if API fails or is restricted
-            return [{"region": "전국", "count": "150", "amount": "32000000000"}]
+            return None
 
     def fetch_hf_rates(self):
         """보금자리론 금리 정보를 가져옵니다."""
@@ -389,7 +388,7 @@ class DataConnector:
             root = ET.fromstring(response.content)
             items = root.findall('.//item')
             return [{"name": item.findtext('prdNm', '보금자리론'), "rate": item.findtext('intrt', '4.2'), "date": item.findtext('stdrDt', '')} for item in items]
-        except Exception: return [{"name": "u-보금자리론", "rate": "4.25", "date": datetime.now().strftime("%Y-%m-%d")}]
+        except Exception: return []
 
     def fetch_conforming_loan_rates(self):
         """적격대출 금리 정보를 가져옵니다."""
@@ -428,38 +427,75 @@ class DataConnector:
         
         try:
             response = requests.get(url, params=params, timeout=10)
-            # 법원 경매 API는 매우 복잡하거나 제한적일 수 있음
-            return [{"region": "서울", "auction_count": 45, "sold_count": 12, "sold_rate": 26.7}]
+            response.raise_for_status()
+            # NOTE: 응답 스키마가 안정화되기 전까지는 컨텍스트에 사용하지 않음
+            return []
         except Exception:
             return []
 
-    def get_market_context(self, region_name):
-        """지역 데이터, 금리, 그리고 부동산원 지표 트렌드를 통합 요약합니다."""
-        # 1. 거시 경제 지표 (금리)
-        macro_summary = "[거시 경제 및 시장 지표]\n"
-        base_rate_data = self.fetch_bok_stats("722Y001", "0101000", cycle='D', count=1)
-        if base_rate_data:
-            macro_summary += f"- 한국은행 기준금리: {base_rate_data[0]['DATA_VALUE']}% (공시일: {base_rate_data[0]['TIME']})\n"
-        
-        # 2. 부동산원 시장 심리 지수 (주간/월간 트렌드)
-        # 테이블 ID 예시: A_2024_00072 (매매 대비 전세가격 비율)
-        reb_data = self.fetch_reb_trend("A_2024_00072")
-        if reb_data:
-            # 전국 또는 서울 권역의 최신 데이터 추출
-            latest_reb = next((r for r in reb_data if "서울" in r.get("UNIT_NM", "") or "전국" in r.get("UNIT_NM", "")), reb_data[0])
-            macro_summary += f"- 시장 추세(부동산원): {latest_reb.get('STATBL_NM', '')} {latest_reb.get('DATA_VALUE', '')}% ({latest_reb.get('PRD_DE', '')})\n"
+    def get_market_context(self, region_name=None):
+        """매크로 지표(상시) + 지역 실거래(가능 시)를 통합 요약합니다.
 
-        # 3. 지역 데이터 (매매/전세 실거래)
-        lawd_cd = self.get_lawd_cd(region_name)
+        region_name이 없어도 기준금리·정책대출 금리·부동산원 지표 등
+        매크로 컨텍스트는 항상 생성해 분석 프롬프트에 주입합니다.
+        """
+        lines = []
+
+        # 1. 한국은행 기준금리
+        try:
+            base_rate_data = self.fetch_bok_stats("722Y001", "0101000", cycle='D', count=1)
+            if base_rate_data:
+                lines.append(f"- 한국은행 기준금리: {base_rate_data[0]['DATA_VALUE']}% (기준일 {base_rate_data[0]['TIME']})")
+        except Exception:
+            pass
+
+        # 2. 주택담보대출 금리 (예금은행 신규취급액 기준)
+        try:
+            mortgage_data = self.fetch_bok_stats("121Y006", "BECBLA0302", cycle='M', count=2)
+            if mortgage_data:
+                latest = mortgage_data[-1]
+                lines.append(f"- 예금은행 주택담보대출 금리(신규취급액): {latest['DATA_VALUE']}% ({latest['TIME']})")
+        except Exception:
+            pass
+
+        # 3. 정책 대출 금리 (보금자리론 / 전세자금대출)
+        try:
+            hf = self.fetch_hf_rates()
+            if hf and hf[0].get('rate'):
+                lines.append(f"- {hf[0].get('name', '보금자리론')} 금리: {hf[0].get('rate', '')}% (기준일 {hf[0].get('date', '')})")
+        except Exception:
+            pass
+        try:
+            rent_rates = self.fetch_rent_loan_rates()
+            if rent_rates:
+                lines.append(f"- {rent_rates[0].get('name', '전세자금대출')} 금리: {rent_rates[0].get('rate', '')}% (기준일 {rent_rates[0].get('date', '')})")
+        except Exception:
+            pass
+
+        # 4. 부동산원 지표 트렌드 (매매 대비 전세가격 비율)
+        try:
+            reb_data = self.fetch_reb_trend("A_2024_00072")
+            if reb_data:
+                latest_reb = next((r for r in reb_data if "서울" in r.get("UNIT_NM", "") or "전국" in r.get("UNIT_NM", "")), reb_data[0])
+                lines.append(f"- 시장 추세(한국부동산원): {latest_reb.get('STATBL_NM', '')} {latest_reb.get('DATA_VALUE', '')}% ({latest_reb.get('PRD_DE', '')})")
+        except Exception:
+            pass
+
+        macro_summary = ""
+        if lines:
+            macro_summary = "[거시 경제 및 시장 지표]\n" + "\n".join(lines) + "\n"
+
+        # 5. 지역 실거래 데이터 (지역명이 식별된 경우에만)
+        lawd_cd = self.get_lawd_cd(region_name) if region_name else None
         if not lawd_cd:
-            return macro_summary + f"\n[{region_name}] 상세 시장 데이터(실거래)는 법정동 코드 미등록으로 생략되었습니다."
-        
+            return macro_summary
+
         now = datetime.now()
         months = [
             now.strftime("%Y%m"),
             (now.replace(day=1) - timedelta(days=1)).strftime("%Y%m")
         ]
-        
+
         all_trades = []
         all_rents = []
         for ym in months:
@@ -467,26 +503,28 @@ class DataConnector:
             rents = self.fetch_apt_rents(lawd_cd, ym)
             if trades: all_trades.extend(trades)
             if rents: all_rents.extend(rents)
-        
-        summary = f"\n[{region_name} 실거래 현황 (최근 2개월)]\n"
-        
+
+        summary = f"\n[{region_name} 아파트 실거래 현황 (최근 2개월, 국토부 실거래가 공개시스템)]\n"
+
         if all_trades:
             avg_trade = sum(t['price'] for t in all_trades) / len(all_trades)
             summary += f"- 평균 매매가: {avg_trade:,.0f}만원 ({len(all_trades)}건)\n"
-            
-            # 세금 시뮬레이션 샘플 (평균가 기준)
+
             acq_tax = self.tax_engine.calculate_acquisition_tax(avg_trade)
             summary += f"- [예상 취득세]: {acq_tax:,.0f}만원 (1주택 기준)\n"
-            
+
         jeonse_only = [r for r in all_rents if r['monthly'] == 0]
         if jeonse_only:
             avg_rent = sum(r['deposit'] for r in jeonse_only) / len(jeonse_only)
             summary += f"- 평균 전세가: {avg_rent:,.0f}만원 ({len(jeonse_only)}건)\n"
-            
+
             if all_trades:
                 jeonse_rate = (avg_rent / avg_trade) * 100
                 summary += f"- 실거래 기반 전세가율: {jeonse_rate:.1f}%\n"
-        
+
+        if not all_trades and not jeonse_only:
+            return macro_summary
+
         return macro_summary + summary
 
 if __name__ == "__main__":

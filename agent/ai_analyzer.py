@@ -23,13 +23,15 @@ load_dotenv()
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
 genai.configure(api_key=GEMINI_API_KEY)
 
-# 가장 안정적인 1.5-flash를 시퀀스 처음에 배치하거나 목록에 포함 시킵니다.
-MODELS_TO_TRY = ['gemini-1.5-flash-latest', 'gemini-1.5-pro-latest', 'gemini-2.0-flash']
+# 최신 세대 모델 우선 (1.5 계열은 서비스 종료 단계로 제외)
+MODELS_TO_TRY = ['gemini-2.5-flash', 'gemini-2.5-pro', 'gemini-2.0-flash']
 MAX_ANALYZER_RETRIES = int(os.getenv("ANALYZER_MAX_RETRIES", "3"))
 ANALYZER_RETRY_BUFFER_SECONDS = int(os.getenv("ANALYZER_RETRY_BUFFER_SECONDS", "5"))
 ANALYZER_BETWEEN_POST_DELAY_SECONDS = int(os.getenv("ANALYZER_BETWEEN_POST_DELAY_SECONDS", "30"))
+# 초안 생성 후 자가 검수(2차 패스) 수행 여부
+ANALYZER_REFINE_PASS = os.getenv("ANALYZER_REFINE_PASS", "true").lower() == "true"
 
-def get_model(model_name=None, temperature=0.0):
+def get_model(model_name=None, temperature=0.35):
     generation_config = {
         "temperature": temperature,
         "top_p": 0.95,
@@ -112,62 +114,53 @@ def check_relevance(post, model_name):
     except:
         return True # 오류 발생 시 보수적으로 수집 유지
 
-def analyze_with_model(post, model_name):
-    original_text = post.get('originalText', post.get('original_text', ''))
+ANALYST_PERSONA = """당신은 국내 증권사 리서치센터에서 15년간 부동산·건설 섹터를 담당해 온 수석연구원입니다.
+독자는 실수요자, 임대인·임차인, 개인 투자자이며, 이들은 뉴스 요약이 아니라 '그래서 나에게 어떤 의미인가'를 알고 싶어 합니다.
+당신의 글은 증권사 산업 리포트처럼 데이터에 근거하되, 일반 독자가 이해할 수 있는 문장으로 씁니다."""
 
-    # Lite Mode 처리 (기존 로직 유지)
-    if 'lite' in model_name:
-        # Lite 모드에서도 적합성 검사는 수행
-        if not check_relevance(post, model_name):
-            print(f"  🚫 {model_name}: (Lite) 부동산 정책과 무관하여 필터링합니다.")
-            return "FILTERED"
+STYLE_RULES = """[문체·품질 규칙 - 반드시 준수]
+1. 모든 주장에 근거를 붙일 것. 원문 속 수치·날짜·적용 대상을 최대한 인용하고, [실제 시장 데이터]가 제공되면 그중 최소 2개 지표를 본문 분석에 직접 연결할 것.
+2. 상투적 표현 금지: "귀추가 주목된다", "전략적 함의", "패러다임 전환", "다각적인 노력", "만전을 기하다", "지속적인 모니터링이 필요하다"류의 마무리, "~할 것으로 보인다"의 반복.
+3. 뜬구름 문장 금지: 수치·대상·시점·메커니즘 중 아무것도 담지 않은 문장이 2개 이상 연속되면 안 됨.
+4. 정부 발표문을 옮겨 적지 말고 행간을 해석할 것: 왜 지금 발표했는지, 원문이 말하지 않은 것은 무엇인지, 과거 유사 정책 국면(예: 2017~2022 규제 강화기, 2023~2024 완화기)과 무엇이 다른지.
+5. 수혜 주체와 부담 주체를 구체적으로 구분할 것. "시장에 영향을 줄 것" 대신 "잔금대출을 앞둔 수분양자는 ~, 규제지역 다주택 보유자는 ~"처럼 쓸 것.
+6. 서술형 문단으로 쓰되 한 문단은 3~5문장. 글머리기호(-, ·, 숫자 목록) 금지.
+7. 전문 용어(LTV, DSR, PF 등)는 처음 등장할 때 한 번만 짧게 풀어 쓸 것.
+8. 확실한 사실과 전망을 구분할 것. 전망을 쓸 때는 "~라면 ~가능성" 형태로 조건을 명시할 것."""
 
-        print(f"  ⚡ [Lite Mode] {model_name} 단일 단계 분석을 수행합니다.")
-        prompt = f"""
-        당신은 대한민국 '부동산 및 금융 세무 정책 수석 리서처'입니다. 
-        다음 보도자료를 전문적으로 분석하여 JSON으로 응답하십시오.
-        
-        [필수 분석 항목]:
-        1. 핵심 의미 전달: 글머리기호(Bullet points)를 절대 사용하지 말고, 완성된 서술형 단락으로 최소 1,200자 이상 작성할 것.
-        2. 4단 구조(content_sections): 요약, 해석, 시장 영향, 투자자 인사이트를 별도의 서술형 단락으로 구성할 것.
-        3. 정책 분류(post_type): 이 글의 성격에 따라 "insight", "analysis", "opinion" 중 하나를 선택할 것.
+JSON_SPEC = """반드시 다음 JSON 구조로만 응답하십시오:
+{
+  "headline": "45자 이내. '~전략 분석', '~함의' 같은 보고서식 제목 금지. 핵심 변화와 숫자를 담은 구체적 제목",
+  "post_type": "insight(정책 해석) / analysis(데이터·통계 중심) / opinion(시장 종합 의견) 중 하나",
+  "cat": "F/X/S/T/R/P 중 하나",
+  "catName": "카테고리명",
+  "summary": ["원문 핵심 요점 3~4개. 각 60~120자, 가능한 한 수치 포함"],
+  "content_sections": {
+    "summary": "무엇이 발표됐는지 핵심 사실 정리. 500~800자 서술형 단락",
+    "meaning": "정책의 배경·의도·행간 해석. 왜 지금인지, 무엇이 빠져 있는지. 600~900자",
+    "market_impact": "매매·전세·분양·대출 등 시장 경로별 파급. 수혜/부담 주체 구분. 시장 데이터 지표 연결. 600~900자",
+    "investor_insight": "실수요자/보유자/투자자 각각의 관점에서 확인할 것과 대응 시나리오. 500~800자"
+  },
+  "keyData": [{ "항목": "원문에서 추출한 실제 지표명", "수치": "구체적 수치·기간", "적용대상": "대상자" }],
+  "evidenceText": "분석의 근거가 된 원문 문장 1~3개를 그대로 인용",
+  "expertOpinions": [{ "comment": "정책의 본질을 짚는 4~6문장 총평. 원문 요약 반복 금지", "affiliation": "Policy Radar 리서치" }],
+  "checklist": ["이 정책에만 해당하는 구체적 확인·행동 항목 4~6개. 어느 정책에나 통하는 문구 금지"]
+}
+- keyData는 최소 3개. 원문에 수치가 부족하면 [실제 시장 데이터]의 지표(기준금리, 정책대출 금리 등)를 활용해 채우십시오. 제목을 그대로 반복하는 행 금지."""
 
-        제목: {post['title']}
-        본문: {original_text[:5000]}
-        
-        응답 JSON 구조:
-        {{
-          "headline": "...",
-          "post_type": "insight / analysis / opinion 중 하나",
-          "cat": "...",
-          "catName": "...",
-          "content_sections": {{
-            "summary": "정책 핵심 요약 (최소 300자 이상, 서술형 문장, 글머리기호 금지)",
-            "meaning": "정책이 의미하는 것과 해석 (최소 300자 이상, 서술형 문장)",
-            "market_impact": "부동산 및 시장 영향 분석 (누가 이득/손해를 보는지, 최소 300자 이상, 서술형 문장)",
-            "investor_insight": "개인/투자자 관점 인사이트와 대응 전략 (최소 300자 이상, 서술형 문장)"
-          }},
-          "keyData": [{{ "항목": "...", "수치": "...", "적용대상": "..." }}],
-          "evidenceText": "...",
-          "expertOpinions": [{{ "comment": "...", "affiliation": "정책 분석팀" }}],
-          "checklist": ["..."]
-        }}
-        """
-        model = get_model(model_name)
-        response = model.generate_content(prompt)
-        
-        # 안전하게 텍스트 추출 (Blocked 등의 경우 예외 발생)
-        try:
-            text = response.text
-        except ValueError:
-            # Safety filter 등에 의해 텍스트가 없을 경우
-            print(f"  ⚠️ {model_name} 응답이 비어있거나 차단되었습니다.")
-            return None
-            
-        return json.loads(clean_json_response(text))
+REFINE_PROMPT = """방금 작성한 JSON 초안을 수석연구원 관점에서 스스로 검수하고 수정하십시오.
+검수 기준:
+1. 분량: content_sections.summary 500자 이상, meaning 600자 이상, market_impact 600자 이상, investor_insight 500자 이상. 미달 섹션은 원문과 시장 데이터를 근거로 보강.
+2. 근거 없는 주장은 삭제하거나 원문 인용·데이터로 뒷받침.
+3. 상투 표현·중복 문장 제거.
+4. keyData가 제목이나 요약의 반복이면 원문의 실제 수치로 교체.
+5. checklist가 범용 문구면 이 정책 고유의 행동 항목으로 교체.
+6. headline이 보고서식('~분석', '~함의')이면 구체적 변화 중심으로 다시 작성.
+수정한 최종 JSON만 출력하십시오. JSON 외 다른 텍스트를 붙이지 마십시오."""
 
+def analyze_with_model(post, model_name, skip_relevance=False):
     # 본격적인 분석 전 적합성 검사
-    if not check_relevance(post, model_name):
+    if not skip_relevance and not check_relevance(post, model_name):
         print(f"  🚫 {model_name}: 부동산 정책과 무관한 자료로 판명되어 필터링합니다.")
         return "FILTERED"
 
@@ -178,70 +171,74 @@ def analyze_with_model(post, model_name):
 # ══════════════════════════════════════════════
 
 def run_pag_pipeline(post, model_name=None):
-    """지표 오류 및 환각 방지를 위한 4단계 PAG 자가 검증 파이프라인"""
+    """초안 생성 + 자가 검수 2단계 파이프라인 (시장 데이터 상시 주입)"""
     original_text = post.get('originalText', post.get('original_text', ''))
     connector = DataConnector()
     region = extract_region(post['title'] + " " + original_text[:500])
-    market_context = connector.get_market_context(region) if region else ""
-    context_str = f"\n[참조: 실제 시장 데이터]\n{market_context}\n" if market_context else ""
+    try:
+        market_context = connector.get_market_context(region)
+    except Exception as e:
+        print(f"  ⚠️ 시장 데이터 수집 실패(분석은 계속 진행): {e}")
+        market_context = ""
+    context_str = f"\n[실제 시장 데이터 - 공공기관 API 실시간 조회값]\n{market_context}\n" if market_context else ""
 
-    # [1단계: 베이스라인 생성]
-    baseline_prompt = f"""
-    당신은 대한민국 '부동산 및 금융 세무 정책 수석 리서처'입니다. 
-    제공된 보도자료와 [실제 시장 데이터]를 결합하여 전문적인 인텔리전스 리포트를 JSON으로 추출하십시오.
-    
-    [가드레일 - 핵심]:
-    1. 4단 구조 서술형성: 요약, 해석, 시장 영향, 인사이트의 4가지 파트를 반드시 서술형 문장(단락)으로 작성하고, 절대로 글머리기호(Bullet)를 사용하지 마십시오. 파트별 최소 300자 이상 기록해야 합니다.
-    2. 포스트 타입(post_type) 분류: 글 성격에 맞게 insight (일반 정책 해석), analysis (데이터/통계 위주 분석), opinion (주관적/종합적 시장 의견) 중 하나로 자동 배정하십시오.
-    3. 근거 명시(Evidence): 분석된 수치와 결론의 근거가 되는 원문의 특정 구절이나 데이터를 'evidenceText' 필드에 텍스트로 명시하십시오.
+    baseline_prompt = f"""{ANALYST_PERSONA}
 
-    {context_str}
-    
-    [보도자료 제목]: {post['title']}
-    [보도자료 원문]: {original_text[:10000]}
+제공된 정부 보도자료 원문과 [실제 시장 데이터]를 결합해, 폴리시레이더에 게재할 심층 분석 리포트를 JSON으로 작성하십시오.
 
-    반드시 다음 JSON 구조로 응답하십시오:
-    {{
-      "headline": "보도자료를 관통하는 임팩트 있는 제목",
-      "post_type": "insight / analysis / opinion 중 하나",
-      "cat": "category_id",
-      "catName": "카테고리명",
-      "content_sections": {{
-        "summary": "정책 핵심 요약 (최소 300자 이상, 서술형 단락, 글머리기호 금지)",
-        "meaning": "정책이 의미하는 것과 행간 해석 (최소 300자 이상, 서술형 단락)",
-        "market_impact": "부동산 및 시장에 미치는 파급력 (최소 300자 이상, 서술형 단락)",
-        "investor_insight": "실수요자/투자자 관점 대응 전략과 인사이트 (최소 300자 이상, 서술형 단락)"
-      }},
-      "keyData": [{{ "항목": "상세항목", "수치": "구체적수치", "적용대상": "대상자" }}],
-      "evidenceText": "분석의 근거가 되는 원문 출처 (텍스트로만)",
-      "expertOpinions": [{{ "comment": "정책의 핵심을 찌르는 수석 리서처의 총평", "affiliation": "정책 분석팀" }}],
-      "checklist": ["투자자/실거주자가 체크해야 할 리스트"]
-    }}
-    """
-    
+{STYLE_RULES}
+{context_str}
+[보도자료 제목]: {post['title']}
+[보도자료 발표일]: {post.get('date', '')}
+[발표 기관]: {post.get('source', '')}
+[보도자료 원문]: {original_text[:14000]}
+
+{JSON_SPEC}
+"""
+
     model = get_model(model_name)
     chat = model.start_chat(history=[])
     response = chat.send_message(baseline_prompt)
-    
+
     try:
         text = response.text
     except ValueError:
         print(f"  ⚠️ {model_name} 응답이 비어있거나 차단되었습니다.")
         return None
-        
-    return json.loads(clean_json_response(text))
 
-def analyze_post_with_retry(post):
+    draft = json.loads(clean_json_response(text))
+
+    if not ANALYZER_REFINE_PASS:
+        return draft
+
+    # 2차 자가 검수 패스
+    try:
+        refine_response = chat.send_message(REFINE_PROMPT)
+        refined = json.loads(clean_json_response(refine_response.text))
+        # 검수 결과가 초안보다 얇아지면 초안 유지
+        def _total_len(d):
+            cs = d.get("content_sections") or {}
+            return sum(len(cs.get(k) or "") for k in ["summary", "meaning", "market_impact", "investor_insight"])
+        if _total_len(refined) >= _total_len(draft) * 0.8:
+            print(f"  ✨ 자가 검수 완료 ({_total_len(draft)}자 → {_total_len(refined)}자)")
+            return refined
+        print("  ⚠️ 검수본이 초안보다 부실하여 초안을 유지합니다.")
+        return draft
+    except Exception as e:
+        print(f"  ⚠️ 자가 검수 패스 실패, 초안 사용: {e}")
+        return draft
+
+def analyze_post_with_retry(post, skip_relevance=False):
     """모델 교차 시도 + 할당량 대기 재시도"""
     attempts = 0
     last_error = None
-    model_sequence = ['gemini-1.5-flash-latest', 'gemini-2.0-flash', 'gemini-flash-lite-latest']
+    model_sequence = list(MODELS_TO_TRY)
 
     while attempts < MAX_ANALYZER_RETRIES:
         for model_name in model_sequence:
             try:
                 print(f"  🤖 {model_name} 분석 시도")
-                return analyze_with_model(post, model_name)
+                return analyze_with_model(post, model_name, skip_relevance=skip_relevance)
             except Exception as error:
                 last_error = error
                 if is_quota_error(error):

@@ -38,12 +38,6 @@ export default function PostDetail({ post }: { post: FullPost }) {
             {decodeHTMLEntities(post.headline)}
           </h1>
 
-          <p className="mt-6 text-[1rem] leading-8 text-[var(--text-muted)]">
-            이 문서는 원문 발표 내용과 정책 해석을 분리해 정리한 자료입니다. 정책 개요,
-            핵심 요약, 기대효과 및 시장 영향, 관련 지표, 인사이트, 원문 출처 순서로 구성해
-            동일한 기준에서 다른 정책과 비교할 수 있도록 했습니다.
-          </p>
-
           {/* New 4-part structure */}
           {sections && Object.keys(sections).length > 0 ? (
             <div className="mt-10 space-y-12">
@@ -202,6 +196,24 @@ export default function PostDetail({ post }: { post: FullPost }) {
                   </p>
                 ))}
               </div>
+            </section>
+          ) : null}
+
+          {post.expertOpinions && post.expertOpinions.length > 0 ? (
+            <section className="mt-10">
+              <h2 className="mb-4 text-[0.8rem] font-extrabold uppercase tracking-[1px] text-[var(--accent)]">
+                리서치 총평
+              </h2>
+              {post.expertOpinions.map((opinion, index) => (
+                <div
+                  key={`${post.id}-opinion-${index}`}
+                  className="border-l-4 border-[var(--accent)] bg-slate-50 px-5 py-5"
+                >
+                  <p className="text-[0.98rem] leading-8 text-[var(--text-main)]">
+                    {decodeHTMLEntities(opinion.comment)}
+                  </p>
+                </div>
+              ))}
             </section>
           ) : null}
 

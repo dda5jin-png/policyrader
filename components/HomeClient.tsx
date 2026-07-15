@@ -217,6 +217,10 @@ function PolicyListItem({
 
 function PolicyDetail({ post, onBack }: { post: FullPost; onBack: () => void }) {
   const { user } = useAuth();
+  const sections =
+    post.content_sections && Object.keys(post.content_sections).length > 0
+      ? post.content_sections
+      : null;
   const [saveMessage, setSaveMessage] = React.useState<string | null>(null);
   const [savePending, setSavePending] = React.useState(false);
 
@@ -306,39 +310,96 @@ function PolicyDetail({ post, onBack }: { post: FullPost; onBack: () => void }) 
       </header>
 
       <div className="max-w-4xl space-y-11 py-8">
-        <Section title="정책 개요">
-          <p>{buildOverview(post)}</p>
-        </Section>
+        {sections ? (
+          <>
+            <Section title="정책 핵심 요약">
+              {post.summary.length > 0 ? (
+                <div className="mb-5 space-y-3">
+                  {post.summary.map((summary, index) => (
+                    <div key={`${post.id}-summary-${index}`} className="border-l-4 border-[var(--accent)] bg-rose-50 px-4 py-4">
+                      <p className="text-[0.98rem] leading-8 text-slate-700">{decodeHTMLEntities(summary)}</p>
+                    </div>
+                  ))}
+                </div>
+              ) : null}
+              <p className="whitespace-pre-wrap">{decodeHTMLEntities(sections.summary)}</p>
+            </Section>
 
-        <Section title="핵심 요약">
-          <div className="space-y-3">
-            {post.summary.map((summary, index) => (
-              <div key={`${post.id}-summary-${index}`} className="border-l-4 border-[var(--accent)] bg-rose-50 px-4 py-4">
-                <p className="text-[0.98rem] leading-8 text-slate-700">{decodeHTMLEntities(summary)}</p>
+            <Section title="배경과 행간 해석">
+              <p className="whitespace-pre-wrap">{decodeHTMLEntities(sections.meaning)}</p>
+            </Section>
+
+            <Section title="시장 파급 분석">
+              <p className="whitespace-pre-wrap">{decodeHTMLEntities(sections.market_impact)}</p>
+            </Section>
+
+            <Section title="관련 지표">
+              <DataTable rows={post.keyData} />
+            </Section>
+
+            <Section title="실수요자·투자자 관점">
+              <p className="whitespace-pre-wrap">{decodeHTMLEntities(sections.investor_insight)}</p>
+            </Section>
+
+            {post.expertOpinions.length > 0 ? (
+              <Section title="리서치 총평">
+                {post.expertOpinions.map((opinion, index) => (
+                  <HighlightBox
+                    key={`${post.id}-opinion-${index}`}
+                    title={opinion.affiliation || '정책 리서치'}
+                    body={decodeHTMLEntities(opinion.comment)}
+                  />
+                ))}
+              </Section>
+            ) : null}
+
+            <Section title="확인 체크리스트">
+              <div className="divide-y divide-[var(--border)] border-y border-[var(--border)]">
+                {post.checklist.map((item, index) => (
+                  <p key={`${post.id}-checklist-${index}`} className="py-4 text-[0.98rem] leading-8 text-slate-700">
+                    {decodeHTMLEntities(item)}
+                  </p>
+                ))}
               </div>
-            ))}
-          </div>
-        </Section>
+            </Section>
+          </>
+        ) : (
+          <>
+            <Section title="정책 개요">
+              <p>{buildOverview(post)}</p>
+            </Section>
 
-        <Section title="기대효과 및 시장 영향">
-          <HighlightBox title="정책 기대효과" body={buildImpact(post)} />
-          {post.regionalImpact ? <p className="mt-5">{decodeHTMLEntities(post.regionalImpact)}</p> : null}
-          {post.yieldImpact ? <p className="mt-5">{decodeHTMLEntities(post.yieldImpact)}</p> : null}
-        </Section>
+            <Section title="핵심 요약">
+              <div className="space-y-3">
+                {post.summary.map((summary, index) => (
+                  <div key={`${post.id}-summary-${index}`} className="border-l-4 border-[var(--accent)] bg-rose-50 px-4 py-4">
+                    <p className="text-[0.98rem] leading-8 text-slate-700">{decodeHTMLEntities(summary)}</p>
+                  </div>
+                ))}
+              </div>
+            </Section>
 
-        <Section title="관련 지표">
-          <DataTable rows={post.keyData} />
-        </Section>
+            <Section title="기대효과 및 시장 영향">
+              <HighlightBox title="정책 기대효과" body={buildImpact(post)} />
+              {post.regionalImpact ? <p className="mt-5">{decodeHTMLEntities(post.regionalImpact)}</p> : null}
+              {post.yieldImpact ? <p className="mt-5">{decodeHTMLEntities(post.yieldImpact)}</p> : null}
+            </Section>
 
-        <Section title="인사이트 체크리스트">
-          <div className="divide-y divide-[var(--border)] border-y border-[var(--border)]">
-            {post.checklist.map((item, index) => (
-              <p key={`${post.id}-checklist-${index}`} className="py-4 text-[0.98rem] leading-8 text-slate-700">
-                {decodeHTMLEntities(item)}
-              </p>
-            ))}
-          </div>
-        </Section>
+            <Section title="관련 지표">
+              <DataTable rows={post.keyData} />
+            </Section>
+
+            <Section title="인사이트 체크리스트">
+              <div className="divide-y divide-[var(--border)] border-y border-[var(--border)]">
+                {post.checklist.map((item, index) => (
+                  <p key={`${post.id}-checklist-${index}`} className="py-4 text-[0.98rem] leading-8 text-slate-700">
+                    {decodeHTMLEntities(item)}
+                  </p>
+                ))}
+              </div>
+            </Section>
+          </>
+        )}
 
         <Section title="원문 출처">
           <div className="grid gap-5 border-y border-[var(--border)] py-6 md:grid-cols-[1fr_auto] md:items-center">
