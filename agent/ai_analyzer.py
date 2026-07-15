@@ -24,7 +24,8 @@ GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
 genai.configure(api_key=GEMINI_API_KEY)
 
 # 최신 세대 모델 우선 (1.5 계열은 서비스 종료 단계로 제외)
-MODELS_TO_TRY = ['gemini-2.5-flash', 'gemini-2.5-pro', 'gemini-2.0-flash']
+# 무료 티어 기준: 2.5-pro는 무료 한도가 거의 없어 폴백에서 제외
+MODELS_TO_TRY = ['gemini-2.5-flash', 'gemini-2.0-flash', 'gemini-2.5-flash-lite']
 MAX_ANALYZER_RETRIES = int(os.getenv("ANALYZER_MAX_RETRIES", "3"))
 ANALYZER_RETRY_BUFFER_SECONDS = int(os.getenv("ANALYZER_RETRY_BUFFER_SECONDS", "5"))
 ANALYZER_BETWEEN_POST_DELAY_SECONDS = int(os.getenv("ANALYZER_BETWEEN_POST_DELAY_SECONDS", "30"))
@@ -39,7 +40,7 @@ def get_model(model_name=None, temperature=0.35):
         "response_mime_type": "text/plain",
     }
     # 모델명 결정 (가용성 기반 리스트에서 선택)
-    target_name = model_name if model_name else MODELS_TO_TRY[1]
+    target_name = model_name if model_name else MODELS_TO_TRY[0]
     
     if not target_name.startswith("models/"):
         target_name = f"models/{target_name}"
@@ -62,6 +63,11 @@ def extract_region(text):
 def is_quota_error(error):
     message = str(error).lower()
     return "429" in message or "quota" in message or "rate limit" in message
+
+def is_daily_quota_error(error):
+    """일일 한도(PerDay) 초과 여부. 이 경우 대기 후 재시도가 무의미함."""
+    message = str(error)
+    return "PerDay" in message or "per_day" in message.lower()
 
 def extract_retry_delay_seconds(error):
     message = str(error)
@@ -247,6 +253,9 @@ def analyze_post_with_retry(post, skip_relevance=False):
                 print(f"  ❌ {model_name} 분석 실패: {error}")
 
         if last_error and is_quota_error(last_error):
+            if is_daily_quota_error(last_error):
+                print("  🛑 일일 무료 할당량 소진 감지. 대기해도 오늘은 회복되지 않아 중단합니다.")
+                break
             wait_for_quota_reset(last_error, attempts)
             attempts += 1
             continue
@@ -277,6 +286,9 @@ def run_analyzer(priority_ids=None, limit_count=10):
             result = analyze_post_with_retry(p)
         except Exception as error:
             failed_posts.append({"id": p.get("id"), "title": p.get("title"), "error": str(error)})
+            if is_daily_quota_error(error):
+                print("  🛑 일일 할당량 소진: 남은 자료는 다음 실행에서 처리합니다.")
+                break
             print(f"  ❌ 분석 실패, 다음 자료로 넘어갑니다: {error}")
             continue
 

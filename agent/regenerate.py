@@ -105,6 +105,10 @@ def main():
             result = analyze_post_with_retry(pseudo_raw, skip_relevance=True)
         except Exception as error:
             failed.append({"id": pid, "error": str(error)})
+            from ai_analyzer import is_daily_quota_error
+            if is_daily_quota_error(error):
+                print("  🛑 일일 할당량 소진: 오늘은 여기까지 처리하고 종료합니다.")
+                break
             print(f"  ❌ 분석 실패: {error}")
             continue
 
