@@ -1,31 +1,18 @@
 {
-  "last_updated": "2026-07-15 03:01:01",
+  "last_updated": "2026-07-15 08:43:24",
   "system_status": {
-    "last_check": "2026-07-15 03:01:01",
-    "daily_scans": 11,
-    "new_posts": 1,
+    "last_check": "2026-07-15 08:43:24",
+    "daily_scans": 10,
+    "new_posts": 0,
     "status": "Active"
   },
   "market_indices": {},
-  "loan_rates": [
-    {
-      "name": "u-보금자리론",
-      "rate": "4.25",
-      "date": "2026-07-15"
-    }
-  ],
+  "loan_rates": [],
   "conforming_rates": [],
   "rent_loan_rates": [],
   "lh_notices": [],
   "risk_alerts": [],
-  "auction_stats": [
-    {
-      "region": "서울",
-      "auction_count": 45,
-      "sold_count": 12,
-      "sold_rate": 26.7
-    }
-  ],
+  "auction_stats": [],
   "ai_summary": {
     "pulse_summary": "데이터 수집 완료. 시장 모니터링 중입니다.",
     "checkpoints": [
