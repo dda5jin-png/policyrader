@@ -30,6 +30,11 @@ BLACKLIST_DEPTS = [
 # 공공데이터포털 인증키
 API_KEY = os.getenv("DATA_GO_KR_API_KEY")
 BASE_URL = "https://apis.data.go.kr/1371000/pressReleaseService/pressReleaseList"
+
+# 증분 수집 시 거슬러 올라갈 최대 일수.
+# 글이 안 쌓이면 posts.json 최신일이 고정돼 조회 구간이 매일 하루씩 늘어난다.
+# (2026-07~09 사고: 53일·482건까지 늘어 1회 실행이 21분) 상한으로 악순환을 끊는다.
+INCREMENTAL_MAX_LOOKBACK_DAYS = int(os.getenv("INCREMENTAL_MAX_LOOKBACK_DAYS", "14"))
 POSTS_PATH = "public/posts.json"
 
 def scrape_full_content(url):
@@ -200,6 +205,12 @@ def run_fetcher():
     if last_date and not force_backfill:
         # 증분 수집: 마지막 수집일로부터 3일 전부터 (누락 방지)
         start_date_limit = last_date - timedelta(days=3)
+        oldest_allowed = datetime.now() - timedelta(days=INCREMENTAL_MAX_LOOKBACK_DAYS)
+        if start_date_limit < oldest_allowed:
+            print(f"  ⚠️ 조회 구간이 상한({INCREMENTAL_MAX_LOOKBACK_DAYS}일)을 초과하여 잘라냅니다. "
+                  f"posts.json 최신일={last_date.date()} — 글이 안 쌓이고 있다는 신호입니다.")
+            print(f"     밀린 구간은 FORCE_BACKFILL=true 로 별도 실행해 채우세요.")
+            start_date_limit = oldest_allowed
         max_posts = 15
     else:
         # 최초 수집 또는 강제 백필: 최근 90일치 (약 3개월) 데이터를 수집하여 기반 데이터 확보

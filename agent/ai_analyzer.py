@@ -23,9 +23,47 @@ load_dotenv()
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
 genai.configure(api_key=GEMINI_API_KEY)
 
-# 최신 세대 모델 우선 (1.5 계열은 서비스 종료 단계로 제외)
-# 무료 티어 기준: 2.5-pro는 무료 한도가 거의 없어 폴백에서 제외
-MODELS_TO_TRY = ['gemini-2.5-flash', 'gemini-2.0-flash', 'gemini-2.5-flash-lite']
+# 선호 모델 순서 — 어디까지나 '희망사항'이고, 실제 사용 모델은
+# resolve_models()가 API에 살아있는 모델을 조회해 결정한다.
+#
+# 2026-09-03 사고 기록:
+#   gemini-2.5-flash 은퇴로 고정 목록 3개가 전부 404 → 분석 0건이 7주간 방치됨.
+#   같은 일이 반복되지 않도록 고정 목록에 의존하지 않는다.
+MODEL_PREFERENCE = [
+    'gemini-3.6-flash',
+    'gemini-3-flash',
+    'gemini-2.5-flash',
+    'gemini-2.0-flash',
+]
+_MODEL_CACHE = None
+
+def _available_models():
+    """generateContent를 지원하는, 지금 실제로 살아있는 모델 목록."""
+    global _MODEL_CACHE
+    if _MODEL_CACHE is not None:
+        return _MODEL_CACHE
+    try:
+        names = []
+        for m in genai.list_models():
+            if 'generateContent' in getattr(m, 'supported_generation_methods', []):
+                names.append(m.name.replace('models/', ''))
+        _MODEL_CACHE = names
+    except Exception as e:
+        print(f"  ⚠️ 모델 목록 조회 실패(선호 목록으로 진행): {e}")
+        _MODEL_CACHE = []
+    return _MODEL_CACHE
+
+def resolve_models():
+    """선호 목록 중 살아있는 것만 사용. 전부 은퇴했으면 가용 모델로 자동 대체."""
+    available = _available_models()
+    if not available:
+        return list(MODEL_PREFERENCE)
+    alive = [m for m in MODEL_PREFERENCE if m in available]
+    if alive:
+        return alive
+    auto = sorted((m for m in available if 'flash' in m and 'embedding' not in m), reverse=True)[:3]
+    print(f"  ⚠️ 선호 모델이 모두 사용 불가. 가용 모델로 자동 대체: {auto}")
+    return auto or available[:3]
 MAX_ANALYZER_RETRIES = int(os.getenv("ANALYZER_MAX_RETRIES", "3"))
 ANALYZER_RETRY_BUFFER_SECONDS = int(os.getenv("ANALYZER_RETRY_BUFFER_SECONDS", "5"))
 ANALYZER_BETWEEN_POST_DELAY_SECONDS = int(os.getenv("ANALYZER_BETWEEN_POST_DELAY_SECONDS", "30"))
@@ -40,7 +78,7 @@ def get_model(model_name=None, temperature=0.35):
         "response_mime_type": "text/plain",
     }
     # 모델명 결정 (가용성 기반 리스트에서 선택)
-    target_name = model_name if model_name else MODELS_TO_TRY[0]
+    target_name = model_name if model_name else resolve_models()[0]
     
     if not target_name.startswith("models/"):
         target_name = f"models/{target_name}"
@@ -238,7 +276,7 @@ def analyze_post_with_retry(post, skip_relevance=False):
     """모델 교차 시도 + 할당량 대기 재시도"""
     attempts = 0
     last_error = None
-    model_sequence = list(MODELS_TO_TRY)
+    model_sequence = resolve_models()
 
     while attempts < MAX_ANALYZER_RETRIES:
         for model_name in model_sequence:

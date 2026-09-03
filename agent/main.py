@@ -38,13 +38,20 @@ def main():
 
     # 2. AI 분석 및 posts.json 업데이트
     succeeded_count = 0
+    analysis_stalled = False
     try:
         analyzer_summary = run_analyzer(limit_count=analyzer_limit_count)
         failed_count = len(analyzer_summary.get("failed", []))
         succeeded_count = analyzer_summary.get("succeeded", 0)
-        print(f"✅ [AI Analyzer] 분석 및 posts.json 업데이트 완료 (성공: {succeeded_count}, 실패: {failed_count})")
+        if succeeded_count == 0 and total_fetched > 0:
+            analysis_stalled = True
+            print(f"❌ [AI Analyzer] 후보 {total_fetched}건 중 단 한 건도 생성하지 못했습니다 "
+                  f"(성공: 0, 실패: {failed_count}) — 파이프라인 고장으로 간주합니다.")
+        else:
+            print(f"✅ [AI Analyzer] 분석 및 posts.json 업데이트 완료 (성공: {succeeded_count}, 실패: {failed_count})")
     except Exception as e:
         print(f"❌ [AI Analyzer] 오류 발생: {e}")
+        analysis_stalled = True
         # AI 분석 실패 시에도 상태 기록을 위해 계속 진행 (succeeded_count=0)
 
         
@@ -75,6 +82,12 @@ def main():
     except Exception as e:
         sys.argv = original_argv
         print(f"❌ [Validator] 오류 발생: {e}")
+        sys.exit(1)
+
+    if analysis_stalled:
+        # 초록불로 끝내면 고장을 아무도 모른다 (7주간 방치된 원인).
+        # 워크플로를 실패로 표시해 즉시 드러나게 한다.
+        print("🛑 [Policy Radar] 새 글이 생성되지 않았습니다. 원인 확인이 필요합니다.")
         sys.exit(1)
 
     print("🏁 [Policy Radar] 모든 프로세스 종료")
