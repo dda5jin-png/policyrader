@@ -29,12 +29,29 @@ genai.configure(api_key=GEMINI_API_KEY)
 # 2026-09-03 사고 기록:
 #   gemini-2.5-flash 은퇴로 고정 목록 3개가 전부 404 → 분석 0건이 7주간 방치됨.
 #   같은 일이 반복되지 않도록 고정 목록에 의존하지 않는다.
+# 1순위는 별칭(alias). 구글이 최신 flash로 알아서 연결해 주므로 은퇴가 없다.
+# 뒤쪽은 별칭이 막혔을 때를 대비한 구체 모델(최신순).
+# ⚠️ gemini-2.5-flash 는 list_models 목록에는 남아 있으나 호출 시 404("no longer
+#    available to new users")가 난다. 목록에 있다고 쓸 수 있는 게 아니므로 제외한다.
 MODEL_PREFERENCE = [
+    'gemini-flash-latest',
+    'gemini-3.8-flash',
+    'gemini-3.7-flash',
     'gemini-3.6-flash',
-    'gemini-3-flash',
-    'gemini-2.5-flash',
-    'gemini-2.0-flash',
+    'gemini-3.5-flash',
 ]
+
+# 자동 대체 시 제외할 특수 변형(이미지·음성·실험용 등 텍스트 분석에 부적합)
+_EXCLUDE_KEYWORDS = ('image', 'tts', 'audio', 'vision', 'embedding',
+                     'omni', 'preview', 'exp', 'thinking')
+
+# 목록에는 남아 있으나 호출하면 404가 확인된 모델 (2026-09-03 실측)
+_KNOWN_DEAD = {'gemini-2.5-flash', 'gemini-2.0-flash', 'gemini-2.5-flash-lite'}
+
+def _is_text_flash(name):
+    if name in _KNOWN_DEAD:
+        return False
+    return 'flash' in name and not any(k in name for k in _EXCLUDE_KEYWORDS)
 _MODEL_CACHE = None
 
 def _available_models():
@@ -61,7 +78,11 @@ def resolve_models():
     alive = [m for m in MODEL_PREFERENCE if m in available]
     if alive:
         return alive
-    auto = sorted((m for m in available if 'flash' in m and 'embedding' not in m), reverse=True)[:3]
+    cands = [m for m in available if _is_text_flash(m)]
+    # 'latest' 별칭 우선 → 그다음 lite가 아닌 최신 모델
+    auto = ([m for m in cands if 'latest' in m and 'lite' not in m]
+            + sorted((m for m in cands if 'lite' not in m and 'latest' not in m), reverse=True)
+            + sorted((m for m in cands if 'lite' in m), reverse=True))[:3]
     print(f"  ⚠️ 선호 모델이 모두 사용 불가. 가용 모델로 자동 대체: {auto}")
     return auto or available[:3]
 MAX_ANALYZER_RETRIES = int(os.getenv("ANALYZER_MAX_RETRIES", "3"))
